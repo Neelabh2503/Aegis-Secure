@@ -1,0 +1,7 @@
+In this file, we have the data related to the Elicitation techniques used. They are
+
+- Survey Form
+- Interviews
+- Focus Groups
+- Research
+- Brainstorming
