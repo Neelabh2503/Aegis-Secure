@@ -1,3 +1,5 @@
+Video Link: https://drive.google.com/file/d/1KwWMSoARoAK9YFQFMQA4LysuAz89-ckG/view?usp=sharing
+
 **Interviewee : Poorva Vaishnav( CINS club \- Deputy Convener, DAIICT)**
 
 **Q — Can you tell me if you have ever received suspicious SMS or emails (like scams, OTP fraud, lottery wins, etc.)? How did you deal with them?**
