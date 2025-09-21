@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-# Simple RNN class with 7 layers in total input Layer , 5 hidden layers and output layer
+# Simple Multilayered perceptron class with 7 layers in total input Layer , 5 hidden layers and output layer
 
 class ScamClassifier(nn.Module):
     def __init__(self,input_dim):
@@ -30,3 +30,4 @@ class ScamClassifier(nn.Module):
         )
     def forward(self, x):
         return self.fc(x)
+
