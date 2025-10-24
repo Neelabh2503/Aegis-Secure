@@ -55,24 +55,61 @@ class _HomeScreenState extends State<HomeScreen> {
 
     /// Manual text scoring input
     Future<void> _handleManualInput() async {
-      String inputText = '';
-      final controller = TextEditingController();
+    final controller = TextEditingController();
+    String prediction = ""; 
 
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
+    await showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setStateDialog) => AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           title: const Text("Manual Text Analysis"),
-          content: TextField(
-            controller: controller,
-            maxLines: 3,
-            decoration: const InputDecoration(
-              hintText: "Enter text to get confidence score",
-              border: OutlineInputBorder(),
-            ),
-            onChanged: (val) => inputText = val,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: controller,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  hintText: "Enter text to get prediction",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (prediction.isNotEmpty)
+                Builder(
+                  builder: (_) {
+                    print("DEBUG: prediction value = '$prediction'");
+
+                    return Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: prediction == "SPAM"
+                            ? Colors.red.shade100
+                            : prediction == "HAM"
+                            ? Colors.green.shade100
+                            : Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        prediction,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: prediction == "SPAM"
+                              ? Colors.red
+                              : prediction == "HAM"
+                              ? Colors.green
+                              : Colors.black87,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+            ],
           ),
           actions: [
             TextButton(
@@ -81,19 +118,36 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Analyzing text... (mocked for now)"),
-                  ),
-                );
+                final inputText = controller.text.trim();
+                if (inputText.isEmpty) return;
+
+                setStateDialog(() {
+                  prediction = "Analyzing...";
+                });
+
+                try {
+                  final result = await ApiService.analyzeText(inputText);
+                  final predValue = result['prediction'] ?? "UNKNOWN";
+                  setStateDialog(() {
+                    prediction = predValue
+                        .trim()
+                        .toUpperCase(); 
+                    print("DEBUG: prediction after extraction = '$prediction'");
+                  });
+                } catch (e) {
+                  setStateDialog(() {
+                    prediction = "ERROR";
+                    print("DEBUG: Error fetching prediction = $e");
+                  });
+                }
               },
               child: const Text("Submit"),
             ),
           ],
         ),
-      );
-    }
+      ),
+    );
+  }
 
     return Scaffold(
       backgroundColor: Colors.white,

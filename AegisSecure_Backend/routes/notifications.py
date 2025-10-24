@@ -14,10 +14,27 @@ router = APIRouter()
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
+CYBER_SECURE_URI=os.getenv("CYBER_SECURE_API_URI")
 
 if not GOOGLE_CLIENT_ID or not GOOGLE_CLIENT_SECRET:
     raise Exception("Google OAuth credentials are missing in .env")
 
+async def get_spam_prediction(text: str):
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                CYBER_SECURE_URI,
+                json={"text": text},
+                timeout=60.0
+            )
+            resp.raise_for_status()
+            data = resp.json()
+
+            return data.get("prediction", "unknown")
+    except Exception as e:
+        print("### Spam prediction failed:", repr(e))  
+        return "unknown"
+    
 async def get_access_token_from_refresh(refresh_token: str):
     """Get a new Google access token using the refresh token."""
     async with httpx.AsyncClient() as client:
@@ -33,6 +50,23 @@ async def get_access_token_from_refresh(refresh_token: str):
         data = resp.json()
         return data.get("access_token")
 
+@router.post("/analyze_text")
+async def analyze_text_endpoint(data: dict):
+    text = data.get("text", "")
+    if not text:
+        return {"prediction": "UNKNOWN"}  # empty input
+
+    try:
+        # get_spam_prediction should return "SPAM" or "HAM" as a string
+        prediction = await get_spam_prediction(text)
+        prediction_str = str(prediction).strip().upper()  # ensure consistency
+        if prediction_str not in ["SPAM", "HAM"]:
+            prediction_str = "UNKNOWN"
+        return {"prediction": prediction_str}
+    except Exception as e:
+        print("Error in analyze_text_endpoint:", e)
+        return {"prediction": "UNKNOWN"}
+    
 @router.post("/gmail/notifications")
 async def gmail_notifications(request: Request):
     try:

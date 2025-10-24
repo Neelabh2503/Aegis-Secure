@@ -23,6 +23,24 @@ class ApiService {
     }
   }
 
+  static Future<Map<String, dynamic>> analyzeText(String text) async {
+    final url = Uri.parse('$baseUrl/analyze_text'); // adjust endpoint name
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${await getToken()}',
+      },
+      body: jsonEncode({'text': text}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to analyze text: ${response.body}');
+    }
+  }
+  
   static Future<http.Response> registerUser(
     String name,
     String email,
