@@ -21,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
+    // Basic validation
     setState(() {
       emailError = email.isEmpty ? "Please enter your email" : null;
       passwordError = password.isEmpty ? "Please enter your password" : null;
@@ -32,21 +33,67 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final res = await ApiService.loginUser(email, password);
+
+      print("DEBUG: Response status = ${res.statusCode}");
+      print("DEBUG: Response body = ${res.body}");
+
       if (res.statusCode == 200) {
-        final token = jsonDecode(res.body)['token'];
+        final data = jsonDecode(res.body);
+
+        final token = data['token'];
+        final verifiedRaw = data['verified'];
+
+        // Robust check for verified: bool, string "true", int 1
+        final isVerified =
+            verifiedRaw == true || verifiedRaw == "true" || verifiedRaw == 1;
+
+        print("DEBUG: Raw verified value = $verifiedRaw");
+        print("DEBUG: Parsed isVerified = $isVerified");
+        print("DEBUG: Token = $token");
+
+        if (!isVerified) {
+          setState(() {
+            passwordError = "Please verify your email before logging in.";
+          });
+          return; // Stop login if not verified
+        }
+
+        if (token == null || token.isEmpty) {
+          setState(() {
+            passwordError = "Failed to get authentication token.";
+          });
+          return;
+        }
+
+        // Save token after verified
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('jwt_token', token);
 
+        // Optionally fetch current user, but catch errors safely
+        try {
+          final userRes = await ApiService.fetchCurrentUser();
+          print("DEBUG: Current user = $userRes");
+        } catch (e) {
+          print("DEBUG: Could not fetch current user: $e");
+          // Continue login anyway
+        }
+
+        // Navigate to home
         Navigator.pushReplacementNamed(context, '/home');
-      } else {
+      } else if (res.statusCode == 401 || res.statusCode == 400) {
         setState(() {
           passwordError = "Invalid email or password";
         });
+      } else {
+        setState(() {
+          passwordError = "Unexpected error: ${res.statusCode}";
+        });
       }
     } catch (e) {
+      print("DEBUG: Exception caught during login: $e");
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Error connecting to server")));
+      ).showSnackBar(SnackBar(content: Text("Error connecting to server: $e")));
     } finally {
       setState(() => _loading = false);
     }

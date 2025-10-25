@@ -28,6 +28,7 @@ class LoginRequest(BaseModel):
 
 class LoginResponse(BaseModel):
     token: str
+    verified: bool
 
 
 @router.post("/register")
@@ -55,24 +56,23 @@ async def register_user(req: RegisterRequest):
 
 @router.post("/login", response_model=LoginResponse)
 async def login_user(req: LoginRequest):
-    # Find user by email
     user = await users_col.find_one({"email": req.email})
     if not user:
         raise HTTPException(status_code=400, detail="User not found")
     
-    # Verify password
     if not pwd_context.verify(req.password, user["password"]):
         raise HTTPException(status_code=400, detail="Incorrect password")
     
-    # Create JWT token valid for 12 hours
     payload = {
         "email": user["email"],
         "user_id": str(user["_id"]),
         "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
     }
-    token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
     
-    return {"token": token}
+    token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+    return {"token": token,"verified": user.get("verified", False)}
+
+
 @router.post("/send-otp")
 async def send_otp(req: SendOTPRequest):
     # Check if user exists
