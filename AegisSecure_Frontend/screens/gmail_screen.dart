@@ -90,100 +90,171 @@ class _GmailScreenState extends State<GmailScreen> {
 
   /// Manual text scoring input
   Future<void> _handleManualInput() async {
-    final controller = TextEditingController();
-    String prediction = ""; 
+      final controller = TextEditingController();
+      String prediction = "";
+      String confidence = "";
 
-    await showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setStateDialog) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text("Manual Text Analysis"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: controller,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText: "Enter text to get prediction",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              if (prediction.isNotEmpty)
-                Builder(
-                  builder: (_) {
-                    print("DEBUG: prediction value = '$prediction'");
-
-                    return Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: prediction == "SPAM"
-                            ? Colors.red.shade100
-                            : prediction == "HAM"
-                            ? Colors.green.shade100
-                            : Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(8),
+      await showDialog(
+        context: context,
+        builder: (context) => StatefulBuilder(
+          builder: (context, setStateDialog) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            elevation: 8,
+            title: const Text(
+              "Manual Text Analysis",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
                       ),
-                      child: Text(
-                        prediction, 
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: prediction == "SPAM"
-                              ? Colors.red
-                              : prediction == "HAM"
-                              ? Colors.green
-                              : Colors.black87,
+                    ],
+                  ),
+                  child: TextField(
+                    controller: controller,
+                    maxLines: 4,
+                    style: const TextStyle(fontSize: 16),
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
+                      hintText: "Enter text to analyze...",
+                      hintStyle: TextStyle(color: Colors.grey.shade500),
+                      border: InputBorder.none,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (prediction.isNotEmpty)
+                  Builder(
+                    builder: (_) {
+                      final isSpam = prediction == "SPAM";
+                      final bgColor = isSpam
+                          ? Colors.red.shade50
+                          : Colors.green.shade50;
+                      final textColor = isSpam
+                          ? Colors.red.shade700
+                          : Colors.green.shade700;
+
+                      return Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: bgColor,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSpam
+                                ? Colors.red.shade200
+                                : Colors.green.shade200,
+                          ),
                         ),
-                      ),
-                    );
-                  },
+                        child: Column(
+                          children: [
+                            Text(
+                              prediction,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: textColor,
+                                fontSize: 18,
+                              ),
+                            ),
+                            if (confidence.isNotEmpty)
+                              const SizedBox(height: 6),
+                            if (confidence.isNotEmpty)
+                              Text(
+                                "Confidence: $confidence",
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 14,
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+              ],
+            ),
+            actionsPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.grey.shade700,
                 ),
+                child: const Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final inputText = controller.text.trim();
+                  if (inputText.isEmpty) return;
+
+                  setStateDialog(() {
+                    prediction = "Analyzing...";
+                    confidence = "";
+                  });
+
+                  try {
+                    final result = await ApiService.analyzeText(inputText);
+                    print("DEBUG: Raw API Response = $result");
+
+                    final confStr = result['prediction'] ?? "0.0";
+                    final conf = double.tryParse(confStr) ?? 0.0;
+                    final label = conf >= 0.5 ? "SPAM" : "HAM";
+
+                    setStateDialog(() {
+                      prediction = label;
+                      confidence = conf.toStringAsFixed(2);
+                      print(
+                        "DEBUG: Classified label = $label with confidence = $confidence",
+                      );
+                    });
+                  } catch (e) {
+                    setStateDialog(() {
+                      prediction = "ERROR";
+                      confidence = "";
+                      print("DEBUG: Error fetching prediction = $e");
+                    });
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue.shade600,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                child: const Text("Submit"),
+              ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final inputText = controller.text.trim();
-                if (inputText.isEmpty) return;
-
-                setStateDialog(() {
-                  prediction = "Analyzing...";
-                });
-
-                try {
-                  final result = await ApiService.analyzeText(inputText);
-                  final predValue = result['prediction'] ?? "UNKNOWN";
-
-                  setStateDialog(() {
-                    prediction = predValue
-                        .trim()
-                        .toUpperCase(); 
-                    print("DEBUG: prediction after extraction = '$prediction'");
-                  });
-                } catch (e) {
-                  setStateDialog(() {
-                    prediction = "ERROR";
-                    print("DEBUG: Error fetching prediction = $e");
-                  });
-                }
-              },
-              child: const Text("Submit"),
-            ),
-          ],
         ),
-      ),
-    );
-  }
+      );
+    }
 
   Color _getRandomColor() {
     const colors = [
