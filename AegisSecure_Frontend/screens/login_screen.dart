@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
-
+import '../screens/verify_otp_screen.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -213,6 +213,198 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24), 
+                Align(
+                  alignment: Alignment.center,
+                  child: TextButton(
+                    onPressed: _loading
+                        ? null
+                        : () async {
+                            final outerContext =
+                                context; 
+                            final emailControllerDialog =
+                                TextEditingController();
+
+                            await showDialog(
+                              context: context,
+                              builder: (dialogContext) {
+                                return AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  title: const Text(
+                                    "Verify Your Email",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Text(
+                                        "Enter your registered email address to receive a verification code.",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      TextField(
+                                        controller: emailControllerDialog,
+                                        keyboardType:
+                                            TextInputType.emailAddress,
+                                        decoration: InputDecoration(
+                                          hintText: "ex: user@aegissecure.com",
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 12,
+                                                vertical: 10,
+                                              ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(dialogContext),
+                                      child: const Text(
+                                        "Cancel",
+                                        style: TextStyle(color: Colors.grey),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(
+                                          0xFF1F2A6E,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        final email = emailControllerDialog.text
+                                            .trim();
+                                        if (email.isEmpty) return;
+
+                                        Navigator.pop(
+                                          dialogContext,
+                                        ); 
+                                        Future.microtask(() async {
+                                          setState(() => _loading = true);
+                                          try {
+                                            final resCheck =
+                                                await ApiService.checkEmailVerification(
+                                                  email,
+                                                );
+
+                                            if (resCheck.statusCode == 200) {
+                                              final data = jsonDecode(
+                                                resCheck.body,
+                                              );
+                                              final isVerified =
+                                                  data['verified'] ?? false;
+
+                                              if (isVerified) {
+                                                _showErrorDialog(
+                                                  outerContext,
+                                                  "This email is already verified. Please login instead.",
+                                                );
+                                              } else {
+                                                final resOtp =
+                                                    await ApiService.sendOtp(
+                                                      email,
+                                                    );
+                                                if (resOtp.statusCode == 200) {
+                                                  Navigator.push(
+                                                    outerContext,
+                                                    MaterialPageRoute(
+                                                      builder: (_) =>
+                                                          VerifyOtpScreen(
+                                                            email: email,
+                                                          ),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  _showErrorDialog(
+                                                    outerContext,
+                                                    "Failed to send verification email. Please try again.",
+                                                  );
+                                                }
+                                              }
+                                            } else if (resCheck.statusCode ==
+                                                404) {
+
+                                              final resOtp =
+                                                  await ApiService.sendOtp(
+                                                    email,
+                                                  );
+                                              if (resOtp.statusCode == 200) {
+                                                Navigator.push(
+                                                  outerContext,
+                                                  MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        VerifyOtpScreen(
+                                                          email: email,
+                                                        ),
+                                                  ),
+                                                );
+                                              } else {
+                                                _showErrorDialog(
+                                                  outerContext,
+                                                  "Failed to send verification email. Please try again.",
+                                                );
+                                              }
+                                            } else if (resCheck.statusCode ==
+                                                400) {
+                                              _showErrorDialog(
+                                                outerContext,
+                                                "Email not registered. Please sign up first.",
+                                              );
+                                            } else {
+                                              _showErrorDialog(
+                                                outerContext,
+                                                "Something went wrong. Please try again.",
+                                              );
+                                            }
+                                          } catch (e) {
+                                            _showErrorDialog(
+                                              outerContext,
+                                              "Error connecting to server. Please check your network.",
+                                            );
+                                          } finally {
+                                            setState(() => _loading = false);
+                                          }
+                                        });
+                                      },
+                                      child: const Text(
+                                        "Send Code",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                    child: Text(
+                      "Verify your email",
+                      style: TextStyle(
+                        color: Colors.blue.shade800,
+                        fontWeight: FontWeight.w600,
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                 ),

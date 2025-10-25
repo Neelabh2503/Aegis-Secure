@@ -187,4 +187,44 @@ class ApiService {
       print("⚠️ Can't launch $url");
     }
   }
+
+  static Future<http.Response> sendOtp(String email) async {
+    final url = Uri.parse('$baseUrl/auth/send-otp');
+    return await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+  }
+
+  static Future<http.Response> verifyOtp(String email, String otp) async {
+    final url = Uri.parse('$baseUrl/auth/verify-otp');
+
+    // print("⭐️" + email);
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email.trim(), 'otp': otp.trim()}),
+    );
+
+    // print("🔴 Verify OTP response: ${response.statusCode} -> ${response.body}");
+    return response; 
+  }
+
+  static Future<http.Response> checkEmailVerification(String email) async {
+    final url = Uri.parse('$baseUrl/auth/check-email'); // your backend endpoint
+
+    try {
+      final res = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+      print("Check Email Status: ${res.statusCode}, Body: ${res.body}");
+      return res;
+    } catch (e) {
+      print("Error checking email verification: $e");
+      return http.Response('{"error": "network"}', 500);
+    }
+  }
 }

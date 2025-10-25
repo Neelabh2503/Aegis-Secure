@@ -59,9 +59,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (res.statusCode == 200) {
         //When registeration is completed, ask user to login or take to OTP verification(OTP not implemented right now)
-        Navigator.pushReplacementNamed(
+        Navigator.pushReplacement(
           context,
-          '/login',
+          MaterialPageRoute(builder: (_) => VerifyOtpScreen(email: email)),
         );
       } else {
         setState(() {

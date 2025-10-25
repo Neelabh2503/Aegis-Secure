@@ -95,7 +95,7 @@ async def send_otp(req: SendOTPRequest):
 
 @router.post("/verify-otp")
 async def verify_otp(req: VerifyOTPRequest):
-    print("📩 Incoming OTP verification request:", req.dict())  # Debug incoming payload
+    print("📩 Incoming OTP verification request:", req.dict()) 
 
     try:
         is_valid = await otp.verify_otp_in_db(req.email, req.otp)
