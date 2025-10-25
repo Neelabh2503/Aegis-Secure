@@ -7,7 +7,8 @@ import jwt
 import os
 from dotenv import load_dotenv
 import datetime
-
+from database import auth_db
+from routes import otp
 load_dotenv()
 from database import users_col 
 
@@ -72,3 +73,42 @@ async def login_user(req: LoginRequest):
     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
     
     return {"token": token}
+@router.post("/send-otp")
+async def send_otp(req: SendOTPRequest):
+    # Check if user exists
+    user = await users_col.find_one({"email": req.email})
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+    
+    # Generate OTP
+    otp_code = otp.generate_otp()
+    
+    # Store OTP in DB
+    await otp.store_otp(req.email, otp_code)
+    
+    # Send OTP email
+    sent = await otp.send_otp_email_async(req.email, otp_code)
+    if sent:
+        return {"message": "OTP sent to your email."}
+    else:
+        return {"message": f"OTP generated (dev mode): {otp_code}"}
+
+@router.post("/verify-otp")
+async def verify_otp(req: VerifyOTPRequest):
+    print("📩 Incoming OTP verification request:", req.dict())  # Debug incoming payload
+
+    try:
+        is_valid = await otp.verify_otp_in_db(req.email, req.otp)
+        print(f"🧩 OTP validation result for {req.email}: {is_valid}")
+
+        if not is_valid:
+            raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+
+        await users_col.update_one({"email": req.email}, {"$set": {"verified": True}})
+        print(f"✅ User {req.email} marked as verified")
+
+        return {"message": "OTP verified successfully, user is now verified."}
+
+    except Exception as e:
+        print(f"❌ Exception during OTP verify: {e}")
+        raise
