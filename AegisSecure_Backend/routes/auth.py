@@ -1,16 +1,19 @@
-# routes/auth.py
-
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException,Depends
 from pydantic import BaseModel
 from passlib.context import CryptContext
 import jwt
 import os
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials 
+from pydantic import BaseModel, EmailStr
 from dotenv import load_dotenv
 import datetime
-from database import auth_db
-from routes import otp
+
+security = HTTPBearer()
 load_dotenv()
-from database import users_col 
+from database import users_col ,auth_db 
+from routes import otp
+
+
 
 router = APIRouter()
 JWT_SECRET = os.getenv("JWT_SECRET", "supersecret")  
@@ -18,7 +21,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class RegisterRequest(BaseModel):
-    name: str
+    name:str
     email: str
     password: str
 
@@ -31,27 +34,40 @@ class LoginResponse(BaseModel):
     verified: bool
 
 
+class SendOTPRequest(BaseModel):
+    email: EmailStr
+
+class VerifyOTPRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
+
 @router.post("/register")
 async def register_user(req: RegisterRequest):
-    # Check if email is already registered
     existing = await users_col.find_one({"email": req.email})
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
-    
-    # Hash the password before storing
+    # print("Raw request body:", body.decode())
+    # print("Parsed:", req.dict())
     hashed_password = pwd_context.hash(req.password)
-    
-    # Prepare user document
     user_doc = {
-        "name": req.name,
+        "name": req.name, 
         "email": req.email,
         "password": hashed_password,
         "verified": False,
         "user_id": str(datetime.datetime.now().timestamp())
     }
-    
     await users_col.insert_one(user_doc)
-    return {"message": "User registered. OTP verification pending."}
+    
+
+    otp_code = otp.generate_otp()
+    await otp.store_otp(req.email, otp_code)
+    sent = await otp.send_otp_email_async(req.email, otp_code)
+
+    if sent:
+        return {"message": "User registered. OTP sent to email."}
+    else:
+        return {"message": f"User registered. OTP (dev mode): {otp_code}"}
 
 
 @router.post("/login", response_model=LoginResponse)
@@ -75,18 +91,15 @@ async def login_user(req: LoginRequest):
 
 @router.post("/send-otp")
 async def send_otp(req: SendOTPRequest):
-    # Check if user exists
+    
     user = await users_col.find_one({"email": req.email})
     if not user:
         raise HTTPException(status_code=400, detail="User not found")
     
-    # Generate OTP
+
     otp_code = otp.generate_otp()
     
-    # Store OTP in DB
     await otp.store_otp(req.email, otp_code)
-    
-    # Send OTP email
     sent = await otp.send_otp_email_async(req.email, otp_code)
     if sent:
         return {"message": "OTP sent to your email."}
@@ -112,3 +125,28 @@ async def verify_otp(req: VerifyOTPRequest):
     except Exception as e:
         print(f"❌ Exception during OTP verify: {e}")
         raise
+
+
+def decode_jwt(token: str):
+    try:
+        decoded = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        return decoded
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+
+@router.get("/me")
+async def get_user_info(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    decoded = decode_jwt(token)
+    user = await users_col.find_one({"email": decoded["email"]})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return {
+        "name": user["name"],
+        "email": user["email"],
+        "verified": user.get("verified", False),
+    }

@@ -16,6 +16,17 @@ class GmailScreen extends StatefulWidget {
 }
 
 class _GmailScreenState extends State<GmailScreen> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await loadConnectedAccounts();
+      await loadEmails();
+    });
+  }
+
+  List<String> connectedAccounts = [];
+  String? selectedGmailAccount;
   List<EmailMessage> emails = [];
   String? currentUserName;
   bool _loading = true;
@@ -24,11 +35,112 @@ class _GmailScreenState extends State<GmailScreen> {
   late WebSocketChannel channel;
   final Random _random = Random();
 
+  void _showAccountSwitcher() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                "Switch Gmail Account",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              ...connectedAccounts.map((email) {
+                final isSelected = email == selectedGmailAccount;
+                final color = isSelected
+                    ? Colors.blueAccent
+                    : Colors.grey.shade600;
+                return Container(
+                  color: isSelected ? Colors.blue.shade50 : Colors.transparent,
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: color.withOpacity(0.2),
+                      child: Text(
+                        email[0].toUpperCase(),
+                        style: TextStyle(
+                          color: color,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    title: Text(
+                      email,
+                      style: TextStyle(
+                        color: color,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                    ),
+                    trailing: isSelected
+                        ? const Icon(Icons.check, color: Colors.blueAccent)
+                        : null,
+                    onTap: () async {
+                      Navigator.pop(context);
+                      if (email != selectedGmailAccount) {
+                        setState(() => selectedGmailAccount = email);
+                        await loadEmails();
+                      }
+                    },
+                  ),
+                );
+              }),
+
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.add, color: Colors.blueAccent),
+                title: const Text("Add another account"),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await ApiService.launchGoogleLogin();
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> loadConnectedAccounts() async {
+    try {
+      final res = await ApiService.fetchConnectedAccounts();
+      final accounts = List<String>.from(
+        res['accounts'].map((a) => a['gmail_email']),
+      );
+      setState(() {
+        connectedAccounts = accounts;
+        selectedGmailAccount = accounts.isNotEmpty ? accounts.first : null;
+      });
+    } catch (e) {
+      print("Failed to load connected Gmail accounts: $e");
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     loadCurrentUser();
-    loadEmails();
+    // loadEmails();
+    loadConnectedAccounts().then((_) => loadEmails());
     connectWebSocket();
   }
 
@@ -39,7 +151,6 @@ class _GmailScreenState extends State<GmailScreen> {
     super.dispose();
   }
 
-  /// Fetch logged-in user info from backend
   Future<void> loadCurrentUser() async {
     try {
       final user = await ApiService.fetchCurrentUser();
@@ -53,19 +164,22 @@ class _GmailScreenState extends State<GmailScreen> {
     }
   }
 
-  /// Live WebSocket updates
   void connectWebSocket() async {
     channel = WebSocketChannel.connect(
-      Uri.parse('wss://aidyn-findable-greedily.ngrok-free.dev/ws/emails'),
-      // Uri.parse('wss://aegissecurebackend.onrender.com/ws/emails'),
+      // Uri.parse('wss://aidyn-findable-greedily.ngrok-free.dev/ws/emails'),
+      Uri.parse('wss://aegissecurebackend.onrender.com/ws/emails'),
     );
 
     channel.stream.listen(
-          (event) async {
+      (event) async {
         final data = jsonDecode(event);
-        if (data['new_email'] == true) {
-          print("📩 New mail received → refreshing inbox");
-          final refreshed = await ApiService.fetchEmails();
+        
+        if (data['new_email'] == true &&
+            data['gmail_email'] == selectedGmailAccount) {
+          print("New mail for $selectedGmailAccount → refreshing inbox");
+          final refreshed = await ApiService.fetchEmailsForAccount(
+            selectedGmailAccount!,
+          );
           setState(() {
             emails = refreshed.map((e) => EmailMessage.fromJson(e)).toList();
           });
@@ -79,182 +193,195 @@ class _GmailScreenState extends State<GmailScreen> {
     );
   }
 
+
   Future<void> loadEmails() async {
     setState(() => _loading = true);
-    final data = await ApiService.fetchEmails();
-    setState(() {
-      emails = data.map((e) => EmailMessage.fromJson(e)).toList();
-      _loading = false;
-    });
+
+    if (selectedGmailAccount == null) {
+      setState(() {
+        emails = [];
+        _loading = false;
+      });
+      return;
+    }
+
+    try {
+      final data = await ApiService.fetchEmailsForAccount(
+        selectedGmailAccount!,
+      );
+      setState(() {
+        emails = data.map((e) => EmailMessage.fromJson(e)).toList();
+      });
+    } catch (e) {
+      print("Failed to load emails: $e");
+    } finally {
+      setState(() => _loading = false);
+    }
   }
 
-  /// Manual text scoring input
   Future<void> _handleManualInput() async {
-      final controller = TextEditingController();
-      String prediction = "";
-      String confidence = "";
+    final controller = TextEditingController();
+    String prediction = "";
+    String confidence = "";
 
-      await showDialog(
-        context: context,
-        builder: (context) => StatefulBuilder(
-          builder: (context, setStateDialog) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            elevation: 8,
-            title: const Text(
-              "Manual Text Analysis",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: controller,
-                    maxLines: 4,
-                    style: const TextStyle(fontSize: 16),
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 16,
-                      ),
-                      hintText: "Enter text to analyze...",
-                      hintStyle: TextStyle(color: Colors.grey.shade500),
-                      border: InputBorder.none,
+    await showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setStateDialog) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 8,
+          title: const Text(
+            "Manual Text Analysis",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade300),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
                     ),
+                  ],
+                ),
+                child: TextField(
+                  controller: controller,
+                  maxLines: 4,
+                  style: const TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 16,
+                    ),
+                    hintText: "Enter text to analyze...",
+                    hintStyle: TextStyle(color: Colors.grey.shade500),
+                    border: InputBorder.none,
                   ),
                 ),
-                const SizedBox(height: 16),
-                if (prediction.isNotEmpty)
-                  Builder(
-                    builder: (_) {
-                      final isSpam = prediction == "SPAM";
-                      final bgColor = isSpam
-                          ? Colors.red.shade50
-                          : Colors.green.shade50;
-                      final textColor = isSpam
-                          ? Colors.red.shade700
-                          : Colors.green.shade700;
+              ),
+              const SizedBox(height: 16),
+              if (prediction.isNotEmpty)
+                Builder(
+                  builder: (_) {
+                    final isSpam = prediction == "SPAM";
+                    final bgColor = isSpam
+                        ? Colors.red.shade50
+                        : Colors.green.shade50;
+                    final textColor = isSpam
+                        ? Colors.red.shade700
+                        : Colors.green.shade700;
 
-                      return Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: bgColor,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isSpam
-                                ? Colors.red.shade200
-                                : Colors.green.shade200,
-                          ),
+                    return Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: bgColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSpam
+                              ? Colors.red.shade200
+                              : Colors.green.shade200,
                         ),
-                        child: Column(
-                          children: [
-                            Text(
-                              prediction,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: textColor,
-                                fontSize: 18,
-                              ),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            prediction,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                              fontSize: 18,
                             ),
-                            if (confidence.isNotEmpty)
-                              const SizedBox(height: 6),
-                            if (confidence.isNotEmpty)
-                              Text(
-                                "Confidence: $confidence",
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 14,
-                                ),
-                              ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-              ],
-            ),
-            actionsPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 8,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.grey.shade700,
+                          ),
+                          if (confidence.isNotEmpty) const SizedBox(height: 6),
+                          if (confidence.isNotEmpty)
+                            Text(
+                              "Confidence: $confidence",
+                              style: TextStyle(color: textColor, fontSize: 14),
+                            ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-                child: const Text("Cancel"),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  final inputText = controller.text.trim();
-                  if (inputText.isEmpty) return;
-
-                  setStateDialog(() {
-                    prediction = "Analyzing...";
-                    confidence = "";
-                  });
-
-                  try {
-                    final result = await ApiService.analyzeText(inputText);
-                    print("DEBUG: Raw API Response = $result");
-
-                    final confStr = result['prediction'] ?? "0.0";
-                    final conf = double.tryParse(confStr) ?? 0.0;
-                    final label = conf >= 0.5 ? "SPAM" : "HAM";
-
-                    setStateDialog(() {
-                      prediction = label;
-                      confidence = conf.toStringAsFixed(2);
-                      print(
-                        "DEBUG: Classified label = $label with confidence = $confidence",
-                      );
-                    });
-                  } catch (e) {
-                    setStateDialog(() {
-                      prediction = "ERROR";
-                      confidence = "";
-                      print("DEBUG: Error fetching prediction = $e");
-                    });
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue.shade600,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                child: const Text("Submit"),
-              ),
             ],
           ),
+          actionsPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 8,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.grey.shade700,
+              ),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final inputText = controller.text.trim();
+                if (inputText.isEmpty) return;
+
+                setStateDialog(() {
+                  prediction = "Analyzing...";
+                  confidence = "";
+                });
+
+                try {
+                  final result = await ApiService.analyzeText(inputText);
+                  print("DEBUG: Raw API Response = $result");
+
+                  final confStr = result['prediction'] ?? "0.0";
+                  final conf = double.tryParse(confStr) ?? 0.0;
+                  final label = conf >= 0.5 ? "SPAM" : "HAM";
+
+                  setStateDialog(() {
+                    prediction = label;
+                    confidence = conf.toStringAsFixed(2);
+                    print(
+                      "DEBUG: Classified label = $label with confidence = $confidence",
+                    );
+                  });
+                } catch (e) {
+                  setStateDialog(() {
+                    prediction = "ERROR";
+                    confidence = "";
+                    print("DEBUG: Error fetching prediction = $e");
+                  });
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue.shade600,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              child: const Text("Submit"),
+            ),
+          ],
         ),
-      );
-    }
+      ),
+    );
+  }
+
 
   Color _getRandomColor() {
     const colors = [
@@ -272,12 +399,12 @@ class _GmailScreenState extends State<GmailScreen> {
     return colors[_random.nextInt(colors.length)];
   }
 
-  /// OAuth Gmail Connection Flow
+  
   void _startOauthFlow() {
     Navigator.pushNamed(context, '/oauth');
   }
 
-  /// Navigate back to Home
+
   void _goToHome() {
     Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   }
@@ -297,10 +424,30 @@ class _GmailScreenState extends State<GmailScreen> {
           icon: const Icon(Icons.menu, color: Colors.black87),
           onPressed: () {},
         ),
-        title: const Text(
-          "Inbox",
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Inbox",
+              style: TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              selectedGmailAccount ?? "No email linked",
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
+
         actions: [
           IconButton(
             icon: const Icon(Icons.add, color: Colors.black87),
@@ -326,13 +473,25 @@ class _GmailScreenState extends State<GmailScreen> {
           else
             Padding(
               padding: const EdgeInsets.only(right: 12.0),
-              child: CircleAvatar(
-                backgroundColor: Colors.purple.shade300,
-                child: Text(
-                  firstLetter,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+              child: GestureDetector(
+                onTap: () async {
+                  final selectedEmail = await Navigator.pushNamed(
+                    context,
+                    '/emailAccountManager',
+                  );
+                  if (selectedEmail != null && selectedEmail is String) {
+                    setState(() => selectedGmailAccount = selectedEmail);
+                    await loadEmails();
+                  }
+                },
+                child: CircleAvatar(
+                  backgroundColor: Colors.purple.shade300,
+                  child: Text(
+                    firstLetter,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -340,81 +499,83 @@ class _GmailScreenState extends State<GmailScreen> {
         ],
       ),
 
-
+      /// BODY
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : emails.isEmpty
           ? const Center(child: Text("No emails found"))
           : RefreshIndicator(
-        onRefresh: loadEmails,
-        child: ListView.separated(
-          itemCount: emails.length,
-          separatorBuilder: (_, __) =>
-          const Divider(height: 0, thickness: 0.3),
-          itemBuilder: (context, index) {
-            final email = emails[index];
-            final avatarColor = _getRandomColor();
+              onRefresh: loadEmails,
+              child: ListView.separated(
+                itemCount: emails.length,
+                separatorBuilder: (_, __) =>
+                    const Divider(height: 0, thickness: 0.3),
+                itemBuilder: (context, index) {
+                  final email = emails[index];
+                  final avatarColor = _getRandomColor();
 
-            return ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
-              leading: CircleAvatar(
-                backgroundColor: avatarColor,
-                child: Text(
-                  email.sender.isNotEmpty
-                      ? email.sender[0].toUpperCase()
-                      : '?',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              title: Text(
-                email.sender,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    email.subject.isEmpty
-                        ? "(No Subject)"
-                        : email.subject,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                  return ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    email.snippet,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 13,
+                    leading: CircleAvatar(
+                      backgroundColor: avatarColor,
+                      child: Text(
+                        email.sender.isNotEmpty
+                            ? email.sender[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 42,
-                    height: 22,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(10),
+                    title: Text(
+                      email.sender,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
-                    alignment: Alignment.center,
-                    child: Text(
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          email.subject.isEmpty
+                              ? "(No Subject)"
+                              : email.subject,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          email.snippet,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: 42,
+                          height: 22,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          alignment: Alignment.center,
+
+                          // ----------
+                          child: Text(
                             email.spamPrediction?.toUpperCase() ?? "UNKNOWN",
                             style: const TextStyle(
                               fontSize: 12,
@@ -422,20 +583,21 @@ class _GmailScreenState extends State<GmailScreen> {
                               color: Colors.black87,
                             ),
                           ),
-                  ),
-                  const Icon(
-                    Icons.more_vert,
-                    size: 20,
-                    color: Colors.grey,
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
 
-      /// FLOATING OAUTH BUTTON
+                          // ----------
+                        ),
+                        const Icon(
+                          Icons.more_vert,
+                          size: 20,
+                          color: Colors.grey,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await ApiService.launchGoogleLogin();
@@ -445,7 +607,6 @@ class _GmailScreenState extends State<GmailScreen> {
         child: const Icon(Icons.add, size: 28, color: Colors.white),
       ),
 
-      /// GMAIL BOTTON BUTTON
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         decoration: BoxDecoration(

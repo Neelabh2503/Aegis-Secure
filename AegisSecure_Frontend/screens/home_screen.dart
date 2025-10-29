@@ -52,6 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final firstLetter = (currentUserName != null && currentUserName!.isNotEmpty)
         ? currentUserName![0].toUpperCase()
         : '?';
+
+    /// Manual text scoring input
     Future<void> _handleManualInput() async {
       final controller = TextEditingController();
       String prediction = "";
@@ -238,6 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
             tooltip: "Manual text input",
             onPressed: _handleManualInput,
           ),
+
           IconButton(
             icon: const Icon(Icons.search, color: Colors.black87),
             onPressed: () {},
@@ -282,6 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+
           Positioned(
             right: 20,
             bottom: 80, 
@@ -324,7 +328,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const Icon(
                 Icons.home_outlined,
-                color: Colors.blue,
+                color: Colors.blue, 
                 size: 28,
               ),
               GestureDetector(

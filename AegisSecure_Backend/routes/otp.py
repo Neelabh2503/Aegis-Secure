@@ -15,14 +15,13 @@ from database import auth_db
 OTP_EXPIRE_MINUTES = int(os.getenv("OTP_EXPIRE_MINUTES", "10"))
 otp_col = auth_db.otps
 
-SMTP_EMAIL = os.getenv("SMTP_EMAIL") 
-REFRESH_TOKEN = os.getenv("REFRESH_TOKEN")  # Gmail API refresh token
+SMTP_EMAIL = os.getenv("SMTP_EMAIL")  
+REFRESH_TOKEN = os.getenv("REFRESH_TOKEN") 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 
-
 async def get_access_token_from_refresh(refresh_token: str) -> str:
-    """Get new access token from refresh token."""
+
     async with httpx.AsyncClient() as client:
         resp = await client.post(
             "https://oauth2.googleapis.com/token",
@@ -38,7 +37,6 @@ async def get_access_token_from_refresh(refresh_token: str) -> str:
 
 
 async def send_gmail_email(access_token: str, to_email: str, subject: str, body: str):
-    """Send an email via Gmail API."""
     message = MIMEText(body, "html")
     message["to"] = to_email
     message["from"] = SMTP_EMAIL
@@ -87,7 +85,7 @@ async def send_otp_email_async(to_email: str, otp: str) -> bool:
         return True
     except Exception as e:
         print("❌ Failed to send OTP via Gmail API:", e)
-       
+        # print(f"[DEV OTP] {to_email} -> {otp}")
         return False
 
 

@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../services/api_service.dart';
-import '../screens/verify_otp_screen.dart';
 
+import '../screens/verify_otp_screen.dart';
+import '../services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -16,6 +16,27 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _loading = false;
   String? emailError;
   String? passwordError;
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+            "Error",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void login() async {
     final email = emailController.text.trim();
@@ -42,8 +63,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
         final token = data['token'];
         final verifiedRaw = data['verified'];
-
-        // Robust check for verified: bool, string "true", int 1
         final isVerified =
             verifiedRaw == true || verifiedRaw == "true" || verifiedRaw == 1;
 
@@ -55,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() {
             passwordError = "Please verify your email before logging in.";
           });
-          return; // Stop login if not verified
+          return; 
         }
 
         if (token == null || token.isEmpty) {
@@ -65,20 +84,20 @@ class _LoginScreenState extends State<LoginScreen> {
           return;
         }
 
-        // Save token after verified
+      
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('jwt_token', token);
 
-        // Optionally fetch current user, but catch errors safely
+       
         try {
           final userRes = await ApiService.fetchCurrentUser();
           print("DEBUG: Current user = $userRes");
         } catch (e) {
           print("DEBUG: Could not fetch current user: $e");
-          // Continue login anyway
+          
         }
 
-        // Navigate to home
+       
         Navigator.pushReplacementNamed(context, '/home');
       } else if (res.statusCode == 401 || res.statusCode == 400) {
         setState(() {
@@ -99,11 +118,10 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-//building the page
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, 
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -111,40 +129,31 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Placehilder for Logo currently
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue.shade900, width: 2),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "A",
-                      style: TextStyle(
-                        color: Colors.blue.shade900,
-                        fontSize: 36,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                // Logo
+                SizedBox(
+                  height: MediaQuery.of(context).size.width * 0.70,
+                  width: MediaQuery.of(context).size.width * 0.70,
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    fit: BoxFit.contain,
                   ),
                 ),
-
-                SizedBox(height: 24),
+               
                 RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
                     text: "Aegis ",
                     style: TextStyle(
+                      fontFamily: 'Jersey20',
                       color: Colors.blue.shade900,
-                      fontSize: 32,
+                      fontSize: 40,
                       fontWeight: FontWeight.w800,
                     ),
                     children: [
                       TextSpan(
                         text: "Secure",
                         style: TextStyle(
+                          fontFamily: 'Jersey20',
                           color: Colors.grey.shade600,
                           fontWeight: FontWeight.w600,
                         ),
@@ -154,7 +163,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
 
                 SizedBox(height: 16),
-
                 Text(
                   "Sign in your account",
                   style: TextStyle(
@@ -166,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 SizedBox(height: 32),
 
-                // Input for Email 
+               
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
@@ -183,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 SizedBox(height: 16),
 
-                // Input for Password with check for 8 character long currrntly, check is applied in backend
+                // Password Field
                 TextField(
                   controller: passwordController,
                   obscureText: true,
@@ -199,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 SizedBox(height: 28),
 
-                // Button for Signing in
+                
                 _loading
                     ? CircularProgressIndicator()
                     : ElevatedButton(
@@ -223,8 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
 
                 SizedBox(height: 20),
-                
-                //log in with Saved Ids
+
                 Text(
                   "or sign in with",
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
@@ -232,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 SizedBox(height: 12),
 
-                // Mail and PhoneNumber Social Icons
+                // Social Icons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -244,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 SizedBox(height: 24),
 
-                // Option to SignUp takes to Register_screen.dart where SignUp process can be done
+                // Sign Up Link
                 GestureDetector(
                   onTap: () => Navigator.pushNamed(context, '/register'),
                   child: RichText(
@@ -263,6 +270,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
+
+                
                 const SizedBox(height: 24), 
                 Align(
                   alignment: Alignment.center,
@@ -392,7 +401,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                               }
                                             } else if (resCheck.statusCode ==
                                                 404) {
-
                                               final resOtp =
                                                   await ApiService.sendOtp(
                                                     email,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import '../screens/verify_otp_screen.dart';
 import '../services/api_service.dart';
-
-
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -58,13 +57,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final res = await ApiService.registerUser(name, email, password);
 
       if (res.statusCode == 200) {
-        //When registeration is completed, ask user to login or take to OTP verification(OTP not implemented right now)
+        // When registeration is completed, ask user to login or take to OTP verification(OTP not implemented right now)
+        // Navigator.pushReplacementNamed(context, '/login');
+
+        // ---⭐️
+        print('✅' + email);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => VerifyOtpScreen(email: email)),
         );
       } else {
         setState(() {
+          print(res.statusCode);
           emailError = "Registration failed, please try again";
         });
       }
@@ -81,7 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, 
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -155,7 +159,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
 
-                SizedBox(height: 16),//SizedBox are used for spacing between fields
+                SizedBox(
+                  height: 16,
+                ), //SizedBox are used for spacing between fields
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(

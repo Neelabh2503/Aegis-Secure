@@ -4,13 +4,15 @@ from database import messages_col, accounts_col
 import os
 from jose import jwt
 from dotenv import load_dotenv
-import base64, json
+from .notifications import get_spam_prediction
+from datetime import datetime
 from websocket_manager import broadcast_new_email
+import base64, json
 
 load_dotenv()
 router = APIRouter()
 
-# Env variables
+
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
@@ -82,22 +84,28 @@ async def google_callback(code: str, state: str = None):
         if not access_token:
             raise HTTPException(status_code=400, detail="Failed to get access token")
 
-        # Get email
+
         profile_resp = await client.get(
             "https://www.googleapis.com/gmail/v1/users/me/profile",
-            headers={"Authorization": f"Bearer {access_token}"}
-        )
+            headers={"Authorization": f"Bearer {access_token}"})
         gmail_email = profile_resp.json().get("emailAddress")
 
-        # Save refresh token
+    
         if refresh_token:
             await accounts_col.update_one(
                 {"user_id": user_id, "gmail_email": gmail_email},
                 {"$set": {"refresh_token": refresh_token}},
-                upsert=True
+                upsert=True)
+        else:
+            await accounts_col.update_one(
+                {"user_id": user_id, "gmail_email": gmail_email},
+                {
+                    "$setOnInsert": {"connected_at": datetime.utcnow()},
+                },
+                upsert=True,
             )
 
-        # Fetch last 10 messages
+
         messages_resp = await client.get(
             "https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=10",
             headers={"Authorization": f"Bearer {access_token}"}
@@ -112,6 +120,12 @@ async def google_callback(code: str, state: str = None):
                 headers={"Authorization": f"Bearer {access_token}"}
             )
             msg_data = msg_resp.json()
+            subject = next((h["value"] for h in msg_data["payload"]["headers"] if h["name"] == "Subject"), "")
+            sender = next((h["value"] for h in msg_data["payload"]["headers"] if h["name"] == "From"), "")
+            snippet = msg_data.get("snippet", "")
+            combined_text = f"{subject} {snippet}"
+            spam_prediction = await get_spam_prediction(combined_text)
+
             emails.append({
                 "gmail_id": msg_id,
                 "gmail_email": gmail_email,
@@ -120,9 +134,10 @@ async def google_callback(code: str, state: str = None):
                 "from": next((h["value"] for h in msg_data["payload"]["headers"] if h["name"]=="From"), ""),
                 "snippet": msg_data.get("snippet", ""),
                 "timestamp": int(msg_data["internalDate"]),
+                "spam_prediction": spam_prediction, 
             })
 
-        # Save messages in DB
+        
         for email in emails:
             await messages_col.update_one(
                 {"user_id": user_id, "gmail_email": gmail_email, "gmail_id": email["gmail_id"]},
@@ -130,7 +145,6 @@ async def google_callback(code: str, state: str = None):
                 upsert=True
             )
 
-        # Start Gmail watch
         topic_name = "projects/emailfetchingcheckandlearn/topics/AegisSecureMails"
         watch_resp = await client.post(
             "https://gmail.googleapis.com/gmail/v1/users/me/watch",

@@ -3,7 +3,8 @@ class EmailMessage {
   final String subject;
   final String snippet;
   final DateTime timestamp;
-  final String? spamPrediction;
+  final String? spamPrediction; 
+
   EmailMessage({
     required this.sender,
     required this.subject,
@@ -19,7 +20,8 @@ class EmailMessage {
       subject: json['subject'] ?? '',
       snippet: json['snippet'] ?? '',
       timestamp: DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true).toLocal(),
-      spamPrediction:json['spam_prediction'] ?? json['prediction'] ?? "unknown",
+      spamPrediction:
+          json['spam_prediction'] ?? json['prediction'] ?? "unknown", 
     );
   }
 }
