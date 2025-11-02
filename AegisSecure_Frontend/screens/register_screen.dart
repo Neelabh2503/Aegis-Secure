@@ -13,8 +13,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
+  bool _showPassword = false;
+  bool _showConfirmPassword = false;
   bool _loading = false;
   bool _agree = false;
+
+  bool _showPasswordInfo = false;
+  bool hasSpecialChar = false;
+  bool hasUppercase = false;
+  bool hasLowercase = false;
+  bool hasNumber = false;
+  bool hasMinLength = false;
+
+  Widget _buildPasswordRule(String text, bool satisfied) {
+    return Row(
+      children: [
+        Icon(
+          satisfied ? Icons.check_circle : Icons.cancel,
+          color: satisfied ? Colors.green : Colors.red,
+          size: 18,
+        ),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: TextStyle(
+            color: satisfied ? Colors.green : Colors.red,
+            fontSize: 13,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _validatePassword(String password) {
+    setState(() {
+      hasUppercase = password.contains(RegExp(r'[A-Z]'));
+      hasLowercase = password.contains(RegExp(r'[a-z]'));
+      hasNumber = password.contains(RegExp(r'[0-9]'));
+      hasSpecialChar = password.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'));
+      hasMinLength = password.length >= 8;
+    });
+  }
 
   String? nameError;
   String? emailError;
@@ -57,10 +96,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final res = await ApiService.registerUser(name, email, password);
 
       if (res.statusCode == 200) {
-        // When registeration is completed, ask user to login or take to OTP verification(OTP not implemented right now)
-        // Navigator.pushReplacementNamed(context, '/login');
-
-        // ---⭐️
         print('✅' + email);
         Navigator.pushReplacement(
           context,
@@ -89,30 +124,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Placeholder for Logo
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue.shade900, width: 2),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "A",
-                      style: TextStyle(
-                        color: Colors.blue.shade900,
-                        fontSize: 36,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-
+                // SizedBox(
+                //   height: MediaQuery.of(context).size.width * 0.30,
+                //   width: MediaQuery.of(context).size.width * 0.30,
+                //   child: Image.asset(
+                //     'assets/images/logo.png',
+                //     fit: BoxFit.contain,
+                //   ),
+                // ),
                 SizedBox(height: 24),
                 RichText(
                   textAlign: TextAlign.center,
@@ -120,7 +144,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     text: "Aegis ",
                     style: TextStyle(
                       color: Colors.blue.shade900,
-                      fontSize: 32,
+                      fontSize: 36,
                       fontWeight: FontWeight.w800,
                     ),
                     children: [
@@ -161,7 +185,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 SizedBox(
                   height: 16,
-                ), //SizedBox are used for spacing between fields
+                ), 
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
@@ -177,23 +201,95 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
 
                 SizedBox(height: 16),
-                TextField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    errorText: passwordError,
-                    labelStyle: TextStyle(color: Colors.grey.shade700),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
 
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: passwordController,
+                            obscureText: !_showPassword,
+                            onChanged: _validatePassword,
+                            decoration: InputDecoration(
+                              labelText: "Password",
+                              errorText: passwordError,
+                              labelStyle: TextStyle(
+                                color: Colors.grey.shade700,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              suffixIcon: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.info_outline),
+                                    color: Colors.blueGrey,
+                                    onPressed: () {
+                                      setState(() {
+                                        _showPasswordInfo = !_showPasswordInfo;
+                                      });
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      _showPassword
+                                          ? Icons.visibility
+                                          : Icons.visibility_off_outlined,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _showPassword = !_showPassword;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (_showPasswordInfo)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8, left: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildPasswordRule(
+                              "At least 8 characters",
+                              hasMinLength,
+                            ),
+                            _buildPasswordRule(
+                              "At least one uppercase letter",
+                              hasUppercase,
+                            ),
+                            _buildPasswordRule(
+                              "At least one lowercase letter",
+                              hasLowercase,
+                            ),
+                            _buildPasswordRule(
+                              "At least one special character",
+                              hasSpecialChar,
+                            ),
+                            _buildPasswordRule(
+                              "At least one number",
+                              hasNumber,
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
                 SizedBox(height: 16),
+
+                // Confirm Password field
                 TextField(
                   controller: confirmPasswordController,
-                  obscureText: true,
+                  obscureText: !_showConfirmPassword,
                   decoration: InputDecoration(
                     labelText: "Confirm Password",
                     errorText: confirmError,
@@ -201,16 +297,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _showConfirmPassword
+                            ? Icons.visibility
+                            : Icons.visibility_off_outlined,
+                        color: Colors.grey.shade600,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _showConfirmPassword = !_showConfirmPassword;
+                        });
+                      },
+                    ),
                   ),
                 ),
 
                 SizedBox(height: 16),
-
-                //Checkbox for temrs and conditions, we will add the Terms Later on
                 Row(
                   children: [
                     Checkbox(
                       value: _agree,
+                      activeColor: Color(0xFF1F2A6E),
                       onChanged: (val) {
                         setState(() => _agree = val ?? false);
                       },
@@ -249,20 +357,53 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
 
-                SizedBox(height: 20),
+                SizedBox(height: 5),
 
                 Text(
-                  "or sign up with",
+                  "OR",
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                 ),
 
-                SizedBox(height: 12),
+                SizedBox(height: 5),
+
+                // Social Icons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _socialButton(Icons.mail_outline),
-                    SizedBox(width: 25),
-                    _socialButton(Icons.phone_outlined),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        // Placeholder for now
+                      },
+                      icon: Image.asset(
+                        'assets/images/google_logo.png',
+                        height: 24,
+                        width: 24,
+                      ),
+                      label: const Text(
+                        "Sign in with Google",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        elevation: 0, // Remove shadow
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: const BorderSide(color: Colors.grey),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        foregroundColor: Colors.white,
+                        surfaceTintColor: Colors.transparent,
+                        shadowColor:
+                            Colors.transparent, // no extra color overlay
+                      ),
+                    ),
                   ],
                 ),
 

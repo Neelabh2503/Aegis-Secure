@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/api_service.dart';
+import '../widgets/sidebar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -43,8 +44,8 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.pushNamedAndRemoveUntil(context, '/gmail', (route) => false);
   }
 
-  void _goToChat() {
-    Navigator.pushNamedAndRemoveUntil(context, '/chat', (route) => false);
+  void _goToSms() {
+    Navigator.pushNamedAndRemoveUntil(context, '/sms', (route) => false);
   }
 
   @override
@@ -52,8 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final firstLetter = (currentUserName != null && currentUserName!.isNotEmpty)
         ? currentUserName![0].toUpperCase()
         : '?';
-
-    /// Manual text scoring input
     Future<void> _handleManualInput() async {
       final controller = TextEditingController();
       String prediction = "";
@@ -228,7 +227,47 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.menu, color: Colors.black87),
-          onPressed: () {},
+          onPressed: () {
+            showGeneralDialog(
+              context: context,
+              barrierDismissible: true,
+              barrierLabel: '',
+              barrierColor: Colors.black54.withOpacity(0.3),
+              transitionDuration: const Duration(milliseconds: 300),
+              pageBuilder: (context, anim1, anim2) {
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: Sidebar(
+                    onClose: () => Navigator.of(context).pop(),
+                    onHomeTap: () {
+                      Navigator.of(context).pop(); 
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("You are already on Home!"),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+              transitionBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return SlideTransition(
+                      position:
+                          Tween(
+                            begin: const Offset(-1, 0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOutCubic,
+                            ),
+                          ),
+                      child: child,
+                    );
+                  },
+            );
+          },
         ),
         title: const Text(
           "Analytics",
@@ -240,7 +279,6 @@ class _HomeScreenState extends State<HomeScreen> {
             tooltip: "Manual text input",
             onPressed: _handleManualInput,
           ),
-
           IconButton(
             icon: const Icon(Icons.search, color: Colors.black87),
             onPressed: () {},
@@ -285,10 +323,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-
           Positioned(
             right: 20,
-            bottom: 80, 
+            bottom: 80,
             child: FloatingActionButton(
               onPressed: () => _logout(context),
               backgroundColor: Colors.redAccent,
@@ -297,51 +334,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade300,
-              blurRadius: 6,
-              offset: const Offset(0, -2),
-            ),
-          ],
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(10),
-            topRight: Radius.circular(10),
-          ),
-        ),
-        child: SafeArea(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              GestureDetector(
-                onTap: _goToGmail,
-                child: const Icon(
-                  Icons.mail_outline,
-                  color: Colors.grey,
-                  size: 28,
-                ),
-              ),
-              const Icon(
-                Icons.home_outlined,
-                color: Colors.blue, 
-                size: 28,
-              ),
-              GestureDetector(
-                onTap: _goToChat,
-                child: const Icon(
-                  Icons.chat_bubble_outline,
-                  color: Colors.grey,
-                  size: 28,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

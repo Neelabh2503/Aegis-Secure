@@ -7,6 +7,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../models/gmail_model.dart';
 import '../services/api_service.dart';
+import '../widgets/sidebar.dart';
 
 class GmailScreen extends StatefulWidget {
   const GmailScreen({Key? key}) : super(key: key);
@@ -19,6 +20,7 @@ class _GmailScreenState extends State<GmailScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // Called when this screen reappears
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await loadConnectedAccounts();
       await loadEmails();
@@ -131,7 +133,7 @@ class _GmailScreenState extends State<GmailScreen> {
         selectedGmailAccount = accounts.isNotEmpty ? accounts.first : null;
       });
     } catch (e) {
-      print("Failed to load connected Gmail accounts: $e");
+      print("⚠️ Failed to load connected Gmail accounts: $e");
     }
   }
 
@@ -150,7 +152,6 @@ class _GmailScreenState extends State<GmailScreen> {
     channel.sink.close();
     super.dispose();
   }
-
   Future<void> loadCurrentUser() async {
     try {
       final user = await ApiService.fetchCurrentUser();
@@ -163,7 +164,6 @@ class _GmailScreenState extends State<GmailScreen> {
       setState(() => _userLoading = false);
     }
   }
-
   void connectWebSocket() async {
     channel = WebSocketChannel.connect(
       // Uri.parse('wss://aidyn-findable-greedily.ngrok-free.dev/ws/emails'),
@@ -173,10 +173,9 @@ class _GmailScreenState extends State<GmailScreen> {
     channel.stream.listen(
       (event) async {
         final data = jsonDecode(event);
-        
         if (data['new_email'] == true &&
             data['gmail_email'] == selectedGmailAccount) {
-          print("New mail for $selectedGmailAccount → refreshing inbox");
+          print("📩 New mail for $selectedGmailAccount → refreshing inbox");
           final refreshed = await ApiService.fetchEmailsForAccount(
             selectedGmailAccount!,
           );
@@ -192,7 +191,6 @@ class _GmailScreenState extends State<GmailScreen> {
       },
     );
   }
-
 
   Future<void> loadEmails() async {
     setState(() => _loading = true);
@@ -213,12 +211,14 @@ class _GmailScreenState extends State<GmailScreen> {
         emails = data.map((e) => EmailMessage.fromJson(e)).toList();
       });
     } catch (e) {
-      print("Failed to load emails: $e");
+      print("⚠️ Failed to load emails: $e");
     } finally {
       setState(() => _loading = false);
     }
   }
 
+  /// Manual text scoring input
+  /// ----------
   Future<void> _handleManualInput() async {
     final controller = TextEditingController();
     String prediction = "";
@@ -382,66 +382,7 @@ class _GmailScreenState extends State<GmailScreen> {
     );
   }
 
-Future<void> _showSearchDialog() async {
-  final _searchController = TextEditingController();
-
-  await showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text("Search Emails"),
-      content: TextField(
-        controller: _searchController,
-        autofocus: true, 
-        decoration: const InputDecoration(
-          hintText: "Search subject, sender, etc...",
-          icon: Icon(Icons.search),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Cancel"),
-        ),
-        
-        ElevatedButton(
-          onPressed: () async {
-            final query = _searchController.text.trim();
-            if (query.isEmpty) {
-              return; 
-            }
-            
-            Navigator.pop(context); 
-
-            setState(() {
-              _loading = true; 
-            });
-
-            try {
-              final data = await ApiService.searchEmails(query);
-              
-              setState(() {
-                emails = data.map((e) => EmailMessage.fromJson(e)).toList();
-              });
-
-            } catch (e) {
-              print("Failed to search emails: $e");
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Search failed: $e")),
-                );
-              }
-            } finally {
-              setState(() {
-                _loading = false;
-              });
-            }
-          },
-          child: const Text("Search"),
-        ),
-      ],
-    ),
-  );
-}
+  // --------
 
   Color _getRandomColor() {
     const colors = [
@@ -459,12 +400,10 @@ Future<void> _showSearchDialog() async {
     return colors[_random.nextInt(colors.length)];
   }
 
-  
+  /// OAuth Gmail Connection Flow
   void _startOauthFlow() {
     Navigator.pushNamed(context, '/oauth');
   }
-
-
   void _goToHome() {
     Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   }
@@ -482,9 +421,49 @@ Future<void> _showSearchDialog() async {
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.menu, color: Colors.black87),
-          onPressed: () {},
+          onPressed: () {
+            showGeneralDialog(
+              context: context,
+              barrierDismissible: true,
+              barrierLabel: '',
+              barrierColor: Colors.black54.withOpacity(0.3),
+              transitionDuration: const Duration(milliseconds: 300),
+              pageBuilder: (context, anim1, anim2) {
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: Sidebar(
+                    onClose: () => Navigator.of(context).pop(),
+                    onMailTap: () {
+                      Navigator.of(context).pop(); // close sidebar
+                      // Optional: Show message or stay on home
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("You are already on Mail Page!"),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+              transitionBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return SlideTransition(
+                      position:
+                          Tween(
+                            begin: const Offset(-1, 0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOutCubic,
+                            ),
+                          ),
+                      child: child,
+                    );
+                  },
+            );
+          },
         ),
-
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -516,7 +495,7 @@ Future<void> _showSearchDialog() async {
           ),
           IconButton(
             icon: const Icon(Icons.search, color: Colors.black87),
-            onPressed: _showSearchDialog(),
+            onPressed: () {},
           ),
           if (_userLoading)
             const Padding(
@@ -657,7 +636,6 @@ Future<void> _showSearchDialog() async {
                 },
               ),
             ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await ApiService.launchGoogleLogin();
@@ -665,45 +643,6 @@ Future<void> _showSearchDialog() async {
         backgroundColor: Colors.blueAccent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.add, size: 28, color: Colors.white),
-      ),
-
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade300,
-              blurRadius: 6,
-              offset: const Offset(0, -2),
-            ),
-          ],
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(10),
-            topRight: Radius.circular(10),
-          ),
-        ),
-        child: SafeArea(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              const Icon(Icons.mail_outline, color: Colors.blue, size: 28),
-              GestureDetector(
-                onTap: _goToHome,
-                child: const Icon(
-                  Icons.home_outlined,
-                  color: Colors.grey,
-                  size: 28,
-                ),
-              ),
-              const Icon(
-                Icons.chat_bubble_outline,
-                color: Colors.grey,
-                size: 28,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

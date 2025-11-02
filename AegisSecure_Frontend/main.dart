@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/EmailAccountManager.dart'; 
-import 'screens/gmail_screen.dart';
-import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/main_navigation.dart';
 import 'screens/register_screen.dart';
 import 'screens/verify_otp_screen.dart';
 
@@ -36,12 +35,10 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: initialToken == null ? '/login' : '/home',
       routes: {
-        '/emailAccountManager': (context) =>
-            const EmailAccountManager(), //----⭐️
+        '/emailAccountManager': (context) => const EmailAccountManager(),
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
-        '/home': (context) => HomeScreen(),
-        '/gmail': (context) => GmailScreen(),
+        '/home': (context) => const MainNavigation(),
         '/otp': (context) => VerifyOtpScreen(email: ''),
       },
     );

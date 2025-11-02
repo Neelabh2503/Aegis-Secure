@@ -5,7 +5,7 @@ from fastapi import WebSocket
 from websocket_manager import connect, disconnect
 load_dotenv()
 
-from routes import auth, gmail, Oauth,notifications,otp
+from routes import auth, gmail, Oauth,notifications,otp,sms,analysis
 from websocket_manager import active_connections  
 from websocket_manager import broadcast_new_email
 import asyncio
@@ -22,13 +22,14 @@ app.include_router(auth.router, prefix="/auth")
 app.include_router(gmail.router)
 app.include_router(Oauth.router)
 app.include_router(Oauth.router, prefix="/auth")
-app.include_router(notifications.router) 
+app.include_router(notifications.router)
+app.include_router(analysis.router)
+app.include_router(sms.router)
 ws_router = APIRouter()
 
 
 @app.websocket("/ws/emails")
 async def websocket_endpoint(websocket: WebSocket):
-    """Handle real-time email update connections."""
     await connect(websocket)
     try:
         while True:

@@ -8,20 +8,17 @@ from email.mime.text import MIMEText
 import httpx
 from dotenv import load_dotenv
 load_dotenv()
-
 from database import auth_db
-
 
 OTP_EXPIRE_MINUTES = int(os.getenv("OTP_EXPIRE_MINUTES", "10"))
 otp_col = auth_db.otps
 
-SMTP_EMAIL = os.getenv("SMTP_EMAIL")  
-REFRESH_TOKEN = os.getenv("REFRESH_TOKEN") 
+SMTP_EMAIL = os.getenv("SMTP_EMAIL")
+REFRESH_TOKEN = os.getenv("REFRESH_TOKEN")
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 
 async def get_access_token_from_refresh(refresh_token: str) -> str:
-
     async with httpx.AsyncClient() as client:
         resp = await client.post(
             "https://oauth2.googleapis.com/token",
@@ -56,14 +53,11 @@ async def send_gmail_email(access_token: str, to_email: str, subject: str, body:
             raise Exception(f"Failed to send email: {resp.text}")
         return resp.json()
 
-
 def generate_otp() -> str:
-    """6-digit OTP as string"""
     return str(random.randint(100000, 999999)).zfill(6)
 
 
 async def send_otp_email_async(to_email: str, otp: str) -> bool:
-    """Send OTP email via Gmail API."""
     html_body = f"""
     <html>
       <body style='font-family: Arial, sans-serif;'>
@@ -90,7 +84,6 @@ async def send_otp_email_async(to_email: str, otp: str) -> bool:
 
 
 async def store_otp(email: str, otp: str):
-    """Store OTP in DB and remove previous ones"""
     await otp_col.delete_many({"email": email})
     doc = {
         "email": email,
@@ -118,6 +111,5 @@ async def verify_otp_in_db(email: str, otp: str) -> bool:
 
 
 async def ensure_otp_indexes():
-    """Create indexes for OTP collection"""
     await otp_col.create_index("email")
     await otp_col.create_index("expires_at", expireAfterSeconds=0)

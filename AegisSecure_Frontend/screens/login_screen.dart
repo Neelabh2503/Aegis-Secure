@@ -1,7 +1,9 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../screens/change_password_screens/change_password_screen.dart';
 import '../screens/verify_otp_screen.dart';
 import '../services/api_service.dart';
 
@@ -16,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _loading = false;
   String? emailError;
   String? passwordError;
+  bool _showPassword = false;
 
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(
@@ -63,6 +66,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
         final token = data['token'];
         final verifiedRaw = data['verified'];
+
+        // Robust check for verified: bool, string "true", int 1
         final isVerified =
             verifiedRaw == true || verifiedRaw == "true" || verifiedRaw == 1;
 
@@ -74,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() {
             passwordError = "Please verify your email before logging in.";
           });
-          return; 
+          return; // Stop login if not verified
         }
 
         if (token == null || token.isEmpty) {
@@ -84,20 +89,20 @@ class _LoginScreenState extends State<LoginScreen> {
           return;
         }
 
-      
+        // Save token after verified
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('jwt_token', token);
 
-       
+        // Optionally fetch current user, but catch errors safely
         try {
           final userRes = await ApiService.fetchCurrentUser();
           print("DEBUG: Current user = $userRes");
         } catch (e) {
           print("DEBUG: Could not fetch current user: $e");
-          
+          // Continue login anyway
         }
 
-       
+        // Navigate to home
         Navigator.pushReplacementNamed(context, '/home');
       } else if (res.statusCode == 401 || res.statusCode == 400) {
         setState(() {
@@ -121,15 +126,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.white, // Full white background
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 28, vertical: 20),
+            padding: EdgeInsets.symmetric(horizontal: 28, vertical: 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Logo
                 SizedBox(
                   height: MediaQuery.of(context).size.width * 0.70,
                   width: MediaQuery.of(context).size.width * 0.70,
@@ -138,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     fit: BoxFit.contain,
                   ),
                 ),
-               
+                // Title
                 RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
@@ -174,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 SizedBox(height: 32),
 
-               
+                // Email Field
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
@@ -194,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Password Field
                 TextField(
                   controller: passwordController,
-                  obscureText: true,
+                  obscureText: !_showPassword,
                   decoration: InputDecoration(
                     labelText: "Password",
                     errorText: passwordError,
@@ -202,12 +206,48 @@ class _LoginScreenState extends State<LoginScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _showPassword
+                            ? Icons.visibility
+                            : Icons.visibility_off_outlined,
+                        color: Colors.grey.shade600,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _showPassword = !_showPassword;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _loading
+                        ? null
+                        : () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const ChangePasswordPage(),
+                              ),
+                            );
+                          },
+                    child: const Text(
+                      "Forgot Password?",
+                      style: TextStyle(
+                        color: Colors.blueAccent,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                    ),
                   ),
                 ),
 
-                SizedBox(height: 28),
+                SizedBox(height: 12),
 
-                
+                // Sign In Button
                 _loading
                     ? CircularProgressIndicator()
                     : ElevatedButton(
@@ -230,28 +270,55 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                SizedBox(height: 20),
+                SizedBox(height: 5),
 
                 Text(
-                  "or sign in with",
+                  "OR",
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                 ),
 
-                SizedBox(height: 12),
+                SizedBox(height: 5),
 
                 // Social Icons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _socialButton(Icons.mail_outline),
-                    SizedBox(width: 25),
-                    _socialButton(Icons.phone_outlined),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                      },
+                      icon: Image.asset(
+                        'assets/images/google_logo.png',
+                        height: 24,
+                        width: 24,
+                      ),
+                      label: const Text(
+                        "Sign in with Google",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: const BorderSide(color: Colors.grey),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        foregroundColor: Colors.white,
+                        surfaceTintColor: Colors.transparent,
+                        shadowColor:
+                            Colors.transparent, 
+                      ),
+                    ),
                   ],
                 ),
-
-                SizedBox(height: 24),
-
-                // Sign Up Link
+                SizedBox(height: 10),
                 GestureDetector(
                   onTap: () => Navigator.pushNamed(context, '/register'),
                   child: RichText(
@@ -271,8 +338,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                
-                const SizedBox(height: 24), 
+                //----⭐️
+                const SizedBox(height: 20), // spacing before the link
                 Align(
                   alignment: Alignment.center,
                   child: TextButton(
@@ -280,7 +347,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ? null
                         : () async {
                             final outerContext =
-                                context; 
+                                context; // Use the screen context for navigation & dialogs
                             final emailControllerDialog =
                                 TextEditingController();
 
@@ -356,7 +423,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                         Navigator.pop(
                                           dialogContext,
-                                        ); 
+                                        ); // Close dialog
+
+                                        // Run async logic in microtask to avoid UI freeze
                                         Future.microtask(() async {
                                           setState(() => _loading = true);
                                           try {
@@ -378,6 +447,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   "This email is already verified. Please login instead.",
                                                 );
                                               } else {
+                                                // Unverified → send OTP
                                                 final resOtp =
                                                     await ApiService.sendOtp(
                                                       email,
@@ -401,6 +471,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               }
                                             } else if (resCheck.statusCode ==
                                                 404) {
+                                              // Treat 404 as unverified → send OTP
                                               final resOtp =
                                                   await ApiService.sendOtp(
                                                     email,

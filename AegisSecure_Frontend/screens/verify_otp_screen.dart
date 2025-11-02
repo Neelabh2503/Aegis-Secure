@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
@@ -14,6 +15,38 @@ class VerifyOtpScreen extends StatefulWidget {
 class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   String otp = "";
   bool _loading = false;
+  int _remainingSeconds = 300;
+  Timer? _timer;
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    setState(() => _remainingSeconds = 300);
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remainingSeconds > 0) {
+        setState(() => _remainingSeconds--);
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  String _formatTime(int seconds) {
+    final m = (seconds ~/ 60).toString().padLeft(2, '0');
+    final s = (seconds % 60).toString().padLeft(2, '0');
+    return "$m:$s";
+  }
 
   Future<void> verifyOtp() async {
     if (otp.isEmpty || otp.length < 6) {
@@ -43,6 +76,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   }
 
   Future<void> resendOtp() async {
+    _startTimer();
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text("Resending OTP...")));
@@ -85,7 +119,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
               const Text(
                 "Verification code",
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 25,
                   fontWeight: FontWeight.w700,
                   color: Colors.black,
                 ),
@@ -94,7 +128,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
               RichText(
                 text: TextSpan(
                   text: "We have sent the code verification to ",
-                  style: TextStyle(color: Colors.grey.shade700, fontSize: 15),
+                  style: TextStyle(color: Colors.grey.shade700, fontSize: 17),
                   children: [
                     TextSpan(
                       text: widget.email,
@@ -107,8 +141,6 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                 ),
               ),
               const SizedBox(height: 40),
-
-              // 6-digit OTP Boxes
               PinCodeTextField(
                 appContext: context,
                 length: 6,
@@ -119,8 +151,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                   borderRadius: BorderRadius.circular(10),
                   fieldHeight: 55,
                   fieldWidth: 45,
-                  activeColor: Colors.deepPurple,
-                  selectedColor: Colors.deepPurpleAccent,
+                  activeColor: Color(0xFF1F2A6E),
+                  selectedColor: Color(0xFF1F2A6E),
                   inactiveColor: Colors.grey.shade300,
                   activeFillColor: Colors.grey.shade100,
                   selectedFillColor: Colors.white,
@@ -130,17 +162,41 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
               ),
 
               const SizedBox(height: 12),
-
-              // Validity Text
-              const Center(
-                child: Text(
-                  "This code is valid for 5 minutes.",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
+              Center(
+                child: _remainingSeconds > 0
+                    ? Text(
+                        "OTP expires in ${_formatTime(_remainingSeconds)}",
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "OTP expired. ",
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.redAccent,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: resendOtp,
+                            child: const Text(
+                              "Resend OTP?",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFF1F2A6E),
+                                fontWeight: FontWeight.w600,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
               ),
 
               const SizedBox(height: 35),
@@ -173,7 +229,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                     child: ElevatedButton(
                       onPressed: verifyOtp,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6C63FF),
+                        backgroundColor: const Color(0xFF1F2A6E),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
