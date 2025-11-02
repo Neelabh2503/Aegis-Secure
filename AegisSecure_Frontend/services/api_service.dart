@@ -180,6 +180,39 @@ class ApiService {
     }
   }
 
+  static Future<List<dynamic>> searchEmails(String query) async {
+  
+  final token = await getToken();
+  if (token == null || token.isEmpty) {
+    print("No JWT token found in SharedPreferences");
+    return [];
+  }
+
+  final url = Uri.parse(
+      '$baseUrl/emails/search?q=${Uri.encodeComponent(query)}');
+
+  try {
+    final res = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body);
+    } else {
+      print(
+          'Failed to search emails. Status: ${res.statusCode}, Body: ${res.body}');
+      return [];
+    }
+  } catch (e) {
+    print('Error searching emails: $e');
+    return [];
+  }
+}
+
   static Future<void> launchGoogleLogin() async {
     final clientId =
         "365011130597-3bv38b9aubtt65rebnbl673c2cogt7j3.apps.googleusercontent.com";
