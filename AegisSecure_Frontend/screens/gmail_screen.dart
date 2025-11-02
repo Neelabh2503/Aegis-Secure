@@ -382,6 +382,66 @@ class _GmailScreenState extends State<GmailScreen> {
     );
   }
 
+Future<void> _showSearchDialog() async {
+  final _searchController = TextEditingController();
+
+  await showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text("Search Emails"),
+      content: TextField(
+        controller: _searchController,
+        autofocus: true, 
+        decoration: const InputDecoration(
+          hintText: "Search subject, sender, etc...",
+          icon: Icon(Icons.search),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Cancel"),
+        ),
+        
+        ElevatedButton(
+          onPressed: () async {
+            final query = _searchController.text.trim();
+            if (query.isEmpty) {
+              return; 
+            }
+            
+            Navigator.pop(context); 
+
+            setState(() {
+              _loading = true; 
+            });
+
+            try {
+              final data = await ApiService.searchEmails(query);
+              
+              setState(() {
+                emails = data.map((e) => EmailMessage.fromJson(e)).toList();
+              });
+
+            } catch (e) {
+              print("Failed to search emails: $e");
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Search failed: $e")),
+                );
+              }
+            } finally {
+              setState(() {
+                _loading = false;
+              });
+            }
+          },
+          child: const Text("Search"),
+        ),
+      ],
+    ),
+  );
+}
 
   Color _getRandomColor() {
     const colors = [
@@ -456,7 +516,7 @@ class _GmailScreenState extends State<GmailScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.search, color: Colors.black87),
-            onPressed: () {},
+            onPressed: _showSearchDialog(),
           ),
           if (_userLoading)
             const Padding(
