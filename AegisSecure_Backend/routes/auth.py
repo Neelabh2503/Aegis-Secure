@@ -150,3 +150,65 @@ async def get_user_info(credentials: HTTPAuthorizationCredentials = Depends(secu
         "email": user["email"],
         "verified": user.get("verified", False),
     }
+ @router.post("/forgot-password")
+async def forgot_password(req: SendOTPRequest):
+    """Generate OTP and send to user's email if the user exists.
+    Returns a generic message regardless of whether the email exists
+    (to avoid user enumeration)."""
+    email = req.email.lower()
+    user = await users_col.find_one({"email": email})
+
+    # If user exists -> store OTP & attempt to send email
+    if user:
+        otp_code = otp.generate_otp()
+        await otp.store_otp(email, otp_code)
+        sent = await otp.send_otp_email_async(email, otp_code)
+        if sent:
+            # generic success
+            return {"message": "If this email is registered, an OTP has been sent."}
+        else:
+            # dev fallback: still generic, but helpful in dev logs
+            print(f"[DEV] OTP for {email}: {otp_code}")
+            return {"message": "If this email is registered, an OTP has been sent."}
+    # If user doesn't exist, respond generically (do not store OTP)
+    return {"message": "If this email is registered, an OTP has been sent."}
+
+@router.post("/verify-reset-otp")
+async def verify_reset_otp(req: VerifyResetOTPRequest):
+    """Verify OTP for password reset. If valid, return a short-lived reset token."""
+    email = req.email.lower()
+    is_valid = await otp.verify_otp_in_db(email, req.otp)
+    if not is_valid:
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+
+    # create and return reset JWT
+    reset_token = create_reset_jwt(email)
+    return {"reset_token": reset_token, "expires_in_minutes": RESET_JWT_TTL_MINUTES}
+
+
+@router.post("/reset-password")
+async def reset_password(data: dict):
+    email = data.get("email")
+    otp = data.get("otp")
+    new_password = data.get("new_password")
+
+    if not all([email, otp, new_password]):
+        raise HTTPException(status_code=400, detail="Missing fields")
+
+    # ✅ Verify OTP (no need for "verified": True)
+    otp_doc = await otps_col.find_one({"email": email, "otp": otp})
+    if not otp_doc:
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+
+    # ✅ Hash and update password
+    hashed_pw = pwd_context.hash(new_password)
+    result = await users_col.update_one(
+        {"email": email},
+        {"$set": {"password": hashed_pw}}
+    )
+
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    await otps_col.delete_many({"email": email})
+    return {"message": "Password updated successfully"}
