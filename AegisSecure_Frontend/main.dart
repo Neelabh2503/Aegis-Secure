@@ -40,7 +40,9 @@ class MyApp extends StatelessWidget {
         '/register': (context) => RegisterScreen(),
         '/home': (context) => const MainNavigation(),
         '/otp': (context) => VerifyOtpScreen(email: ''),
+        '/sms': (context) => const SmsScreen(),
       },
     );
   }
 }
+
