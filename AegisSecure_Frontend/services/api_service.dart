@@ -349,5 +349,57 @@ class ApiService {
       await prefs.setString('active_linked_email', email);
     }
   }
-  //--⭐️ 
+  //.
+  static Future<Map<String, dynamic>> analyzeSmsList(
+    List<SmsMessage> messages,
+  ) async {
+    final url = Uri.parse(
+      '$baseUrl/analyze_sms_list',
+    ); 
+    final token = await getToken();
+
+    if (token == null) {
+      throw Exception('User is not authenticated');
+    }
+    final List<String> messageBodies = messages
+        .map((msg) => msg.body ?? "") 
+        .where((body) => body.isNotEmpty) 
+        .toList();
+
+    if (messageBodies.isEmpty) {
+      return {'status': 'success', 'message': 'No new messages to analyze.'};
+    }
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+        'ngrok-skip-browser-warning': 'true',
+      },
+      body: jsonEncode({'texts': messageBodies}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to analyze SMS list: ${response.body}');
+    }
+  }
+  static Future<http.Response> resetPassword(
+    String email,
+    String otp,
+    String newPassword,
+  ) async {
+    final url = Uri.parse('$baseUrl/auth/reset-password');
+    return await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'otp': otp,
+        'new_password': newPassword,
+      }),
+    );
+  }
 }
