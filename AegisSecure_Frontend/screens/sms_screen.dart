@@ -418,3 +418,194 @@ class _SmsScreenState extends State<SmsScreen> {
     );
   }
 }
+class SmsSearchDelegate extends SearchDelegate<String> {
+  final List<SmsMessageModel> allMessages;
+
+  SmsSearchDelegate(this.allMessages);
+
+  @override
+  List<Widget>? buildActions(BuildContext context) => [
+    if (query.isNotEmpty)
+      IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ''),
+  ];
+
+  @override
+  Widget? buildLeading(BuildContext context) => IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => close(context, ''),
+  );
+
+  @override
+  Widget buildResults(BuildContext context) => _buildSmsList(context);
+
+  @override
+  Widget buildSuggestions(BuildContext context) => _buildSmsList(context);
+
+  Widget _buildSmsList(BuildContext context) {
+    final q = query.toLowerCase();
+    final theme = Theme.of(context);
+
+    final filtered = allMessages.where((msg) {
+      return msg.address.toLowerCase().contains(q) ||
+          msg.body.toLowerCase().contains(q);
+    }).toList();
+
+    if (filtered.isEmpty) {
+      return const Center(
+        child: Text(
+          "No matching messages found",
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
+
+    return Container(
+      color: theme.brightness == Brightness.dark
+          ? const Color(0xFF121212)
+          : const Color(0xFFF9FAFC),
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+        itemCount: filtered.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 8),
+        itemBuilder: (context, index) {
+          final msg = filtered[index];
+          final sender = msg.address;
+          final score = msg.spamScore ?? 0.0;
+
+          final isSpam = score >= 0.5;
+          final spamColor = isSpam
+              ? Colors.red.shade100
+              : Colors.green.shade100;
+          final spamTextColor = isSpam
+              ? Colors.red.shade700
+              : Colors.green.shade700;
+
+          final time = DateTime.fromMillisecondsSinceEpoch(
+            msg.dateMs,
+          ).toLocal();
+          final formattedTime =
+              "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
+
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors
+                      .primaries[sender.hashCode % Colors.primaries.length],
+                  child: Text(
+                    sender.isNotEmpty ? sender[0].toUpperCase() : "?",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _highlightMatch(
+                        sender,
+                        query,
+                        const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      _highlightMatch(
+                        msg.body,
+                        query,
+                        TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: spamColor,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: spamTextColor.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Text(
+                        isSpam ? "SPAM" : "HAM",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: spamTextColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      formattedTime,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _highlightMatch(String text, String query, TextStyle baseStyle) {
+    if (query.isEmpty) return Text(text, style: baseStyle);
+
+    final lower = text.toLowerCase();
+    final q = query.toLowerCase();
+
+    final spans = <TextSpan>[];
+    int start = 0;
+
+    while (true) {
+      final index = lower.indexOf(q, start);
+      if (index == -1) {
+        spans.add(TextSpan(text: text.substring(start)));
+        break;
+      }
+      if (index > start) {
+        spans.add(TextSpan(text: text.substring(start, index)));
+      }
+      spans.add(
+        TextSpan(
+          text: text.substring(index, index + q.length),
+          style: const TextStyle(
+            color: Colors.blueAccent,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+      start = index + q.length;
+    }
+
+    return RichText(
+      text: TextSpan(style: baseStyle, children: spans),
+      overflow: TextOverflow.ellipsis,
+      maxLines: 2,
+    );
+  }
+}
