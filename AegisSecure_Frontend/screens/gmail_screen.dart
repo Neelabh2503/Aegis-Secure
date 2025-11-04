@@ -647,3 +647,220 @@ class _GmailScreenState extends State<GmailScreen> {
     );
   }
 }
+class EmailSearchDelegate extends SearchDelegate<String> {
+  final List<EmailMessage> allEmails;
+  final Random _random = Random();
+  EmailSearchDelegate(this.allEmails);
+
+  // Gmail-like soft color palette for avatars
+
+  @override
+  List<Widget>? buildActions(BuildContext context) => [
+    if (query.isNotEmpty)
+      IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ''),
+  ];
+
+  @override
+  Widget? buildLeading(BuildContext context) => IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => close(context, ''),
+  );
+
+  @override
+  Widget buildResults(BuildContext context) => _buildEmailList(context);
+
+  @override
+  Widget buildSuggestions(BuildContext context) => _buildEmailList(context);
+
+  Widget _buildEmailList(BuildContext context) {
+    final q = query.toLowerCase();
+    final theme = Theme.of(context);
+
+    final filtered = allEmails.where((email) {
+      return email.sender.toLowerCase().contains(q) ||
+          email.subject.toLowerCase().contains(q) ||
+          email.snippet.toLowerCase().contains(q);
+    }).toList();
+
+    if (filtered.isEmpty) {
+      return const Center(
+        child: Text(
+          "No matching emails found",
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
+
+    return Container(
+      color: theme.brightness == Brightness.dark
+          ? const Color(0xFF121212)
+          : const Color(0xFFF9FAFC),
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+        itemCount: filtered.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 8),
+        itemBuilder: (context, index) {
+          final email = filtered[index];
+          final rawPred = email.spamPrediction?.toUpperCase() ?? "UNKNOWN";
+
+          final isSpam =
+              rawPred == "SPAM" ||
+              double.tryParse(rawPred) != null && double.parse(rawPred) >= 0.5;
+
+          final spamColor = isSpam
+              ? Colors.red.shade100
+              : Colors.green.shade100;
+          final spamTextColor = isSpam
+              ? Colors.red.shade700
+              : Colors.green.shade700;
+
+          return InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => EmailDetailScreen(email: email),
+                ),
+              );
+            },
+
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: _parseColor(email.charColor ?? "#9E9E9E"),
+                    child: Text(
+                      email.sender.isNotEmpty
+                          ? email.sender[0].toUpperCase()
+                          : 'A',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _highlightMatch(
+                          email.sender,
+                          query,
+                          const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        _highlightMatch(
+                          email.subject.isEmpty
+                              ? "(No Subject)"
+                              : email.subject,
+                          query,
+                          const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        _highlightMatch(
+                          email.snippet,
+                          query,
+                          TextStyle(color: Colors.grey[600], fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: spamColor,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: spamTextColor.withOpacity(0.3),
+                          ),
+                        ),
+                        child: Text(
+                          rawPred.isEmpty ? "UNKNOWN" : rawPred,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: spamTextColor,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Icon(Icons.more_vert, color: Colors.grey, size: 20),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Highlight matched query inside text
+  Widget _highlightMatch(String? text, String query, TextStyle baseStyle) {
+    final safeText = text ?? "";
+    if (query.isEmpty || safeText.isEmpty) {
+      return Text(safeText, style: baseStyle);
+    }
+
+    final lower = safeText.toLowerCase();
+    final q = query.toLowerCase();
+
+    final spans = <TextSpan>[];
+    int start = 0;
+
+    while (true) {
+      final index = lower.indexOf(q, start);
+      if (index == -1) {
+        spans.add(TextSpan(text: safeText.substring(start)));
+        break;
+      }
+      if (index > start) {
+        spans.add(TextSpan(text: safeText.substring(start, index)));
+      }
+      spans.add(
+        TextSpan(
+          text: safeText.substring(index, index + q.length),
+          style: baseStyle.copyWith(
+            color: Colors.blueAccent,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+      start = index + q.length;
+    }
+
+    return RichText(
+      text: TextSpan(style: baseStyle, children: spans),
+      overflow: TextOverflow.ellipsis,
+      maxLines: 1,
+    );
+  }
+
+  Color _parseColor(String hex) {
+    if (hex.startsWith("#")) hex = hex.substring(1);
+    return Color(int.parse("FF$hex", radix: 16));
+  }
+}
