@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../models/sms_message.dart';
 import '../services/api_service.dart';
 import '../services/sms_service.dart';
+import '../widgets/sidebar.dart';
 import '../widgets/sidebar.dart';
 
 class SmsScreen extends StatefulWidget {
@@ -15,15 +17,42 @@ class SmsScreen extends StatefulWidget {
 
 class _SmsScreenState extends State<SmsScreen> {
   final SmsService _smsService = SmsService();
-  void showDebug(String msg) {
-    print("$msg");
-    if (mounted && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), duration: const Duration(seconds: 2)),
-      );
-    }
+  List<SmsMessageModel> _messages = [];
+  bool _loading = true;
+
+  StreamSubscription? _smsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    initSmsFlow();
   }
 
+  @override
+  void dispose() {
+    _smsService.disconnect();
+    _smsStream?.cancel();
+    super.dispose();
+  }
+
+   Future<void> initSmsFlow() async {
+    try {
+      await _smsService.syncSmsToBackend();
+      final fetched = await _smsService.fetchAllFromBackend();
+      setState(() {
+        _messages = fetched;
+        _loading = false;
+      });
+
+      _smsService.connectWebSocket((newMsg) {
+        setState(() => _messages.insert(0, newMsg));
+      });
+    } catch (e) {
+      print("Error initializing SMS: $e");
+      setState(() => _loading = false);
+    }
+  }
+  
   String getDisplayName(String address, String? contactName) {
     if (contactName != null && contactName.isNotEmpty) return contactName;
     final isBusinessSender = RegExp(r'[A-Za-z]').hasMatch(address);
@@ -31,66 +60,6 @@ class _SmsScreenState extends State<SmsScreen> {
       return address.replaceAll(RegExp(r'^[A-Z]{2}-'), '');
     }
     return address;
-  }
-
-  List<Map<String, dynamic>> _messages = [];
-  bool _loading = true;
-  late StreamSubscription _smsStream;
-  @override
-  void initState() {
-    super.initState();
-    fetchLocalSMS();
-    listenForIncomingMessages();
-  }
-
-  @override
-  void dispose() {
-    _smsStream.cancel();
-    super.dispose();
-  }
-
-  void listenForIncomingMessages() {
-    _smsStream = _smsService.onNewMessage.listen((message) async {
-      await analyzeAndAddNewMessage(message);
-    });
-  }
-
-  Future<void> analyzeAndAddNewMessage(Map<String, dynamic> msg) async {
-    try {
-      final response = await ApiService.analyzeText(msg['body']);
-      final rawPrediction = response['prediction'];
-      final score = double.tryParse(rawPrediction.toString()) ?? 0.0;
-
-      setState(() {
-        _messages.insert(0, {...msg, 'score': score});
-      });
-    } catch (e) {
-      print("⚠️ Error analyzing new message: $e");
-    }
-  }
-
-  Future<void> fetchLocalSMS() async {
-    try {
-      final smsList = await _smsService.getAllMessages();
-      final analyzedMessages = <Map<String, dynamic>>[];
-
-      for (final msg in smsList) {
-        try {
-          final response = await ApiService.analyzeText(msg['body']);
-          final rawPrediction = response['prediction'];
-          final score = double.tryParse(rawPrediction.toString()) ?? 0.0;
-          analyzedMessages.add({...msg, 'score': score});
-        } catch (_) {}
-      }
-
-      setState(() {
-        _messages = analyzedMessages;
-        _loading = false;
-      });
-    } catch (e) {
-      print("❌ Failed to fetch SMS: $e");
-      setState(() => _loading = false);
-    }
   }
 
   Future<void> _handleManualInput() async {
@@ -122,7 +91,7 @@ class _SmsScreenState extends State<SmsScreen> {
                     BoxShadow(
                       color: Colors.black12,
                       blurRadius: 4,
-                      offset: Offset(0, 2),
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
@@ -213,24 +182,18 @@ class _SmsScreenState extends State<SmsScreen> {
 
                 try {
                   final result = await ApiService.analyzeText(inputText);
-                  print("DEBUG: Raw API Response = $result");
-
                   final confStr = result['prediction'] ?? "0.0";
-                  final conf = double.tryParse(confStr) ?? 0.0;
+                  final conf = double.tryParse(confStr.toString()) ?? 0.0;
                   final label = conf >= 0.5 ? "SPAM" : "HAM";
 
                   setStateDialog(() {
                     prediction = label;
                     confidence = conf.toStringAsFixed(2);
-                    print(
-                      "DEBUG: Classified label = $label with confidence = $confidence",
-                    );
                   });
                 } catch (e) {
                   setStateDialog(() {
                     prediction = "ERROR";
                     confidence = "";
-                    print("DEBUG: Error fetching prediction = $e");
                   });
                 }
               },
@@ -256,16 +219,13 @@ class _SmsScreenState extends State<SmsScreen> {
     );
   }
 
-  Widget _buildMessageTile(Map<String, dynamic> msg) {
-    final rawAddress = msg['address'] ?? 'Unknown';
-    final contactName = msg['displayName'];
-    final sender = getDisplayName(rawAddress, contactName);
-    // final sender = msg['address'] ?? 'Unknown';
-    final body = msg['body'] ?? '';
-    final score = (msg['score'] ?? 0.0).toDouble();
-    final date = msg['date'] ?? DateTime.now().millisecondsSinceEpoch;
 
-    final time = DateTime.fromMillisecondsSinceEpoch(date).toLocal();
+  Widget _buildMessageTile(SmsMessageModel msg) {
+    final sender = getDisplayName(msg.address, null);
+    final body = msg.body;
+    final score = msg.spamScore ?? 0.0;
+
+    final time = DateTime.fromMillisecondsSinceEpoch(msg.dateMs).toLocal();
     final formattedTime =
         "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
 
@@ -292,10 +252,9 @@ class _SmsScreenState extends State<SmsScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Avatar
             CircleAvatar(
               backgroundColor:
-                  Colors.primaries[sender.hashCode % Colors.primaries.length],
+              Colors.primaries[sender.hashCode % Colors.primaries.length],
               child: Text(
                 sender.isNotEmpty ? sender[0].toUpperCase() : "?",
                 style: const TextStyle(
@@ -305,8 +264,6 @@ class _SmsScreenState extends State<SmsScreen> {
               ),
             ),
             const SizedBox(width: 12),
-
-            // Sender + message
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,7 +287,6 @@ class _SmsScreenState extends State<SmsScreen> {
               ),
             ),
             Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Container(
@@ -374,7 +330,6 @@ class _SmsScreenState extends State<SmsScreen> {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -397,7 +352,7 @@ class _SmsScreenState extends State<SmsScreen> {
                   child: Sidebar(
                     onClose: () => Navigator.of(context).pop(),
                     onMessagesTap: () {
-                      Navigator.of(context).pop(); // close sidebar
+                      Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("You are already on Messages!"),
@@ -409,20 +364,20 @@ class _SmsScreenState extends State<SmsScreen> {
               },
               transitionBuilder:
                   (context, animation, secondaryAnimation, child) {
-                    return SlideTransition(
-                      position:
-                          Tween(
-                            begin: const Offset(-1, 0),
-                            end: Offset.zero,
-                          ).animate(
-                            CurvedAnimation(
-                              parent: animation,
-                              curve: Curves.easeOutCubic,
-                            ),
-                          ),
-                      child: child,
-                    );
-                  },
+                return SlideTransition(
+                  position:
+                  Tween(
+                    begin: const Offset(-1, 0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeOutCubic,
+                    ),
+                  ),
+                  child: child,
+                );
+              },
             );
           },
         ),
@@ -451,15 +406,15 @@ class _SmsScreenState extends State<SmsScreen> {
           : _messages.isEmpty
           ? const Center(child: Text("No messages found"))
           : RefreshIndicator(
-              onRefresh: fetchLocalSMS,
-              child: ListView.separated(
-                itemCount: _messages.length,
-                separatorBuilder: (_, __) =>
-                    const Divider(height: 0, thickness: 0.3),
-                itemBuilder: (context, index) =>
-                    _buildMessageTile(_messages[index]),
-              ),
-            ),
+        onRefresh: initSmsFlow,
+        child: ListView.separated(
+          itemCount: _messages.length,
+          separatorBuilder: (_, __) =>
+          const Divider(height: 0, thickness: 0.3),
+          itemBuilder: (context, index) =>
+              _buildMessageTile(_messages[index]),
+        ),
+      ),
     );
   }
 }
