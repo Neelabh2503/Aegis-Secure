@@ -1,84 +1,128 @@
-import 'dart:async';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:telephony/telephony.dart';
+import 'dart:convert';
 
-@pragma('vm:entry-point')
-void backgroundSmsHandler(SmsMessage message) {
-  print("BG SMS: ${message.body}");
-}
+import 'package:http/http.dart' as http;
+import 'package:telephony/telephony.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+
+import '../models/sms_message.dart';
+import '../services/api_service.dart';
 
 class SmsService {
-  final Telephony _telephony = Telephony.instance;
-  final StreamController<Map<String, dynamic>> _smsStreamController =
-  StreamController.broadcast();
+  // static const String baseUrl =
+      "https://aidyn-findable-greedily.ngrok-free.dev";
+  static const String baseUrl = "https://aegissecurebackend.onrender.com";
+  // static const String wsUrl =
+      "wss://aidyn-findable-greedily.ngrok-free.dev/ws/sms";
+  static const String wsUrl = 'wss://aegissecurebackend.onrender.com/ws/emails';
 
-  Stream<Map<String, dynamic>> get onNewMessage => _smsStreamController.stream;
+  final Telephony telephony = Telephony.instance;
+  WebSocketChannel? _channel;
 
-  Future<bool> requestSmsPermission() async {
-    var status = await Permission.sms.status;
-    if (status.isGranted) return true;
-    var result = await Permission.sms.request();
-    if (result.isGranted) return true;
-    if (result.isPermanentlyDenied) openAppSettings();
-    return false;
-  }
-
-  Future<List<Map<String, dynamic>>> getAllMessages({int limit = 10}) async {
-    bool hasPermission = await requestSmsPermission();
-    if (!hasPermission) {
-      print("No SMS permission");
-      return [];
-    }
-
-    try {
-      print("Fetching latest $limit SMS...");
-      List<SmsMessage> messages = await _telephony.getInboxSms(
-        columns: [
-          SmsColumn.ADDRESS,
-          SmsColumn.BODY,
-          SmsColumn.DATE,
-          SmsColumn.TYPE,
-        ],
-        sortOrder: [OrderBy(SmsColumn.DATE, sort: Sort.DESC)],
-      );
-
-      final recent = messages.take(limit).toList();
-      print("Fetched ${recent.length} SMS");
-
-      return recent
-          .map(
-            (msg) => {
-          "address": msg.address ?? "Unknown",
-          "body": msg.body ?? "",
-          "date": msg.date,
-          "type": msg.type == SmsType.MESSAGE_TYPE_INBOX
-              ? "inbox"
-              : msg.type == SmsType.MESSAGE_TYPE_SENT
-              ? "sent"
-              : "other",
-        },
-      )
-          .toList();
-    } catch (e, st) {
-      print("Error in getAllMessages: $e\n$st");
-      return [];
-    }
-  }
-
-  void startListeningForIncomingSms() {
-    _telephony.listenIncomingSms(
-      onNewMessage: (SmsMessage message) {
-        final data = {
-          "address": message.address ?? "Unknown",
-          "body": message.body ?? "",
-          "date": message.date,
-          "type": "inbox",
-        };
-        print("New SMS: ${message.body}");
-        _smsStreamController.add(data);
-      },
-      onBackgroundMessage: backgroundSmsHandler,
-      listenInBackground: true,
+  Future<List<SmsMessageModel>> fetchDeviceSms() async {
+    final List<SmsMessage> smsList = await telephony.getInboxSms(
+      columns: [
+        SmsColumn.ADDRESS,
+        SmsColumn.BODY,
+        SmsColumn.DATE,
+        SmsColumn.TYPE,
+      ],
+      sortOrder: [OrderBy(SmsColumn.DATE, sort: Sort.DESC)],
     );
+    final limit = 10;
+    final allMessages = smsList.map((sms) {
+      return SmsMessageModel(
+        address: sms.address ?? "Unknown",
+        body: sms.body ?? "",
+        dateMs: sms.date ?? 0,
+        type: sms.type == SmsType.MESSAGE_TYPE_INBOX ? "inbox" : "sent",
+      );
+    }).toList();
+    final last10Messages = allMessages.take(limit).toList();
+    return last10Messages;
+  }
+
+  Future<void> syncSmsToBackend() async {
+    final token = await ApiService.getToken();
+    if (token == null || token.isEmpty) {
+      print("No JWT token found — user not logged in.");
+      return;
+    }
+
+    final smsList = await fetchDeviceSms();
+    print("Found ${smsList.length} SMS messages on device.");
+
+    final url = Uri.parse("$baseUrl/sms/sync");
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode({"messages": smsList.map((m) => m.toJson()).toList()}),
+    );
+
+    if (response.statusCode == 200) {
+      print("Synced ${smsList.length} SMS successfully to backend.");
+    } else {
+      print("Sync failed: ${response.statusCode} → ${response.body}");
+    }
+  }
+  Future<List<SmsMessageModel>> fetchAllFromBackend() async {
+    final token = await ApiService.getToken();
+    if (token == null) {
+      print("Missing token; cannot fetch backend SMS.");
+      return [];
+    }
+
+    final url = Uri.parse("$baseUrl/sms/all");
+    final response = await http.get(
+      url,
+      headers: {"Authorization": "Bearer $token"},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List messages = data["sms_messages"];
+      print("Loaded ${messages.length} messages from backend.");
+      return messages.map((e) => SmsMessageModel.fromJson(e)).toList();
+    } else {
+      print("Fetch failed: ${response.statusCode}");
+      return [];
+    }
+  }
+  void connectWebSocket(Function(SmsMessageModel) onNewMessage) {
+    _channel = WebSocketChannel.connect(Uri.parse(wsUrl));
+
+    _channel!.stream.listen(
+      (message) {
+        try {
+          final data = jsonDecode(message);
+          final newMsg = SmsMessageModel.fromJson(data);
+          print("New SMS received via WebSocket: ${newMsg.body}");
+          onNewMessage(newMsg);
+        } catch (e) {
+          print("WebSocket message parse error: $e");
+        }
+      },
+      onDone: () {
+        print("WebSocket closed. Reconnecting...");
+        reconnect(onNewMessage);
+      },
+      onError: (err) {
+        print("WebSocket error: $err");
+        reconnect(onNewMessage);
+      },
+    );
+  }
+
+  void reconnect(Function(SmsMessageModel) onNewMessage) {
+    Future.delayed(const Duration(seconds: 3), () {
+      print("Reconnecting WebSocket...");
+      connectWebSocket(onNewMessage);
+    });
+  }
+
+  void disconnect() {
+    _channel?.sink.close();
   }
 }

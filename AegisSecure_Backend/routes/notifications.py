@@ -9,7 +9,6 @@ from datetime import datetime, timezone
 load_dotenv()
 
 router = APIRouter()
-
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
@@ -33,7 +32,9 @@ async def get_spam_prediction(text: str):
         print("### Spam prediction failed:", repr(e))  
         return "unknown"
 
+
 async def get_access_token_from_refresh(refresh_token: str):
+    """Get a new Google access token using the refresh token."""
     async with httpx.AsyncClient() as client:
         resp = await client.post(
             "https://oauth2.googleapis.com/token",
@@ -46,6 +47,9 @@ async def get_access_token_from_refresh(refresh_token: str):
         )
         data = resp.json()
         return data.get("access_token")
+
+
+#-----------------------
 
 @router.post("/analyze_text")
 async def analyze_text_endpoint(data: dict):
@@ -70,7 +74,8 @@ async def gmail_notifications(request: Request):
         raw_data = await request.json()
         if "message" not in raw_data:
             return {"status": "ignored"}
-  
+
+        
         msg_str = base64.b64decode(raw_data["message"]["data"]).decode("utf-8")
         msg = json.loads(msg_str)
 
@@ -135,6 +140,6 @@ async def gmail_notifications(request: Request):
 
     except Exception as e:
         import traceback
-        print("❌ Error in gmail_notifications:", str(e))
+        print("Error in gmail_notifications:", str(e))
         traceback.print_exc()
         return {"status": "error", "message": str(e)}

@@ -21,7 +21,6 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
   OverlayEntry? _overlayEntry;
 
   String? activeAccountEmail; 
-
   @override
   @override
   void initState() {
@@ -65,7 +64,7 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
         _loading = false;
       });
     } catch (e) {
-      print("⚠️ Failed to load accounts: $e");
+      print("Failed to load accounts: $e");
       setState(() => _loading = false);
     }
   }
@@ -103,8 +102,6 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
 
     try {
       await ApiService.deleteConnectedAccount(gmailEmail);
-
-      // ✅ if deleting current active one, auto-switch
       if (activeAccountEmail == gmailEmail) {
         final remaining = connectedAccounts
             .where((a) => a['email'] != gmailEmail)
@@ -126,7 +123,7 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
       _showCapsuleMessage("Account removed");
       _loadAccounts();
     } catch (e) {
-      print("❌ Failed to delete account: $e");
+      print("Failed to delete account: $e");
       _showCapsuleMessage("Failed to remove account", error: true);
     }
   }
@@ -191,12 +188,6 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.4,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black87),
-          onPressed: () {
-            print("Sidebar icon tapped");
-          },
-        ),
         automaticallyImplyLeading: false,
         title: const Text(
           "Mail Inbox Information",
@@ -269,8 +260,6 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
                     ),
                   ),
                   const SizedBox(height: 10),
-
-                  // ✅ Connected accounts list
                   Expanded(
                     child: SingleChildScrollView(
                       child: Container(
@@ -378,19 +367,11 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
                                 "Add another account",
                                 style: TextStyle(fontWeight: FontWeight.w500),
                               ),
-                              // onTap: () async {
-                              //   await ApiService.launchGoogleLogin();
-                              //   _loadAccounts();
-                              // },
                               onTap: () async {
                                 await ApiService.launchGoogleLogin();
-
-                                // Wait a short delay to allow backend to update the account
                                 await Future.delayed(
                                   const Duration(seconds: 10),
                                 );
-
-                                // Then reload the list
                                 await _loadAccounts();
                                 _showCapsuleMessage(
                                   "Account added successfully",

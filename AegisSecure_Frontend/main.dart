@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'screens/EmailAccountManager.dart'; 
+
+import 'screens/EmailAccountManager.dart';
 import 'screens/login_screen.dart';
 import 'screens/main_navigation.dart';
 import 'screens/register_screen.dart';
@@ -10,7 +11,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('jwt_token');
-
   runApp(MyApp(initialToken: token));
 }
 
@@ -38,11 +38,12 @@ class MyApp extends StatelessWidget {
         '/emailAccountManager': (context) => const EmailAccountManager(),
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
+        // '/home': (context) => HomeScreen(),
+        // '/gmail': (context) => GmailScreen(),
+        // '/sms': (context) => const SmsScreen(),
         '/home': (context) => const MainNavigation(),
         '/otp': (context) => VerifyOtpScreen(email: ''),
-        '/sms': (context) => const SmsScreen(),
       },
     );
   }
 }
-

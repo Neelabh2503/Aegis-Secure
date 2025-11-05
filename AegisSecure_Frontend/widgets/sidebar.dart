@@ -103,7 +103,7 @@ class Sidebar extends StatelessWidget {
                         Icons.home_outlined,
                         'Home',
                         onHomeTap ??
-                                () {
+                            () {
                               Navigator.pop(context);
                               Navigator.pushNamed(context, '/home');
                             },
@@ -112,7 +112,7 @@ class Sidebar extends StatelessWidget {
                         Icons.person_outline,
                         'Account',
                         onAccountTap ??
-                                () {
+                            () {
                               Navigator.pop(context);
                               Navigator.pushNamed(context, '/account');
                             },
@@ -121,7 +121,7 @@ class Sidebar extends StatelessWidget {
                         Icons.mail_outline,
                         'Mail',
                         onMailTap ??
-                                () {
+                            () {
                               Navigator.pop(context);
                               Navigator.push(
                                 context,
@@ -135,7 +135,7 @@ class Sidebar extends StatelessWidget {
                         Icons.chat_bubble_outline,
                         'Messages',
                         onMessagesTap ??
-                                () {
+                            () {
                               Navigator.pop(context);
                               Navigator.push(
                                 context,
@@ -150,7 +150,7 @@ class Sidebar extends StatelessWidget {
                         'Change Language',
                         onLanguageTap,
                       ),
-                      _buildMenuItem(Icons.logout, 'Sign Out', onLogoutTap),
+                      _buildLogoutItem(context),
                     ],
                   ),
                 ),
@@ -176,6 +176,102 @@ class Sidebar extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogoutItem(BuildContext context) {
+    return InkWell(
+      onTap: () async {
+        Navigator.pop(context); 
+        await Future.delayed(const Duration(milliseconds: 150));
+
+        final confirmed = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 10,
+              title: Row(
+                children: const [
+                  Icon(Icons.logout, color: Color(0xFF1F2A6E)),
+                  SizedBox(width: 10),
+                  Text(
+                    "Confirm Sign Out",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              content: const Text(
+                "Are you sure you want to sign out from your account?",
+                style: TextStyle(fontSize: 16, color: Colors.black87),
+              ),
+              actionsPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 10,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.grey.shade700,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                  ),
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => Navigator.pop(context, true),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF1F2A6E),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 10,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  icon: const Icon(Icons.exit_to_app, size: 18),
+                  label: const Text(
+                    "Sign Out",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (confirmed == true && onLogoutTap != null) {
+          onLogoutTap!(); 
+        }
+      },
+      borderRadius: BorderRadius.circular(8),
+      splashColor: const Color(0xFF1F2A6E).withOpacity(0.1),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+        child: Row(
+          children: const [
+            Icon(Icons.logout, color: Colors.black87, size: 22),
+            SizedBox(width: 18),
+            Text(
+              "Sign Out",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );

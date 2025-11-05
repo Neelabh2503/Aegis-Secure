@@ -96,6 +96,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final res = await ApiService.registerUser(name, email, password);
 
       if (res.statusCode == 200) {
+        // ---⭐️
         print('✅' + email);
         Navigator.pushReplacement(
           context,
@@ -116,7 +117,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  //builfing the page
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,23 +128,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Placeholder for Logo
-                // SizedBox(
-                //   height: MediaQuery.of(context).size.width * 0.30,
-                //   width: MediaQuery.of(context).size.width * 0.30,
-                //   child: Image.asset(
-                //     'assets/images/logo.png',
-                //     fit: BoxFit.contain,
-                //   ),
-                // ),
                 SizedBox(height: 24),
                 RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
                     text: "Aegis ",
                     style: TextStyle(
-                      color: Colors.blue.shade900,
-                      fontSize: 36,
+                      fontFamily: 'Jersey20',
+                      color: Color(0xFF1F2A6E),
+                      fontSize: 60,
                       fontWeight: FontWeight.w800,
                     ),
                     children: [
@@ -183,9 +175,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
 
-                SizedBox(
-                  height: 16,
-                ), 
+                SizedBox(height: 16,), 
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
@@ -285,8 +275,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ],
                 ),
                 SizedBox(height: 16),
-
-                // Confirm Password field
                 TextField(
                   controller: confirmPasswordController,
                   obscureText: !_showConfirmPassword,
@@ -312,7 +300,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                 ),
-
                 SizedBox(height: 16),
                 Row(
                   children: [
@@ -333,8 +320,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
 
                 SizedBox(height: 20),
-
-                //Button for ciompleting the registeration
                 _loading
                     ? CircularProgressIndicator()
                     : ElevatedButton(
@@ -356,60 +341,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                       ),
-
-                SizedBox(height: 5),
-
-                Text(
-                  "OR",
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                ),
-
-                SizedBox(height: 5),
-
-                // Social Icons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        // Placeholder for now
-                      },
-                      icon: Image.asset(
-                        'assets/images/google_logo.png',
-                        height: 24,
-                        width: 24,
-                      ),
-                      label: const Text(
-                        "Sign in with Google",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        elevation: 0, // Remove shadow
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: const BorderSide(color: Colors.grey),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                        foregroundColor: Colors.white,
-                        surfaceTintColor: Colors.transparent,
-                        shadowColor:
-                            Colors.transparent, // no extra color overlay
-                      ),
-                    ),
-                  ],
-                ),
-
                 SizedBox(height: 24),
-
-                // Option to go to login Page
                 GestureDetector(
                   onTap: () => Navigator.pushNamed(context, '/login'),
                   child: RichText(

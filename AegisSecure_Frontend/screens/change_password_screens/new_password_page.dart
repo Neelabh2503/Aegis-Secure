@@ -131,7 +131,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
             TextField(
               controller: newPasswordController,
               obscureText: !showPassword,
-              onChanged: _validatePassword,
+              onChanged: _validatePassword, 
               decoration: InputDecoration(
                 labelText: "New Password",
                 border: OutlineInputBorder(

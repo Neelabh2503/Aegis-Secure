@@ -57,83 +57,119 @@ class _HomeScreenState extends State<HomeScreen> {
       final controller = TextEditingController();
       String prediction = "";
       String confidence = "";
-
       await showDialog(
         context: context,
+        barrierDismissible: true,
         builder: (context) => StatefulBuilder(
-          builder: (context, setStateDialog) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            elevation: 8,
-            title: const Text(
-              "Manual Text Analysis",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: controller,
-                    maxLines: 4,
-                    style: const TextStyle(fontSize: 16),
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 16,
-                      ),
-                      hintText: "Enter text to analyze...",
-                      hintStyle: TextStyle(color: Colors.grey.shade500),
-                      border: InputBorder.none,
+          builder: (context, setStateDialog) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 40,
+              ),
+              child: Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(maxHeight: 580),
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26.withOpacity(0.08),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
                     ),
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                if (prediction.isNotEmpty)
-                  Builder(
-                    builder: (_) {
-                      final isSpam = prediction == "SPAM";
-                      final bgColor = isSpam
-                          ? Colors.red.shade50
-                          : Colors.green.shade50;
-                      final textColor = isSpam
-                          ? Colors.red.shade700
-                          : Colors.green.shade700;
-
-                      return Container(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Manual Text Analysis",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.grey),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: Colors.grey.shade300),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: controller,
+                        maxLines: 8,
+                        style: const TextStyle(fontSize: 15, height: 1.5),
+                        decoration: InputDecoration(
+                          hintText: "Enter text to analyze...",
+                          hintStyle: TextStyle(color: Colors.grey.shade500),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    if (prediction.isNotEmpty)
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.easeOut,
+                        padding: const EdgeInsets.all(18),
+                        margin: const EdgeInsets.only(bottom: 10),
                         width: double.infinity,
-                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: bgColor,
-                          borderRadius: BorderRadius.circular(12),
+                          color: prediction == "SPAM"
+                              ? Colors.red.shade50
+                              : Colors.green.shade50,
+                          borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: isSpam
+                            color: prediction == "SPAM"
                                 ? Colors.red.shade200
                                 : Colors.green.shade200,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
                         ),
                         child: Column(
                           children: [
                             Text(
                               prediction,
-                              textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: textColor,
                                 fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: prediction == "SPAM"
+                                    ? Colors.red.shade700
+                                    : Colors.green.shade700,
                               ),
                             ),
                             if (confidence.isNotEmpty)
@@ -142,84 +178,87 @@ class _HomeScreenState extends State<HomeScreen> {
                               Text(
                                 "Confidence: $confidence",
                                 style: TextStyle(
-                                  color: textColor,
                                   fontSize: 14,
+                                  color: prediction == "SPAM"
+                                      ? Colors.red.shade700
+                                      : Colors.green.shade700,
                                 ),
                               ),
                           ],
                         ),
-                      );
-                    },
-                  ),
-              ],
-            ),
-            actionsPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 8,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.grey.shade700,
+                      ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.grey.shade700,
+                            textStyle: const TextStyle(fontSize: 15),
+                          ),
+                          child: const Text("Cancel"),
+                        ),
+                        const SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final inputText = controller.text.trim();
+                            if (inputText.isEmpty) return;
+
+                            setStateDialog(() {
+                              prediction = "Analyzing...";
+                              confidence = "";
+                            });
+
+                            try {
+                              final result = await ApiService.analyzeText(
+                                inputText,
+                              );
+                              final confStr = result['prediction'] ?? "0.0";
+                              final conf = double.tryParse(confStr) ?? 0.0;
+                              final label = conf >= 0.5 ? "SPAM" : "HAM";
+
+                              setStateDialog(() {
+                                prediction = label;
+                                confidence = conf.toStringAsFixed(2);
+                              });
+                            } catch (e) {
+                              setStateDialog(() {
+                                prediction = "ERROR";
+                                confidence = "";
+                              });
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue.shade700,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 22,
+                              vertical: 14,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            elevation: 4,
+                          ),
+                          child: const Text(
+                            "Analyze",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                child: const Text("Cancel"),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  final inputText = controller.text.trim();
-                  if (inputText.isEmpty) return;
-
-                  setStateDialog(() {
-                    prediction = "Analyzing...";
-                    confidence = "";
-                  });
-
-                  try {
-                    final result = await ApiService.analyzeText(inputText);
-                    print("DEBUG: Raw API Response = $result");
-
-                    final confStr = result['prediction'] ?? "0.0";
-                    final conf = double.tryParse(confStr) ?? 0.0;
-                    final label = conf >= 0.5 ? "SPAM" : "HAM";
-
-                    setStateDialog(() {
-                      prediction = label;
-                      confidence = conf.toStringAsFixed(2);
-                      print(
-                        "DEBUG: Classified label = $label with confidence = $confidence",
-                      );
-                    });
-                  } catch (e) {
-                    setStateDialog(() {
-                      prediction = "ERROR";
-                      confidence = "";
-                      print("DEBUG: Error fetching prediction = $e");
-                    });
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue.shade600,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                child: const Text("Submit"),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       );
     }
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -240,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Sidebar(
                     onClose: () => Navigator.of(context).pop(),
                     onHomeTap: () {
-                      Navigator.of(context).pop(); 
+                      Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("You are already on Home!"),
@@ -278,10 +317,6 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.add, color: Colors.black87),
             tooltip: "Manual text input",
             onPressed: _handleManualInput,
-          ),
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.black87),
-            onPressed: () {},
           ),
           if (_userLoading)
             const Padding(

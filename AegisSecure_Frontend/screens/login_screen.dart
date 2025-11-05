@@ -44,8 +44,6 @@ class _LoginScreenState extends State<LoginScreen> {
   void login() async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
-
-    // Basic validation
     setState(() {
       emailError = email.isEmpty ? "Please enter your email" : null;
       passwordError = password.isEmpty ? "Please enter your password" : null;
@@ -58,28 +56,26 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final res = await ApiService.loginUser(email, password);
 
-      print("DEBUG: Response status = ${res.statusCode}");
-      print("DEBUG: Response body = ${res.body}");
+      // print("DEBUG: Response status = ${res.statusCode}");
+      // print("DEBUG: Response body = ${res.body}");
 
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
 
         final token = data['token'];
         final verifiedRaw = data['verified'];
-
-        // Robust check for verified: bool, string "true", int 1
         final isVerified =
             verifiedRaw == true || verifiedRaw == "true" || verifiedRaw == 1;
 
-        print("DEBUG: Raw verified value = $verifiedRaw");
-        print("DEBUG: Parsed isVerified = $isVerified");
-        print("DEBUG: Token = $token");
+        // print("DEBUG: Raw verified value = $verifiedRaw");
+        // print("DEBUG: Parsed isVerified = $isVerified");
+        // print("DEBUG: Token = $token");
 
         if (!isVerified) {
           setState(() {
             passwordError = "Please verify your email before logging in.";
           });
-          return; // Stop login if not verified
+          return;
         }
 
         if (token == null || token.isEmpty) {
@@ -88,21 +84,19 @@ class _LoginScreenState extends State<LoginScreen> {
           });
           return;
         }
-
-        // Save token after verified
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('jwt_token', token);
-
-        // Optionally fetch current user, but catch errors safely
+        List<String> savedAccounts =
+            prefs.getStringList('saved_accounts') ?? [];
+        final newAccount = '$email:$password';
+        if (!savedAccounts.contains(newAccount)) {
+          savedAccounts.add(newAccount);
+          await prefs.setStringList('saved_accounts', savedAccounts);
+        }
         try {
           final userRes = await ApiService.fetchCurrentUser();
-          print("DEBUG: Current user = $userRes");
         } catch (e) {
-          print("DEBUG: Could not fetch current user: $e");
-          // Continue login anyway
         }
-
-        // Navigate to home
         Navigator.pushReplacementNamed(context, '/home');
       } else if (res.statusCode == 401 || res.statusCode == 400) {
         setState(() {
@@ -114,7 +108,6 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       }
     } catch (e) {
-      print("DEBUG: Exception caught during login: $e");
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Error connecting to server: $e")));
@@ -126,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Full white background
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -142,14 +135,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     fit: BoxFit.contain,
                   ),
                 ),
-                // Title
                 RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
                     text: "Aegis ",
                     style: TextStyle(
                       fontFamily: 'Jersey20',
-                      color: Colors.blue.shade900,
+                      color: Color(0xFF1F2A6E),
                       fontSize: 40,
                       fontWeight: FontWeight.w800,
                     ),
@@ -177,8 +169,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
 
                 SizedBox(height: 32),
-
-                // Email Field
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
@@ -194,8 +184,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
 
                 SizedBox(height: 16),
-
-                // Password Field
                 TextField(
                   controller: passwordController,
                   obscureText: !_showPassword,
@@ -244,10 +232,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-
                 SizedBox(height: 12),
-
-                // Sign In Button
                 _loading
                     ? CircularProgressIndicator()
                     : ElevatedButton(
@@ -279,12 +264,187 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 SizedBox(height: 5),
 
-                // Social Icons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton.icon(
-                      onPressed: () {
+                      onPressed: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        final savedAccounts =
+                            prefs.getStringList('saved_accounts') ?? [];
+
+                        if (savedAccounts.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "No saved accounts found on this device.",
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (savedAccounts.length == 1) {
+                          final parts = savedAccounts.first.split(':');
+                          if (parts.length == 2) {
+                            emailController.text = parts[0];
+                            passwordController.text = parts[1];
+                            login();
+                          }
+                          return;
+                        }
+
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              backgroundColor: Colors.white,
+                              child: Container(
+                                padding: const EdgeInsets.fromLTRB(
+                                  20,
+                                  16,
+                                  20,
+                                  12,
+                                ),
+                                constraints: const BoxConstraints(
+                                  maxHeight: 380,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "Select an Account",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 17,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.close,
+                                            color: Colors.grey,
+                                          ),
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                        ),
+                                      ],
+                                    ),
+                                    const Divider(height: 18),
+                                    Expanded(
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: savedAccounts.length,
+                                        itemBuilder: (context, index) {
+                                          final parts = savedAccounts[index]
+                                              .split(':');
+                                          final email = parts.first;
+
+                                          return Container(
+                                            margin: const EdgeInsets.symmetric(
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey.shade100,
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.03),
+                                                  blurRadius: 3,
+                                                  offset: const Offset(0, 1),
+                                                ),
+                                              ],
+                                            ),
+                                            child: ListTile(
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 4,
+                                                  ),
+                                              leading: CircleAvatar(
+                                                radius: 18,
+                                                backgroundColor: const Color(
+                                                  0xFFE8ECFF,
+                                                ),
+                                                child: Text(
+                                                  email[0].toUpperCase(),
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF1F2A6E),
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ),
+                                              title: Text(
+                                                email,
+                                                style: const TextStyle(
+                                                  fontSize:
+                                                      14,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.black87,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              trailing: IconButton(
+                                                icon: const Icon(
+                                                  Icons.delete_outline,
+                                                  color: Colors.grey,
+                                                  size: 22,
+                                                ),
+                                                onPressed: () async {
+                                                  final prefs =
+                                                      await SharedPreferences.getInstance();
+                                                  final updated =
+                                                      List<String>.from(
+                                                        savedAccounts,
+                                                      )..removeAt(index);
+                                                  await prefs.setStringList(
+                                                    'saved_accounts',
+                                                    updated,
+                                                  );
+                                                  Navigator.pop(context);
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        "Removed $email from saved accounts.",
+                                                      ),
+                                                      behavior: SnackBarBehavior
+                                                          .floating,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                              onTap: () {
+                                                Navigator.pop(context);
+                                                emailController.text = parts[0];
+                                                passwordController.text =
+                                                    parts.length > 1
+                                                    ? parts[1]
+                                                    : '';
+                                                login();
+                                              },
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
                       },
                       icon: Image.asset(
                         'assets/images/google_logo.png',
@@ -313,7 +473,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         foregroundColor: Colors.white,
                         surfaceTintColor: Colors.transparent,
                         shadowColor:
-                            Colors.transparent, 
+                            Colors.transparent,
                       ),
                     ),
                   ],
@@ -337,9 +497,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-
-                //----⭐️
-                const SizedBox(height: 20), // spacing before the link
+                const SizedBox(height: 20),
                 Align(
                   alignment: Alignment.center,
                   child: TextButton(
@@ -347,7 +505,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ? null
                         : () async {
                             final outerContext =
-                                context; // Use the screen context for navigation & dialogs
+                                context; 
                             final emailControllerDialog =
                                 TextEditingController();
 
@@ -423,9 +581,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                         Navigator.pop(
                                           dialogContext,
-                                        ); // Close dialog
-
-                                        // Run async logic in microtask to avoid UI freeze
+                                        );
                                         Future.microtask(() async {
                                           setState(() => _loading = true);
                                           try {
@@ -447,7 +603,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   "This email is already verified. Please login instead.",
                                                 );
                                               } else {
-                                                // Unverified → send OTP
                                                 final resOtp =
                                                     await ApiService.sendOtp(
                                                       email,
@@ -471,7 +626,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                               }
                                             } else if (resCheck.statusCode ==
                                                 404) {
-                                              // Treat 404 as unverified → send OTP
                                               final resOtp =
                                                   await ApiService.sendOtp(
                                                     email,

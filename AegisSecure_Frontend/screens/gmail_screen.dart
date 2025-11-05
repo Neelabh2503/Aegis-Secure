@@ -4,8 +4,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-
 import '../models/gmail_model.dart';
+import '../screens/Email_detail_screen.dart';
 import '../services/api_service.dart';
 import '../widgets/sidebar.dart';
 
@@ -20,16 +20,35 @@ class _GmailScreenState extends State<GmailScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Called when this screen reappears
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await loadConnectedAccounts();
       await loadEmails();
     });
   }
 
+  Color _parseColor(String hexColor) {
+    try {
+      hexColor = hexColor.replaceAll("#", "");
+      if (hexColor.length == 6) hexColor = "FF$hexColor";
+      return Color(int.parse(hexColor, radix: 16));
+    } catch (_) {
+      return Colors.grey.shade400;
+    }
+  }
+
+  String _formatTime(DateTime dt) {
+    final now = DateTime.now();
+    if (now.difference(dt).inDays == 0) {
+      return "${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}";
+    } else {
+      return "${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}";
+    }
+  }
+
   List<String> connectedAccounts = [];
   String? selectedGmailAccount;
   List<EmailMessage> emails = [];
+  List<EmailMessage> allEmails = [];
   String? currentUserName;
   bool _loading = true;
   bool _userLoading = true;
@@ -37,88 +56,56 @@ class _GmailScreenState extends State<GmailScreen> {
   late WebSocketChannel channel;
   final Random _random = Random();
 
-  void _showAccountSwitcher() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 12),
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                "Switch Gmail Account",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(height: 16),
-              ...connectedAccounts.map((email) {
-                final isSelected = email == selectedGmailAccount;
-                final color = isSelected
-                    ? Colors.blueAccent
-                    : Colors.grey.shade600;
-                return Container(
-                  color: isSelected ? Colors.blue.shade50 : Colors.transparent,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: color.withOpacity(0.2),
-                      child: Text(
-                        email[0].toUpperCase(),
-                        style: TextStyle(
-                          color: color,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    title: Text(
-                      email,
-                      style: TextStyle(
-                        color: color,
-                        fontWeight: isSelected
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                      ),
-                    ),
-                    trailing: isSelected
-                        ? const Icon(Icons.check, color: Colors.blueAccent)
-                        : null,
-                    onTap: () async {
-                      Navigator.pop(context);
-                      if (email != selectedGmailAccount) {
-                        setState(() => selectedGmailAccount = email);
-                        await loadEmails();
-                      }
-                    },
-                  ),
-                );
-              }),
+  Future<void> _showSearchDialog() async {
+    final _searchController = TextEditingController();
 
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.add, color: Colors.blueAccent),
-                title: const Text("Add another account"),
-                onTap: () async {
-                  Navigator.pop(context);
-                  await ApiService.launchGoogleLogin();
-                },
-              ),
-              const SizedBox(height: 8),
-            ],
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Search Emails"),
+        content: TextField(
+          controller: _searchController,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: "Search subject, sender, etc...",
+            icon: Icon(Icons.search),
           ),
-        );
-      },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final query = _searchController.text.trim();
+              if (query.isEmpty) return;
+
+              Navigator.pop(context);
+              setState(() => _loading = true);
+
+              try {
+                final results = await ApiService.searchEmails(query);
+                setState(() {
+                  emails = results
+                      .map((e) => EmailMessage.fromJson(e))
+                      .toList();
+                });
+              } catch (e) {
+                print("Search failed: $e");
+                if (mounted) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text("Search failed: $e")));
+                }
+              } finally {
+                setState(() => _loading = false);
+              }
+            },
+            child: const Text("Search"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -133,7 +120,7 @@ class _GmailScreenState extends State<GmailScreen> {
         selectedGmailAccount = accounts.isNotEmpty ? accounts.first : null;
       });
     } catch (e) {
-      print("⚠️ Failed to load connected Gmail accounts: $e");
+      print("Failed to load connected Gmail accounts: $e");
     }
   }
 
@@ -141,7 +128,6 @@ class _GmailScreenState extends State<GmailScreen> {
   void initState() {
     super.initState();
     loadCurrentUser();
-    // loadEmails();
     loadConnectedAccounts().then((_) => loadEmails());
     connectWebSocket();
   }
@@ -160,7 +146,7 @@ class _GmailScreenState extends State<GmailScreen> {
         _userLoading = false;
       });
     } catch (e) {
-      print("⚠️ Failed to load user: $e");
+      print("Failed to load user: $e");
       setState(() => _userLoading = false);
     }
   }
@@ -175,7 +161,7 @@ class _GmailScreenState extends State<GmailScreen> {
         final data = jsonDecode(event);
         if (data['new_email'] == true &&
             data['gmail_email'] == selectedGmailAccount) {
-          print("📩 New mail for $selectedGmailAccount → refreshing inbox");
+          // print("⭐️New mail for $selectedGmailAccount → refreshing inbox");
           final refreshed = await ApiService.fetchEmailsForAccount(
             selectedGmailAccount!,
           );
@@ -184,9 +170,9 @@ class _GmailScreenState extends State<GmailScreen> {
           });
         }
       },
-      onError: (err) => print("⚠️ WebSocket error: $err"),
+      onError: (err) => print("WebSocket error: $err"),
       onDone: () {
-        print("🔁 WS closed, retrying in 5s...");
+        print("WS closed, retrying in 5s...");
         Future.delayed(const Duration(seconds: 5), connectWebSocket);
       },
     );
@@ -197,7 +183,7 @@ class _GmailScreenState extends State<GmailScreen> {
 
     if (selectedGmailAccount == null) {
       setState(() {
-        emails = [];
+        emails = allEmails;
         _loading = false;
       });
       return;
@@ -207,18 +193,40 @@ class _GmailScreenState extends State<GmailScreen> {
       final data = await ApiService.fetchEmailsForAccount(
         selectedGmailAccount!,
       );
+      final loadedEmails = data.map((e) => EmailMessage.fromJson(e)).toList();
+
       setState(() {
-        emails = data.map((e) => EmailMessage.fromJson(e)).toList();
+        allEmails = loadedEmails;
+        emails = loadedEmails;
       });
     } catch (e) {
-      print("⚠️ Failed to load emails: $e");
+      print("Failed to load emails: $e");
     } finally {
       setState(() => _loading = false);
     }
   }
 
-  /// Manual text scoring input
-  /// ----------
+  void _performSearch(String query) {
+    query = query.toLowerCase();
+
+    if (query.isEmpty) {
+      setState(() => emails = allEmails);
+      return;
+    }
+
+    final filtered = allEmails.where((email) {
+      final from = email.sender.toLowerCase();
+      final subject = email.subject.toLowerCase();
+      final snippet = email.snippet.toLowerCase();
+
+      return from.contains(query) ||
+          subject.contains(query) ||
+          snippet.contains(query);
+    }).toList();
+
+    setState(() => emails = filtered);
+  }
+
   Future<void> _handleManualInput() async {
     final controller = TextEditingController();
     String prediction = "";
@@ -226,193 +234,210 @@ class _GmailScreenState extends State<GmailScreen> {
 
     await showDialog(
       context: context,
+      barrierDismissible: true, 
       builder: (context) => StatefulBuilder(
-        builder: (context, setStateDialog) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          elevation: 8,
-          title: const Text(
-            "Manual Text Analysis",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade300),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  controller: controller,
-                  maxLines: 4,
-                  style: const TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 16,
-                    ),
-                    hintText: "Enter text to analyze...",
-                    hintStyle: TextStyle(color: Colors.grey.shade500),
-                    border: InputBorder.none,
+        builder: (context, setStateDialog) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            insetPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 40,
+            ),
+            child: Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(maxHeight: 580),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26.withOpacity(0.08),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(height: 16),
-              if (prediction.isNotEmpty)
-                Builder(
-                  builder: (_) {
-                    final isSpam = prediction == "SPAM";
-                    final bgColor = isSpam
-                        ? Colors.red.shade50
-                        : Colors.green.shade50;
-                    final textColor = isSpam
-                        ? Colors.red.shade700
-                        : Colors.green.shade700;
-
-                    return Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Manual Text Analysis",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.grey),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: Colors.grey.shade300),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      controller: controller,
+                      maxLines: 8,
+                      style: const TextStyle(fontSize: 15, height: 1.5),
+                      decoration: InputDecoration(
+                        hintText: "Enter text to analyze...",
+                        hintStyle: TextStyle(color: Colors.grey.shade500),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  if (prediction.isNotEmpty)
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeOut,
+                      padding: const EdgeInsets.all(18),
+                      margin: const EdgeInsets.only(bottom: 10),
                       width: double.infinity,
-                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: bgColor,
-                        borderRadius: BorderRadius.circular(12),
+                        color: prediction == "SPAM"
+                            ? Colors.red.shade50
+                            : Colors.green.shade50,
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: isSpam
+                          color: prediction == "SPAM"
                               ? Colors.red.shade200
                               : Colors.green.shade200,
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
                       ),
                       child: Column(
                         children: [
                           Text(
                             prediction,
-                            textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: textColor,
                               fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: prediction == "SPAM"
+                                  ? Colors.red.shade700
+                                  : Colors.green.shade700,
                             ),
                           ),
                           if (confidence.isNotEmpty) const SizedBox(height: 6),
                           if (confidence.isNotEmpty)
                             Text(
                               "Confidence: $confidence",
-                              style: TextStyle(color: textColor, fontSize: 14),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: prediction == "SPAM"
+                                    ? Colors.red.shade700
+                                    : Colors.green.shade700,
+                              ),
                             ),
                         ],
                       ),
-                    );
-                  },
-                ),
-            ],
-          ),
-          actionsPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 8,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.grey.shade700,
+                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.grey.shade700,
+                          textStyle: const TextStyle(fontSize: 15),
+                        ),
+                        child: const Text("Cancel"),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final inputText = controller.text.trim();
+                          if (inputText.isEmpty) return;
+
+                          setStateDialog(() {
+                            prediction = "Analyzing...";
+                            confidence = "";
+                          });
+
+                          try {
+                            final result = await ApiService.analyzeText(
+                              inputText,
+                            );
+                            final confStr = result['prediction'] ?? "0.0";
+                            final conf = double.tryParse(confStr) ?? 0.0;
+                            final label = conf >= 0.5 ? "SPAM" : "HAM";
+
+                            setStateDialog(() {
+                              prediction = label;
+                              confidence = conf.toStringAsFixed(2);
+                            });
+                          } catch (e) {
+                            setStateDialog(() {
+                              prediction = "ERROR";
+                              confidence = "";
+                            });
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue.shade700,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 22,
+                            vertical: 14,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          textStyle: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          elevation: 4,
+                        ),
+                        child: const Text(
+                          "Analyze",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              child: const Text("Cancel"),
             ),
-            ElevatedButton(
-              onPressed: () async {
-                final inputText = controller.text.trim();
-                if (inputText.isEmpty) return;
-
-                setStateDialog(() {
-                  prediction = "Analyzing...";
-                  confidence = "";
-                });
-
-                try {
-                  final result = await ApiService.analyzeText(inputText);
-                  print("DEBUG: Raw API Response = $result");
-
-                  final confStr = result['prediction'] ?? "0.0";
-                  final conf = double.tryParse(confStr) ?? 0.0;
-                  final label = conf >= 0.5 ? "SPAM" : "HAM";
-
-                  setStateDialog(() {
-                    prediction = label;
-                    confidence = conf.toStringAsFixed(2);
-                    print(
-                      "DEBUG: Classified label = $label with confidence = $confidence",
-                    );
-                  });
-                } catch (e) {
-                  setStateDialog(() {
-                    prediction = "ERROR";
-                    confidence = "";
-                    print("DEBUG: Error fetching prediction = $e");
-                  });
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade600,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              child: const Text("Submit"),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
-  }
-
-  // --------
-
-  Color _getRandomColor() {
-    const colors = [
-      Colors.red,
-      Colors.blue,
-      Colors.green,
-      Colors.orange,
-      Colors.purple,
-      Colors.teal,
-      Colors.amber,
-      Colors.indigo,
-      Colors.pink,
-      Colors.brown,
-    ];
-    return colors[_random.nextInt(colors.length)];
-  }
-
-  /// OAuth Gmail Connection Flow
-  void _startOauthFlow() {
-    Navigator.pushNamed(context, '/oauth');
-  }
-  void _goToHome() {
-    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   }
 
   @override
   Widget build(BuildContext context) {
     final firstLetter = (currentUserName != null && currentUserName!.isNotEmpty)
         ? currentUserName![0].toUpperCase()
-        : '?';
+        : 'A';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -434,8 +459,7 @@ class _GmailScreenState extends State<GmailScreen> {
                   child: Sidebar(
                     onClose: () => Navigator.of(context).pop(),
                     onMailTap: () {
-                      Navigator.of(context).pop(); // close sidebar
-                      // Optional: Show message or stay on home
+                      Navigator.of(context).pop(); 
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("You are already on Mail Page!"),
@@ -464,6 +488,7 @@ class _GmailScreenState extends State<GmailScreen> {
             );
           },
         ),
+
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -495,8 +520,14 @@ class _GmailScreenState extends State<GmailScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.search, color: Colors.black87),
-            onPressed: () {},
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: EmailSearchDelegate(allEmails),
+              );
+            },
           ),
+
           if (_userLoading)
             const Padding(
               padding: EdgeInsets.only(right: 12.0),
@@ -538,7 +569,6 @@ class _GmailScreenState extends State<GmailScreen> {
         ],
       ),
 
-      /// BODY
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : emails.isEmpty
@@ -548,112 +578,149 @@ class _GmailScreenState extends State<GmailScreen> {
               child: ListView.separated(
                 itemCount: emails.length,
                 separatorBuilder: (_, __) =>
-                    const Divider(height: 0, thickness: 0.3),
+                    Divider(thickness: 0.8, color: Colors.grey.shade300),
                 itemBuilder: (context, index) {
                   final email = emails[index];
-                  final avatarColor = _getRandomColor();
+                  final rawPred =
+                      email.spamPrediction?.toUpperCase() ?? "UNKNOWN";
 
-                  return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    leading: CircleAvatar(
-                      backgroundColor: avatarColor,
-                      child: Text(
-                        email.sender.isNotEmpty
-                            ? email.sender[0].toUpperCase()
-                            : '?',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    title: Text(
-                      email.sender,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          email.subject.isEmpty
-                              ? "(No Subject)"
-                              : email.subject,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          email.snippet,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          width: 42,
-                          height: 22,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          alignment: Alignment.center,
+                  final isSpam =
+                      rawPred == "SPAM" ||
+                      double.tryParse(rawPred) != null &&
+                          double.parse(rawPred) >= 0.5;
 
-                          // ----------
-                          child: Text(
-                            email.spamPrediction?.toUpperCase() ?? "UNKNOWN",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                  final spamColor = isSpam
+                      ? Colors.red.shade100
+                      : Colors.green.shade100;
+                  final spamTextColor = isSpam
+                      ? Colors.red.shade700
+                      : Colors.green.shade700;
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => EmailDetailScreen(email: email),
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      color: Colors.white,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: _parseColor(
+                              email.charColor ?? "#9E9E9E",
+                            ),
+                            child: Text(
+                              email.sender.isNotEmpty
+                                  ? email.sender[0].toUpperCase()
+                                  : 'A',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                             ),
                           ),
-
-                          // ----------
-                        ),
-                        const Icon(
-                          Icons.more_vert,
-                          size: 20,
-                          color: Colors.grey,
-                        ),
-                      ],
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  email.sender,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  email.subject.isEmpty
+                                      ? "(No Subject)"
+                                      : email.subject,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  email.snippet,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: spamColor,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: spamTextColor.withOpacity(0.3),
+                                  ),
+                                ),
+                                child: Text(
+                                  email.spamPrediction.toString(),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: spamTextColor,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              const Icon(
+                                Icons.more_vert,
+                                size: 20,
+                                color: Colors.grey,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
               ),
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await ApiService.launchGoogleLogin();
-        },
-        backgroundColor: Colors.blueAccent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: const Icon(Icons.add, size: 28, color: Colors.white),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //     await ApiService.launchGoogleLogin();
+      //   },
+      //   backgroundColor: Colors.blueAccent,
+      //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      //   child: const Icon(Icons.add, size: 28, color: Colors.white),
+      // ),
     );
   }
 }
+
 class EmailSearchDelegate extends SearchDelegate<String> {
   final List<EmailMessage> allEmails;
   final Random _random = Random();
   EmailSearchDelegate(this.allEmails);
-
-  // Gmail-like soft color palette for avatars
-
   @override
   List<Widget>? buildActions(BuildContext context) => [
     if (query.isNotEmpty)
@@ -818,7 +885,6 @@ class EmailSearchDelegate extends SearchDelegate<String> {
     );
   }
 
-  /// Highlight matched query inside text
   Widget _highlightMatch(String? text, String query, TextStyle baseStyle) {
     final safeText = text ?? "";
     if (query.isEmpty || safeText.isEmpty) {

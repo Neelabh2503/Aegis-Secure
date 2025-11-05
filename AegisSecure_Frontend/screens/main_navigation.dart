@@ -11,10 +11,8 @@ class MainNavigation extends StatefulWidget {
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  int _currentIndex = 1; //for home screen we chose 1
-
+  int _currentIndex = 1; 
   final List<Widget> _pages = const [SmsScreen(), HomeScreen(), GmailScreen()];
-
   void _onTabTapped(int index) {
     setState(() => _currentIndex = index);
   }

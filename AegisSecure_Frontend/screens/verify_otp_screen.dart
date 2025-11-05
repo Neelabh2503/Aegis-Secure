@@ -200,8 +200,6 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
               ),
 
               const SizedBox(height: 35),
-
-              // Buttons Row
               Row(
                 children: [
                   Expanded(

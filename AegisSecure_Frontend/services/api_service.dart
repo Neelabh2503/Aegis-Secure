@@ -3,14 +3,13 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:telephony/telephony.dart';
-import 'package:telephony/telephony.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ApiService {
-  static const String baseUrl = "https://aegissecurebackend.onrender.com";
+  // static const String baseUrl = "https://aegissecurebackend.onrender.com";
   static const String CyberUrl =
       "https://cybersecure-backend-api.onrender.com/predict";
-  // static const String baseUrl =
+  static const String baseUrl =
       "https://aidyn-findable-greedily.ngrok-free.dev";
   // neEd to store the JWT tokn in sharedPreferences so that user dont have to logIn again and again every time he opens the App.
   static Future<void> saveToken(String token) async {
@@ -58,7 +57,7 @@ class ApiService {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'name': name, 'email': email, 'password': password}),
     );
-    print('🔴 Register response: ${res.statusCode} → ${res.body}');
+    print('Register response: ${res.statusCode} → ${res.body}');
     return res;
   }
 
@@ -115,7 +114,7 @@ class ApiService {
       final data = jsonDecode(res.body);
       return data['access_token'];
     } else {
-      print("⚠️ Failed to refresh access token: ${res.body}");
+      print("Failed to refresh access token: ${res.body}");
       return null;
     }
   }
@@ -132,9 +131,12 @@ class ApiService {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"text": text}),
       );
-
-      print("DEBUG: Raw API HTTP status = ${response.statusCode}");
-      print("DEBUG: Raw API HTTP body = ${response.body}");
+//       print('''
+// ✅⭐️ DEBUG: Sending POST request
+// URL: $url
+// Headers: {"Content-Type": "application/json"}
+// 🔹Body: ${jsonEncode({"text": text})}
+// ''');
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
@@ -152,21 +154,20 @@ class ApiService {
 
   static Future<List<dynamic>> fetchEmails({String? gmailEmail}) async {
     String? token;
-
     if (gmailEmail != null) {
       token = await getGoogleAccessToken(gmailEmail);
       if (token == null) {
-        print("⚠️ Failed to get refreshed Google access token");
+        print("Failed to get refreshed Google access token");
         return [];
       }
     } else {
       token = await getToken();
+      print("[DEBUG] Fetching JWT token...");
       if (token == null || token.isEmpty) {
-        print("⚠️ No JWT token found in SharedPreferences");
+        print("No JWT token found in SharedPreferences");
         return [];
       }
     }
-
     final url = Uri.parse('$baseUrl/emails');
     final res = await http.get(
       url,
@@ -175,8 +176,9 @@ class ApiService {
         'Authorization': 'Bearer $token',
       },
     );
-    print("🔵 Status code: ${res.statusCode}");
-    print("🔵 Response body: ${res.body}");
+    print("[DEBUG] Response received:");
+    print("Status Code: ${res.statusCode}");
+    print("Body: ${res.body}");
     if (res.statusCode == 200) {
       return jsonDecode(res.body);
     } else {
@@ -189,23 +191,19 @@ class ApiService {
         "365011130597-3bv38b9aubtt65rebnbl673c2cogt7j3.apps.googleusercontent.com";
     // final redirectUri ="https://aidyn-findable-greedily.ngrok-free.dev/auth/google/callback";
     final redirectUri ="https://aegissecurebackend.onrender.com/auth/google/callback";
-    // 1️⃣ Get user_id from login JWT
     final userId = await getUserId();
     if (userId == null) {
-      print("⚠️ No user logged in");
+      print("No user logged in");
       return;
     }
-
-    // 2️⃣ Request fresh state token from backend
     final res = await http.get(
       Uri.parse("$baseUrl/gmail/state-token?user_id=$userId"),
     );
     if (res.statusCode != 200) {
-      print("⚠️ Failed to get state token");
+      print("Failed to get state token");
       return;
     }
     final stateToken = jsonDecode(res.body)['state'];
-
 
     final url = Uri.parse(
       "https://accounts.google.com/o/oauth2/v2/auth"
@@ -221,7 +219,7 @@ class ApiService {
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } else {
-      print("⚠️ Can't launch $url");
+      print("Can't launch $url");
     }
   }
   static Future<http.Response> sendOtp(String email) async {
@@ -235,20 +233,18 @@ class ApiService {
 
   static Future<http.Response> verifyOtp(String email, String otp) async {
     final url = Uri.parse('$baseUrl/auth/verify-otp');
-
-    print("⭐️" + email);
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'email': email.trim(), 'otp': otp.trim()}),
     );
 
-    print("🔴 Verify OTP response: ${response.statusCode} -> ${response.body}");
+    print("Verify OTP response: ${response.statusCode} -> ${response.body}");
     return response; 
   }
 
   static Future<http.Response> checkEmailVerification(String email) async {
-    final url = Uri.parse('$baseUrl/auth/check-email'); 
+    final url = Uri.parse('$baseUrl/auth/check-email');
 
     try {
       final res = await http.post(
@@ -349,21 +345,22 @@ class ApiService {
       await prefs.setString('active_linked_email', email);
     }
   }
-  //.
+
+
   static Future<Map<String, dynamic>> analyzeSmsList(
     List<SmsMessage> messages,
   ) async {
     final url = Uri.parse(
       '$baseUrl/analyze_sms_list',
-    ); 
+    );
     final token = await getToken();
 
     if (token == null) {
       throw Exception('User is not authenticated');
     }
     final List<String> messageBodies = messages
-        .map((msg) => msg.body ?? "") 
-        .where((body) => body.isNotEmpty) 
+        .map((msg) => msg.body ?? "")
+        .where((body) => body.isNotEmpty)
         .toList();
 
     if (messageBodies.isEmpty) {
@@ -386,6 +383,7 @@ class ApiService {
       throw Exception('Failed to analyze SMS list: ${response.body}');
     }
   }
+
   static Future<http.Response> resetPassword(
     String email,
     String otp,
@@ -401,5 +399,36 @@ class ApiService {
         'new_password': newPassword,
       }),
     );
+  }
+
+  static Future<List<dynamic>> searchEmails(String query) async {
+    final token = await getToken();
+    if (token == null || token.isEmpty) {
+      print("No JWT token found in SharedPreferences");
+      return [];
+    }
+    final url = Uri.parse(
+      '$baseUrl/emails/search?q=${Uri.encodeComponent(query)}',
+    );
+    try {
+      final res = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      if (res.statusCode == 200) {
+        return jsonDecode(res.body);
+      } else {
+        print(
+          'Failed to search emails. Status: ${res.statusCode}, Body: ${res.body}',
+        );
+        return [];
+      }
+    } catch (e) {
+      print('Error searching emails: $e');
+      return [];
+    }
   }
 }

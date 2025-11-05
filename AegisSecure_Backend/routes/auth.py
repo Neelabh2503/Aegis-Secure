@@ -6,14 +6,14 @@ import os
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials 
 from pydantic import BaseModel, EmailStr
 from dotenv import load_dotenv
+from passlib.context import CryptContext
+from typing import Optional
 import datetime
 
 security = HTTPBearer()
 load_dotenv()
-from database import users_col ,auth_db 
+from database import users_col ,auth_db,otps_col
 from routes import otp
-
-
 
 router = APIRouter()
 JWT_SECRET = os.getenv("JWT_SECRET", "supersecret")  
@@ -41,27 +41,57 @@ class VerifyOTPRequest(BaseModel):
     email: EmailStr
     otp: str
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """A dependency to get the current user from a JWT token."""
-    token = credentials.credentials
+
+class UserResponse(BaseModel):
+    name: str
+    email: str
+    user_id: str
+
+
+#--⭐️
+
+class VerifyOTPRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
+class VerifyResetOTPRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
+class ResetPasswordRequest(BaseModel):
+    reset_token: str
+    new_password: str
+    confirm_password: str
+
+
+RESET_JWT_TTL_MINUTES = int(os.getenv("RESET_JWT_TTL_MINUTES", "15"))
+
+def hash_password(plain: str) -> str:
+    return pwd_context.hash(plain)
+
+def verify_password(plain: str, hashed: str) -> bool:
+    return pwd_context.verify(plain, hashed)
+
+def create_reset_jwt(email: str) -> str:
+    exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=RESET_JWT_TTL_MINUTES)
+    payload = {"sub": email, "purpose": "password_reset", "exp": exp}
+    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return token
+
+def decode_reset_jwt(token: str) -> dict:
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
-        email: str = payload.get("email")
-        if email is None:
-            raise HTTPException(status_code=403, detail="Invalid token payload")
-
-        user = await users_col.find_one({"email": email})
-        if user is None:
-            raise HTTPException(status_code=404, detail="User not found")
-
-        user["user_id"] = str(user["_id"])
-        return user
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        if payload.get("purpose") != "password_reset":
+            raise HTTPException(status_code=401, detail="Invalid token purpose")
+        return payload
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=403, detail="Token has expired")
+        raise HTTPException(status_code=401, detail="Reset token expired")
     except jwt.InvalidTokenError:
-        raise HTTPException(status_code=403, detail="Invalid token")
+        raise HTTPException(status_code=401, detail="Invalid reset token")
 
+#--⭐️
 
+    
 @router.post("/register")
 async def register_user(req: RegisterRequest):
     existing = await users_col.find_one({"email": req.email})
@@ -78,8 +108,7 @@ async def register_user(req: RegisterRequest):
         "user_id": str(datetime.datetime.now().timestamp())
     }
     await users_col.insert_one(user_doc)
-    
-
+    #<--⭐️
     otp_code = otp.generate_otp()
     await otp.store_otp(req.email, otp_code)
     sent = await otp.send_otp_email_async(req.email, otp_code)
@@ -88,7 +117,6 @@ async def register_user(req: RegisterRequest):
         return {"message": "User registered. OTP sent to email."}
     else:
         return {"message": f"User registered. OTP (dev mode): {otp_code}"}
-
 
 @router.post("/login", response_model=LoginResponse)
 async def login_user(req: LoginRequest):
@@ -108,17 +136,13 @@ async def login_user(req: LoginRequest):
     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
     return {"token": token,"verified": user.get("verified", False)}
 
-
 @router.post("/send-otp")
 async def send_otp(req: SendOTPRequest):
-    
     user = await users_col.find_one({"email": req.email})
     if not user:
         raise HTTPException(status_code=400, detail="User not found")
     
-
     otp_code = otp.generate_otp()
-    
     await otp.store_otp(req.email, otp_code)
     sent = await otp.send_otp_email_async(req.email, otp_code)
     if sent:
@@ -128,7 +152,7 @@ async def send_otp(req: SendOTPRequest):
 
 @router.post("/verify-otp")
 async def verify_otp(req: VerifyOTPRequest):
-    print("📩 Incoming OTP verification request:", req.dict()) 
+    print("📩Incoming OTP verification request:", req.dict())  
 
     try:
         is_valid = await otp.verify_otp_in_db(req.email, req.otp)
@@ -159,6 +183,7 @@ def decode_jwt(token: str):
 
 @router.get("/me")
 async def get_user_info(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Returns the name and email of the logged-in user."""
     token = credentials.credentials
     decoded = decode_jwt(token)
     user = await users_col.find_one({"email": decoded["email"]})
@@ -170,27 +195,47 @@ async def get_user_info(credentials: HTTPAuthorizationCredentials = Depends(secu
         "email": user["email"],
         "verified": user.get("verified", False),
     }
- @router.post("/forgot-password")
+
+
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """A dependency to get the current user from a JWT token."""
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        email: str = payload.get("email")
+        if email is None:
+            raise HTTPException(status_code=403, detail="Invalid token payload")
+
+        user = await users_col.find_one({"email": email})
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        user["user_id"] = str(user["_id"])
+        return user
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=403, detail="Token has expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=403, detail="Invalid token")
+    
+
+    
+@router.post("/forgot-password")
 async def forgot_password(req: SendOTPRequest):
     """Generate OTP and send to user's email if the user exists.
     Returns a generic message regardless of whether the email exists
     (to avoid user enumeration)."""
     email = req.email.lower()
     user = await users_col.find_one({"email": email})
-
-    # If user exists -> store OTP & attempt to send email
     if user:
         otp_code = otp.generate_otp()
         await otp.store_otp(email, otp_code)
         sent = await otp.send_otp_email_async(email, otp_code)
         if sent:
-            # generic success
             return {"message": "If this email is registered, an OTP has been sent."}
         else:
-            # dev fallback: still generic, but helpful in dev logs
             print(f"[DEV] OTP for {email}: {otp_code}")
             return {"message": "If this email is registered, an OTP has been sent."}
-    # If user doesn't exist, respond generically (do not store OTP)
     return {"message": "If this email is registered, an OTP has been sent."}
 
 @router.post("/verify-reset-otp")
@@ -200,8 +245,6 @@ async def verify_reset_otp(req: VerifyResetOTPRequest):
     is_valid = await otp.verify_otp_in_db(email, req.otp)
     if not is_valid:
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
-
-    # create and return reset JWT
     reset_token = create_reset_jwt(email)
     return {"reset_token": reset_token, "expires_in_minutes": RESET_JWT_TTL_MINUTES}
 
@@ -214,13 +257,10 @@ async def reset_password(data: dict):
 
     if not all([email, otp, new_password]):
         raise HTTPException(status_code=400, detail="Missing fields")
-
-    # ✅ Verify OTP (no need for "verified": True)
     otp_doc = await otps_col.find_one({"email": email, "otp": otp})
     if not otp_doc:
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
 
-    # ✅ Hash and update password
     hashed_pw = pwd_context.hash(new_password)
     result = await users_col.update_one(
         {"email": email},
@@ -229,6 +269,5 @@ async def reset_password(data: dict):
 
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="User not found")
-
     await otps_col.delete_many({"email": email})
     return {"message": "Password updated successfully"}
