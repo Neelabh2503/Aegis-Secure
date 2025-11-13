@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+
 import '../models/gmail_model.dart';
 import '../screens/Email_detail_screen.dart';
 import '../services/api_service.dart';
@@ -13,20 +14,22 @@ class GmailScreen extends StatefulWidget {
   const GmailScreen({Key? key}) : super(key: key);
 
   @override
-  _GmailScreenState createState() => _GmailScreenState();
+  GmailScreenState createState() => GmailScreenState();
 }
 
-class _GmailScreenState extends State<GmailScreen> {
+class GmailScreenState extends State<GmailScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await loadConnectedAccounts();
-      await loadEmails();
+      if (mounted && selectedGmailAccount != null) {
+        await loadEmails();
+      }
     });
   }
 
-  Color _parseColor(String hexColor) {
+  Color parseColor(String hexColor) {
     try {
       hexColor = hexColor.replaceAll("#", "");
       if (hexColor.length == 6) hexColor = "FF$hexColor";
@@ -36,7 +39,7 @@ class _GmailScreenState extends State<GmailScreen> {
     }
   }
 
-  String _formatTime(DateTime dt) {
+  String formatTime(DateTime dt) {
     final now = DateTime.now();
     if (now.difference(dt).inDays == 0) {
       return "${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}";
@@ -50,21 +53,43 @@ class _GmailScreenState extends State<GmailScreen> {
   List<EmailMessage> emails = [];
   List<EmailMessage> allEmails = [];
   String? currentUserName;
-  bool _loading = true;
-  bool _userLoading = true;
+  bool loading = true;
+  bool userLoading = true;
   Timer? _pollingTimer;
   late WebSocketChannel channel;
-  final Random _random = Random();
+
+  Future<void> loadConnectedAccounts() async {
+    try {
+      final res = await ApiService.fetchConnectedAccounts();
+      final accounts = List<String>.from(
+        res['accounts'].map((a) => a['gmail_email']),
+      );
+      setState(() {
+        connectedAccounts = accounts;
+        // print("⭐️");
+        print(ApiService.selectedEmailAccount);
+        if (ApiService.selectedEmailAccount != null &&
+            accounts.contains(ApiService.selectedEmailAccount)) {
+          selectedGmailAccount = ApiService.selectedEmailAccount;
+        } else {
+          selectedGmailAccount = accounts.isNotEmpty ? accounts.last : null;
+          ApiService.selectedEmailAccount = selectedGmailAccount;
+        }
+      });
+    } catch (e) {
+      print("**** Failed to load connected Gmail accounts: $e");
+    }
+  }
 
   Future<void> _showSearchDialog() async {
-    final _searchController = TextEditingController();
+    final searchController = TextEditingController();
 
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Search Emails"),
         content: TextField(
-          controller: _searchController,
+          controller: searchController,
           autofocus: true,
           decoration: const InputDecoration(
             hintText: "Search subject, sender, etc...",
@@ -78,12 +103,10 @@ class _GmailScreenState extends State<GmailScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
-              final query = _searchController.text.trim();
+              final query = searchController.text.trim();
               if (query.isEmpty) return;
-
               Navigator.pop(context);
-              setState(() => _loading = true);
-
+              setState(() => loading = true);
               try {
                 final results = await ApiService.searchEmails(query);
                 setState(() {
@@ -99,7 +122,7 @@ class _GmailScreenState extends State<GmailScreen> {
                   ).showSnackBar(SnackBar(content: Text("Search failed: $e")));
                 }
               } finally {
-                setState(() => _loading = false);
+                setState(() => loading = false);
               }
             },
             child: const Text("Search"),
@@ -109,26 +132,16 @@ class _GmailScreenState extends State<GmailScreen> {
     );
   }
 
-  Future<void> loadConnectedAccounts() async {
-    try {
-      final res = await ApiService.fetchConnectedAccounts();
-      final accounts = List<String>.from(
-        res['accounts'].map((a) => a['gmail_email']),
-      );
-      setState(() {
-        connectedAccounts = accounts;
-        selectedGmailAccount = accounts.isNotEmpty ? accounts.first : null;
-      });
-    } catch (e) {
-      print("Failed to load connected Gmail accounts: $e");
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     loadCurrentUser();
-    loadConnectedAccounts().then((_) => loadEmails());
+    loadConnectedAccounts().then((_) async {
+      if (mounted && selectedGmailAccount != null) {
+        ApiService.selectedEmailAccount = selectedGmailAccount;
+        await loadEmails();
+      }
+    });
     connectWebSocket();
   }
 
@@ -138,18 +151,21 @@ class _GmailScreenState extends State<GmailScreen> {
     channel.sink.close();
     super.dispose();
   }
+
   Future<void> loadCurrentUser() async {
     try {
       final user = await ApiService.fetchCurrentUser();
       setState(() {
         currentUserName = user['name'] ?? 'U';
-        _userLoading = false;
+        userLoading = false;
       });
     } catch (e) {
-      print("Failed to load user: $e");
-      setState(() => _userLoading = false);
+      print("***** Failed to load user: $e");
+      setState(() => userLoading = false);
     }
   }
+
+  /// Live WebSocket updates
   void connectWebSocket() async {
     channel = WebSocketChannel.connect(
       // Uri.parse('wss://aidyn-findable-greedily.ngrok-free.dev/ws/emails'),
@@ -161,7 +177,7 @@ class _GmailScreenState extends State<GmailScreen> {
         final data = jsonDecode(event);
         if (data['new_email'] == true &&
             data['gmail_email'] == selectedGmailAccount) {
-          // print("⭐️New mail for $selectedGmailAccount → refreshing inbox");
+          // print("New mail for $selectedGmailAccount → refreshing inbox");
           final refreshed = await ApiService.fetchEmailsForAccount(
             selectedGmailAccount!,
           );
@@ -179,12 +195,12 @@ class _GmailScreenState extends State<GmailScreen> {
   }
 
   Future<void> loadEmails() async {
-    setState(() => _loading = true);
+    setState(() => loading = true);
 
     if (selectedGmailAccount == null) {
       setState(() {
         emails = allEmails;
-        _loading = false;
+        loading = false;
       });
       return;
     }
@@ -202,7 +218,7 @@ class _GmailScreenState extends State<GmailScreen> {
     } catch (e) {
       print("Failed to load emails: $e");
     } finally {
-      setState(() => _loading = false);
+      setState(() => loading = false);
     }
   }
 
@@ -227,14 +243,19 @@ class _GmailScreenState extends State<GmailScreen> {
     setState(() => emails = filtered);
   }
 
+  Future<void> _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('jwt_token');
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+  }
+
   Future<void> _handleManualInput() async {
     final controller = TextEditingController();
     String prediction = "";
     String confidence = "";
-
     await showDialog(
       context: context,
-      barrierDismissible: true, 
+      barrierDismissible: true,
       builder: (context) => StatefulBuilder(
         builder: (context, setStateDialog) {
           return Dialog(
@@ -310,6 +331,7 @@ class _GmailScreenState extends State<GmailScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
+
                   if (prediction.isNotEmpty)
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 400),
@@ -318,14 +340,18 @@ class _GmailScreenState extends State<GmailScreen> {
                       margin: const EdgeInsets.only(bottom: 10),
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: prediction == "SPAM"
+                        color:
+                            double.tryParse(confidence) != null &&
+                                double.parse(confidence) > 50.0
                             ? Colors.red.shade50
                             : Colors.green.shade50,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: prediction == "SPAM"
-                              ? Colors.red.shade200
-                              : Colors.green.shade200,
+                          color:
+                              double.tryParse(confidence) != null &&
+                                  double.parse(confidence) > 50.0
+                              ? Colors.red.shade50
+                              : Colors.green.shade50,
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -342,7 +368,9 @@ class _GmailScreenState extends State<GmailScreen> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: prediction == "SPAM"
+                              color:
+                                  double.tryParse(confidence) != null &&
+                                      double.parse(confidence) > 50.0
                                   ? Colors.red.shade700
                                   : Colors.green.shade700,
                             ),
@@ -353,7 +381,9 @@ class _GmailScreenState extends State<GmailScreen> {
                               "Confidence: $confidence",
                               style: TextStyle(
                                 fontSize: 14,
-                                color: prediction == "SPAM"
+                                color:
+                                    double.tryParse(confidence) != null &&
+                                        double.parse(confidence) > 50.0
                                     ? Colors.red.shade700
                                     : Colors.green.shade700,
                               ),
@@ -387,12 +417,25 @@ class _GmailScreenState extends State<GmailScreen> {
                             final result = await ApiService.analyzeText(
                               inputText,
                             );
-                            final confStr = result['prediction'] ?? "0.0";
-                            final conf = double.tryParse(confStr) ?? 0.0;
-                            final label = conf >= 0.5 ? "SPAM" : "HAM";
+                            final rawScore =
+                                result['spam_prediction'] ??
+                                result['prediction'] ??
+                                0;
+                            final conf = (result['confidence'] is num)
+                                ? (result['confidence'] as num).toDouble()
+                                : double.tryParse(
+                                        result['confidence']?.toString() ?? '',
+                                      ) ??
+                                      0.0;
+
+                            final decision = (result['final_decision'] ?? '')
+                                .toString()
+                                .toUpperCase();
 
                             setStateDialog(() {
-                              prediction = label;
+                              prediction = decision.isNotEmpty
+                                  ? decision
+                                  : "--";
                               confidence = conf.toStringAsFixed(2);
                             });
                           } catch (e) {
@@ -433,6 +476,7 @@ class _GmailScreenState extends State<GmailScreen> {
     );
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     final firstLetter = (currentUserName != null && currentUserName!.isNotEmpty)
@@ -440,55 +484,96 @@ class _GmailScreenState extends State<GmailScreen> {
         : 'A';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      key: _scaffoldKey,
+      drawer: Sidebar(
+        onClose: () => _scaffoldKey.currentState?.closeDrawer(),
+        onLogoutTap: () async {
+          _scaffoldKey.currentState?.closeDrawer();
+          await Future.delayed(const Duration(milliseconds: 150));
+
+          final confirmed = await showDialog<bool>(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                elevation: 10,
+                title: Row(
+                  children: const [
+                    Icon(Icons.logout, color: Color(0xFF1F2A6E)),
+                    SizedBox(width: 10),
+                    Text(
+                      "Confirm Sign Out",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                content: const Text(
+                  "Are you sure you want to sign out from your account?",
+                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                ),
+                actionsPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.grey.shade700,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                    ),
+                    child: const Text("Cancel"),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1F2A6E),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(Icons.exit_to_app, size: 18),
+                    label: const Text(
+                      "Sign Out",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+
+          if (confirmed == true) {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.remove('jwt_token');
+            Navigator.of(
+              context,
+              rootNavigator: true,
+            ).pushNamedAndRemoveUntil('/login', (route) => false);
+          }
+        },
+      ),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.menu, color: Colors.black87),
           onPressed: () {
-            showGeneralDialog(
-              context: context,
-              barrierDismissible: true,
-              barrierLabel: '',
-              barrierColor: Colors.black54.withOpacity(0.3),
-              transitionDuration: const Duration(milliseconds: 300),
-              pageBuilder: (context, anim1, anim2) {
-                return Align(
-                  alignment: Alignment.centerLeft,
-                  child: Sidebar(
-                    onClose: () => Navigator.of(context).pop(),
-                    onMailTap: () {
-                      Navigator.of(context).pop(); 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("You are already on Mail Page!"),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
-              transitionBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                    return SlideTransition(
-                      position:
-                          Tween(
-                            begin: const Offset(-1, 0),
-                            end: Offset.zero,
-                          ).animate(
-                            CurvedAnimation(
-                              parent: animation,
-                              curve: Curves.easeOutCubic,
-                            ),
-                          ),
-                      child: child,
-                    );
-                  },
-            );
+            _scaffoldKey.currentState?.openDrawer();
           },
         ),
-
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -514,7 +599,7 @@ class _GmailScreenState extends State<GmailScreen> {
 
         actions: [
           IconButton(
-            icon: const Icon(Icons.add, color: Colors.black87),
+            icon: const Icon(Icons.edit_note, color: Colors.black87),
             tooltip: "Manual text input",
             onPressed: _handleManualInput,
           ),
@@ -528,7 +613,7 @@ class _GmailScreenState extends State<GmailScreen> {
             },
           ),
 
-          if (_userLoading)
+          if (userLoading)
             const Padding(
               padding: EdgeInsets.only(right: 12.0),
               child: CircleAvatar(
@@ -568,8 +653,7 @@ class _GmailScreenState extends State<GmailScreen> {
             ),
         ],
       ),
-
-      body: _loading
+      body: loading
           ? const Center(child: CircularProgressIndicator())
           : emails.isEmpty
           ? const Center(child: Text("No emails found"))
@@ -577,24 +661,41 @@ class _GmailScreenState extends State<GmailScreen> {
               onRefresh: loadEmails,
               child: ListView.separated(
                 itemCount: emails.length,
-                separatorBuilder: (_, __) =>
-                    Divider(thickness: 0.8, color: Colors.grey.shade300),
+                separatorBuilder: (_, __) => Divider(
+                  height: 0.5,
+                  thickness: 1.0,
+                  color: Colors.grey.shade300,
+                ),
                 itemBuilder: (context, index) {
                   final email = emails[index];
                   final rawPred =
-                      email.spamPrediction?.toUpperCase() ?? "UNKNOWN";
-
+                      (email.spamPrediction?.toUpperCase() ?? "--") == "UNKNOWN"
+                      ? "--"
+                      : (email.spamPrediction?.toUpperCase() ?? "--");
+                  final predValue = double.tryParse(rawPred);
                   final isSpam =
-                      rawPred == "SPAM" ||
-                      double.tryParse(rawPred) != null &&
-                          double.parse(rawPred) >= 0.5;
+                      (rawPred == "SPAM") ||
+                      (predValue != null && predValue >= 50);
+                  Color spamColor;
+                  Color spamTextColor;
+                  Color getColorForScore(double? score) {
+                    if (score == null) return Colors.grey.shade300;
+                    if (score < 25) return Colors.green.shade100;
+                    if (score < 50) return Colors.yellow.shade100;
+                    if (score < 75) return Colors.orange.shade100;
+                    return Colors.red.shade100;
+                  }
 
-                  final spamColor = isSpam
-                      ? Colors.red.shade100
-                      : Colors.green.shade100;
-                  final spamTextColor = isSpam
-                      ? Colors.red.shade700
-                      : Colors.green.shade700;
+                  Color getTextColorForScore(double? score) {
+                    if (score == null) return Colors.grey.shade600;
+                    if (score < 25) return Colors.green.shade700;
+                    if (score < 50) return Colors.amber.shade700;
+                    if (score < 75) return Colors.deepOrange.shade700;
+                    return Colors.red.shade700;
+                  }
+
+                  spamColor = getColorForScore(predValue);
+                  spamTextColor = getTextColorForScore(predValue);
                   return InkWell(
                     onTap: () {
                       Navigator.push(
@@ -615,7 +716,7 @@ class _GmailScreenState extends State<GmailScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           CircleAvatar(
-                            backgroundColor: _parseColor(
+                            backgroundColor: parseColor(
                               email.charColor ?? "#9E9E9E",
                             ),
                             child: Text(
@@ -690,12 +791,6 @@ class _GmailScreenState extends State<GmailScreen> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 12),
-                              const Icon(
-                                Icons.more_vert,
-                                size: 20,
-                                color: Colors.grey,
-                              ),
                             ],
                           ),
                         ],
@@ -705,22 +800,14 @@ class _GmailScreenState extends State<GmailScreen> {
                 },
               ),
             ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () async {
-      //     await ApiService.launchGoogleLogin();
-      //   },
-      //   backgroundColor: Colors.blueAccent,
-      //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      //   child: const Icon(Icons.add, size: 28, color: Colors.white),
-      // ),
     );
   }
 }
 
 class EmailSearchDelegate extends SearchDelegate<String> {
   final List<EmailMessage> allEmails;
-  final Random _random = Random();
   EmailSearchDelegate(this.allEmails);
+
   @override
   List<Widget>? buildActions(BuildContext context) => [
     if (query.isNotEmpty)
@@ -734,21 +821,17 @@ class EmailSearchDelegate extends SearchDelegate<String> {
   );
 
   @override
-  Widget buildResults(BuildContext context) => _buildEmailList(context);
-
+  Widget buildResults(BuildContext context) => buildEmailList(context);
   @override
-  Widget buildSuggestions(BuildContext context) => _buildEmailList(context);
-
-  Widget _buildEmailList(BuildContext context) {
+  Widget buildSuggestions(BuildContext context) => buildEmailList(context);
+  Widget buildEmailList(BuildContext context) {
     final q = query.toLowerCase();
     final theme = Theme.of(context);
-
     final filtered = allEmails.where((email) {
       return email.sender.toLowerCase().contains(q) ||
           email.subject.toLowerCase().contains(q) ||
           email.snippet.toLowerCase().contains(q);
     }).toList();
-
     if (filtered.isEmpty) {
       return const Center(
         child: Text(
@@ -768,19 +851,35 @@ class EmailSearchDelegate extends SearchDelegate<String> {
         separatorBuilder: (_, __) => const SizedBox(height: 8),
         itemBuilder: (context, index) {
           final email = filtered[index];
-          final rawPred = email.spamPrediction?.toUpperCase() ?? "UNKNOWN";
-
+          final rawPred =
+              (email.spamPrediction?.toUpperCase() ?? "--") == "UNKNOWN"
+              ? "--"
+              : (email.spamPrediction?.toUpperCase() ?? "--");
+          final predValue = double.tryParse(rawPred);
           final isSpam =
-              rawPred == "SPAM" ||
-              double.tryParse(rawPred) != null && double.parse(rawPred) >= 0.5;
+              (rawPred == "SPAM") || (predValue != null && predValue >= 50);
 
-          final spamColor = isSpam
-              ? Colors.red.shade100
-              : Colors.green.shade100;
-          final spamTextColor = isSpam
-              ? Colors.red.shade700
-              : Colors.green.shade700;
+          Color spamColor;
+          Color spamTextColor;
 
+          Color getColorForScore(double? score) {
+            if (score == null) return Colors.grey.shade300;
+            if (score < 25) return Colors.green.shade100;
+            if (score < 50) return Colors.yellow.shade100;
+            if (score < 75) return Colors.orange.shade100;
+            return Colors.red.shade100;
+          }
+
+          Color getTextColorForScore(double? score) {
+            if (score == null) return Colors.grey.shade600;
+            if (score < 25) return Colors.green.shade700;
+            if (score < 50) return Colors.amber.shade700;
+            if (score < 75) return Colors.deepOrange.shade700;
+            return Colors.red.shade700;
+          }
+
+          spamColor = getColorForScore(predValue);
+          spamTextColor = getTextColorForScore(predValue);
           return InkWell(
             onTap: () {
               Navigator.push(
@@ -790,7 +889,6 @@ class EmailSearchDelegate extends SearchDelegate<String> {
                 ),
               );
             },
-
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -802,7 +900,7 @@ class EmailSearchDelegate extends SearchDelegate<String> {
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundColor: _parseColor(email.charColor ?? "#9E9E9E"),
+                    backgroundColor: parseColor(email.charColor ?? "#9E9E9E"),
                     child: Text(
                       email.sender.isNotEmpty
                           ? email.sender[0].toUpperCase()
@@ -818,7 +916,7 @@ class EmailSearchDelegate extends SearchDelegate<String> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _highlightMatch(
+                        highlightMatch(
                           email.sender,
                           query,
                           const TextStyle(
@@ -828,7 +926,7 @@ class EmailSearchDelegate extends SearchDelegate<String> {
                           ),
                         ),
                         const SizedBox(height: 2),
-                        _highlightMatch(
+                        highlightMatch(
                           email.subject.isEmpty
                               ? "(No Subject)"
                               : email.subject,
@@ -839,7 +937,7 @@ class EmailSearchDelegate extends SearchDelegate<String> {
                           ),
                         ),
                         const SizedBox(height: 2),
-                        _highlightMatch(
+                        highlightMatch(
                           email.snippet,
                           query,
                           TextStyle(color: Colors.grey[600], fontSize: 13),
@@ -864,7 +962,7 @@ class EmailSearchDelegate extends SearchDelegate<String> {
                           ),
                         ),
                         child: Text(
-                          rawPred.isEmpty ? "UNKNOWN" : rawPred,
+                          rawPred.isEmpty ? "--" : rawPred,
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
@@ -885,18 +983,15 @@ class EmailSearchDelegate extends SearchDelegate<String> {
     );
   }
 
-  Widget _highlightMatch(String? text, String query, TextStyle baseStyle) {
+  Widget highlightMatch(String? text, String query, TextStyle baseStyle) {
     final safeText = text ?? "";
     if (query.isEmpty || safeText.isEmpty) {
       return Text(safeText, style: baseStyle);
     }
-
     final lower = safeText.toLowerCase();
     final q = query.toLowerCase();
-
     final spans = <TextSpan>[];
     int start = 0;
-
     while (true) {
       final index = lower.indexOf(q, start);
       if (index == -1) {
@@ -917,7 +1012,6 @@ class EmailSearchDelegate extends SearchDelegate<String> {
       );
       start = index + q.length;
     }
-
     return RichText(
       text: TextSpan(style: baseStyle, children: spans),
       overflow: TextOverflow.ellipsis,
@@ -925,7 +1019,7 @@ class EmailSearchDelegate extends SearchDelegate<String> {
     );
   }
 
-  Color _parseColor(String hex) {
+  Color parseColor(String hex) {
     if (hex.startsWith("#")) hex = hex.substring(1);
     return Color(int.parse("FF$hex", radix: 16));
   }

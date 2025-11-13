@@ -9,29 +9,28 @@ class EmailAccountManager extends StatefulWidget {
   const EmailAccountManager({Key? key}) : super(key: key);
 
   @override
-  State<EmailAccountManager> createState() => _EmailAccountManagerState();
+  State<EmailAccountManager> createState() => EmailAccountManagerState();
 }
 
-class _EmailAccountManagerState extends State<EmailAccountManager> {
+class EmailAccountManagerState extends State<EmailAccountManager> {
   String? currentUserName;
   String? currentUserEmail;
-  Timer? _refreshTimer;
+  Timer? refreshTimer;
   List<Map<String, String>> connectedAccounts = [];
   bool _loading = true;
   OverlayEntry? _overlayEntry;
-
-  String? activeAccountEmail; 
+  String? activeAccountEmail;
   @override
   @override
   void initState() {
     super.initState();
-    _loadAccounts();
-    _refreshTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      _loadAccounts();
+    loadAccounts();
+    refreshTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      loadAccounts();
     });
   }
 
-  Future<void> _loadAccounts() async {
+  Future<void> loadAccounts() async {
     try {
       final user = await ApiService.fetchCurrentUser();
       final accounts = await ApiService.fetchConnectedAccounts();
@@ -64,18 +63,18 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
         _loading = false;
       });
     } catch (e) {
-      print("Failed to load accounts: $e");
+      print("** Failed to load accounts: $e");
       setState(() => _loading = false);
     }
   }
 
-  Future<void> _setActiveAccount(String email) async {
+  Future<void> setActiveAccount(String email) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('active_linked_email', email);
     setState(() => activeAccountEmail = email);
   }
 
-  Future<void> _deleteAccount(String gmailEmail) async {
+  Future<void> deleteAccount(String gmailEmail) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -97,9 +96,7 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
         ],
       ),
     );
-
     if (confirm != true) return;
-
     try {
       await ApiService.deleteConnectedAccount(gmailEmail);
       if (activeAccountEmail == gmailEmail) {
@@ -109,28 +106,24 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
         final newActive = remaining.isNotEmpty
             ? remaining.first['email']
             : null;
-
         final prefs = await SharedPreferences.getInstance();
         if (newActive == null) {
           await prefs.remove('active_linked_email');
         } else {
           await prefs.setString('active_linked_email', newActive);
         }
-
         setState(() => activeAccountEmail = newActive);
       }
-
-      _showCapsuleMessage("Account removed");
-      _loadAccounts();
+      showcapsuleMessage("Account removed");
+      loadAccounts();
     } catch (e) {
       print("Failed to delete account: $e");
-      _showCapsuleMessage("Failed to remove account", error: true);
+      showcapsuleMessage("Failed to remove account", error: true);
     }
   }
 
-  void _showCapsuleMessage(String message, {bool error = false}) {
+  void showcapsuleMessage(String message, {bool error = false}) {
     _overlayEntry?.remove();
-
     _overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         bottom: 80,
@@ -182,13 +175,11 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
     final String avatarLetter = (currentUserName?.isNotEmpty ?? false)
         ? currentUserName![0].toUpperCase()
         : '?';
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.4,
-        automaticallyImplyLeading: false,
         title: const Text(
           "Mail Inbox Information",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
@@ -300,7 +291,7 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
                                       : Colors.transparent,
                                   child: ListTile(
                                     leading: CircleAvatar(
-                                      backgroundColor: _getColorForLetter(
+                                      backgroundColor: getColorforLetter(
                                         connectedAccounts[i]['name'] ??
                                             connectedAccounts[i]['email'] ??
                                             '',
@@ -339,14 +330,14 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
                                         Icons.delete_outline,
                                         color: Colors.redAccent,
                                       ),
-                                      onPressed: () => _deleteAccount(
+                                      onPressed: () => deleteAccount(
                                         connectedAccounts[i]['email'] ?? '',
                                       ),
                                     ),
                                     onTap: () async {
                                       final email =
                                           connectedAccounts[i]['email'] ?? '';
-                                      await _setActiveAccount(email);
+                                      await setActiveAccount(email);
                                       Navigator.pop(context, email);
                                     },
                                   ),
@@ -372,8 +363,8 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
                                 await Future.delayed(
                                   const Duration(seconds: 10),
                                 );
-                                await _loadAccounts();
-                                _showCapsuleMessage(
+                                await loadAccounts();
+                                showcapsuleMessage(
                                   "Account added successfully",
                                 );
                               },
@@ -383,7 +374,6 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
                   const Text(
                     "Privacy Policy • Terms of Service",
@@ -395,7 +385,7 @@ class _EmailAccountManagerState extends State<EmailAccountManager> {
     );
   }
 
-  Color _getColorForLetter(String text) {
+  Color getColorforLetter(String text) {
     final colors = [
       Colors.blue,
       Colors.green,

@@ -1,19 +1,15 @@
+import os,re,random,base64,httpx
 from fastapi import APIRouter, HTTPException, Request
-import httpx
 from database import messages_col, accounts_col,avatars_col
-import os
 from jose import jwt
-from dotenv import load_dotenv
 from .notifications import get_spam_prediction
 from datetime import datetime
-import base64, json
-import random
-import re
 from fastapi.responses import HTMLResponse
+from dotenv import load_dotenv
 load_dotenv()
+
 router = APIRouter()
 
-from websocket_manager import broadcast_new_email
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
@@ -52,6 +48,29 @@ async def refresh_access_token(user_id: str, gmail_email: str):
 
     return {"access_token": access_token}
 
+def extract_body(payload):
+    """Recursively extract plain text or HTML email body from Gmail payload."""
+    if not payload:
+        return ""
+
+    mime_type = payload.get("mimeType", "")
+    body_data = payload.get("body", {}).get("data")
+    if body_data and ("text/plain" in mime_type or "text/html" in mime_type):
+        try:
+            text = base64.urlsafe_b64decode(body_data).decode("utf-8", errors="ignore")
+            return text.strip()
+        except Exception as e:
+            # print("Decode error:", e)
+            return ""
+    for part in payload.get("parts", []):
+        text = extract_body(part)
+        if text:
+            return text
+
+    return ""
+
+
+
 
 @router.get("/google/callback")
 async def google_callback(code: str, state: str = None):
@@ -80,6 +99,7 @@ async def google_callback(code: str, state: str = None):
         token_data = token_resp.json()
         access_token = token_data.get("access_token")
         refresh_token = token_data.get("refresh_token")
+
         if not access_token:
             raise HTTPException(status_code=400, detail="Failed to get access token")
 
@@ -103,7 +123,7 @@ async def google_callback(code: str, state: str = None):
                 upsert=True,
             )
         messages_resp = await client.get(
-            "https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=10",
+            "https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=2",#number of emails to be fetched.
             headers={"Authorization": f"Bearer {access_token}"}
         )
         messages_list = messages_resp.json().get("messages", [])
@@ -122,9 +142,11 @@ async def google_callback(code: str, state: str = None):
             match = re.search(r"<(.+?)>", from_header)
             sender_email = match.group(1) if match else from_header
             snippet = msg_data.get("snippet", "")
-            combined_text = f"{subject} {snippet}"
+            body = extract_body(msg_data.get("payload", {}))
+            combined_text = f"{sender_email}{subject} {body}"
 
-            spam_prediction = await get_spam_prediction(combined_text)
+            # print("This is new Email"+body);
+            spam_result = await get_spam_prediction(combined_text)
             char_color = await get_sender_avatar_color(sender_email)
 
             emails.append({
@@ -136,11 +158,19 @@ async def google_callback(code: str, state: str = None):
                 "from_email": sender_email,
                 "char_color": char_color,
                 "snippet": snippet,
+                "body": body,
                 "timestamp": int(msg_data["internalDate"]),
-                "spam_prediction": spam_prediction,
+                "spam_prediction": spam_result.get("confidence"),
+                "spam_reasoning": spam_result.get("reasoning"),
+                "spam_highlighted_text": spam_result.get("highlighted_text"),
+                "spam_suggestion": spam_result.get("suggestion"),
+                "spam_verdict": spam_result.get("final_decision"),
             })
 
+
         for email in emails:
+            if not email.get("subject") or not email.get("from_email"):
+              continue  
             await messages_col.update_one(
                 {"user_id": user_id, "gmail_email": gmail_email, "gmail_id": email["gmail_id"]},
                 {"$set": email},
@@ -159,12 +189,6 @@ async def google_callback(code: str, state: str = None):
                 {"$set": {"last_history_id": watch_data["historyId"]}}
             )
 
-    # return {
-    #     "status": "success",
-    #     "fetched": len(emails),
-    #     "gmail_email": gmail_email,
-    #     "watch_status": "started"
-    # }
     return HTMLResponse(f"""
 <html>
   <head>
@@ -291,7 +315,7 @@ async def google_callback(code: str, state: str = None):
         Return to AegisSecure App
       </a>
 
-      <div class="note">If your app doesn’t open automatically, tap the button above.</div>
+      <div class="note">If your app doesn't open automatically, tap the button above.</div>
     </div>
     <footer>© 2025 AegisSecure — Protecting You from Online Mishaps</footer>
   </body>

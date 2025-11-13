@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'screens/AccountPage.dart';
 import 'screens/EmailAccountManager.dart';
 import 'screens/login_screen.dart';
 import 'screens/main_navigation.dart';
+import 'screens/privacyPolicy.dart';
 import 'screens/register_screen.dart';
+import 'screens/settings_screen.dart';
+import 'screens/termsOfService.dart';
 import 'screens/verify_otp_screen.dart';
 
 void main() async {
@@ -36,13 +40,14 @@ class MyApp extends StatelessWidget {
       initialRoute: initialToken == null ? '/login' : '/home',
       routes: {
         '/emailAccountManager': (context) => const EmailAccountManager(),
-        '/login': (context) => LoginScreen(),
+        '/login': (c) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
-        // '/home': (context) => HomeScreen(),
-        // '/gmail': (context) => GmailScreen(),
-        // '/sms': (context) => const SmsScreen(),
+        '/account': (context) => AccountPage(),
         '/home': (context) => const MainNavigation(),
         '/otp': (context) => VerifyOtpScreen(email: ''),
+        '/settings': (context) => SettingsScreen(),
+        '/terms': (context) => const TermsOfServicePage(),
+        '/privacy': (context) => const PrivacyPolicyPage(),
       },
     );
   }

@@ -10,13 +10,13 @@ import hashlib
 import httpx
 import os
 from fastapi.encoders import jsonable_encoder
-from bson import ObjectId
+from routes.notifications import get_spam_prediction
 
 
 router = APIRouter()
 load_dotenv()
 
-CYBER_MODEL_URL = "https://cybersecure-backend-api.onrender.com/predict"
+CYBER_MODEL_URL = os.getenv("CYBER_SECURE_API_URI")
 class SmsMessage(BaseModel):
     address: str
     body: str
@@ -32,30 +32,10 @@ def generate_message_hash(address: str, body: str, date_ms: int):
 
 
 def serialize_doc(doc):
-    """Convert MongoDB ObjectId and datetime to JSON serializable forms."""
     doc["_id"] = str(doc["_id"])
     if isinstance(doc.get("created_at"), datetime):
         doc["created_at"] = doc["created_at"].isoformat()
     return doc
-
-async def analyze_sms_text(text: str) -> float:
-    """Send message text to CyberSecure model for spam probability."""
-    try:
-        async with httpx.AsyncClient(timeout=15) as client:
-            res = await client.post(
-                CYBER_MODEL_URL,
-                json={"text": text},
-                headers={"Content-Type": "application/json"},
-            )
-        if res.status_code == 200:
-            data = res.json()
-            return float(data.get("prediction", 0.0))
-        else:
-            print(f"⚠️ Model API error: {res.status_code} {res.text}")
-            return 0.0
-    except Exception as e:
-        print(f"❌ Error calling model: {e}")
-        return 0.0
 
 @router.post("/sync")
 async def sync_sms(request: SmsSyncRequest, current_user: dict = Depends(get_current_user)):
@@ -70,8 +50,8 @@ async def sync_sms(request: SmsSyncRequest, current_user: dict = Depends(get_cur
         existing = await sms_messages_col.find_one({"hash": msg_hash, "user_id": user_id})
         if existing:
             continue
-
-        spam_score = await analyze_sms_text(msg.body)
+        combined_text=f"{""}{""}{msg.body}"
+        spam_analysis = await get_spam_prediction(combined_text)
 
         message_doc = {
             "user_id": user_id,
@@ -80,8 +60,12 @@ async def sync_sms(request: SmsSyncRequest, current_user: dict = Depends(get_cur
             "timestamp": msg.date_ms,
             "type": msg.type,
             "hash": msg_hash,
-            "spam_score": spam_score,
-            "created_at": datetime.utcnow()
+            "spam_score": spam_analysis.get("confidence"),
+            "created_at": datetime.utcnow(),
+            "spam_reasoning": spam_analysis.get("reasoning"),
+            "spam_highlighted_text": spam_analysis.get("highlighted_text"),
+            "spam_suggestion": spam_analysis.get("suggestion"),
+            "spam_verdict": spam_analysis.get("final_decision"),
         }
 
         await sms_messages_col.insert_one(message_doc)

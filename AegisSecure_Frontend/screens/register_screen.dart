@@ -1,24 +1,26 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
 import '../screens/verify_otp_screen.dart';
 import '../services/api_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  RegisterScreenState createState() => RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class RegisterScreenState extends State<RegisterScreen> {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  bool _showPassword = false;
-  bool _showConfirmPassword = false;
-  bool _loading = false;
+  bool showPassword = false;
+  bool showconfirmPassword = false;
+  bool loading = false;
   bool _agree = false;
 
-  bool _showPasswordInfo = false;
+  bool showPasswordInfo = false;
   bool hasSpecialChar = false;
   bool hasUppercase = false;
   bool hasLowercase = false;
@@ -90,14 +92,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         confirmError != null)
       return;
 
-    setState(() => _loading = true);
+    setState(() => loading = true);
 
     try {
       final res = await ApiService.registerUser(name, email, password);
 
       if (res.statusCode == 200) {
-        // ---⭐️
-        print('✅' + email);
+        // print('✅' + email);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => VerifyOtpScreen(email: email)),
@@ -113,7 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text("Error connecting to server")));
     } finally {
-      setState(() => _loading = false);
+      setState(() => loading = false);
     }
   }
 
@@ -165,6 +166,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(height: 32),
                 TextField(
                   controller: nameController,
+                  maxLength: 50,
                   decoration: InputDecoration(
                     labelText: "Full Name",
                     errorText: nameError,
@@ -175,7 +177,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
 
-                SizedBox(height: 16,), 
+                SizedBox(height: 16),
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
@@ -200,7 +202,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Expanded(
                           child: TextField(
                             controller: passwordController,
-                            obscureText: !_showPassword,
+                            obscureText: !showPassword,
+                            maxLength: 64,
                             onChanged: _validatePassword,
                             decoration: InputDecoration(
                               labelText: "Password",
@@ -219,20 +222,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     color: Colors.blueGrey,
                                     onPressed: () {
                                       setState(() {
-                                        _showPasswordInfo = !_showPasswordInfo;
+                                        showPasswordInfo = !showPasswordInfo;
                                       });
                                     },
                                   ),
                                   IconButton(
                                     icon: Icon(
-                                      _showPassword
+                                      showPassword
                                           ? Icons.visibility
                                           : Icons.visibility_off_outlined,
                                       color: Colors.grey.shade600,
                                     ),
                                     onPressed: () {
                                       setState(() {
-                                        _showPassword = !_showPassword;
+                                        showPassword = !showPassword;
                                       });
                                     },
                                   ),
@@ -243,7 +246,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ],
                     ),
-                    if (_showPasswordInfo)
+                    if (showPasswordInfo)
                       Padding(
                         padding: const EdgeInsets.only(top: 8, left: 8),
                         child: Column(
@@ -277,7 +280,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(height: 16),
                 TextField(
                   controller: confirmPasswordController,
-                  obscureText: !_showConfirmPassword,
+                  obscureText: !showconfirmPassword,
                   decoration: InputDecoration(
                     labelText: "Confirm Password",
                     errorText: confirmError,
@@ -287,14 +290,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _showConfirmPassword
+                        showconfirmPassword
                             ? Icons.visibility
                             : Icons.visibility_off_outlined,
                         color: Colors.grey.shade600,
                       ),
                       onPressed: () {
                         setState(() {
-                          _showConfirmPassword = !_showConfirmPassword;
+                          showconfirmPassword = !showconfirmPassword;
                         });
                       },
                     ),
@@ -305,22 +308,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   children: [
                     Checkbox(
                       value: _agree,
-                      activeColor: Color(0xFF1F2A6E),
+                      activeColor: const Color(0xFF1F2A6E),
                       onChanged: (val) {
                         setState(() => _agree = val ?? false);
                       },
                     ),
                     Expanded(
-                      child: Text(
-                        "I agree to the Terms and Privacy Policy",
-                        style: TextStyle(color: Colors.grey.shade700),
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: 14,
+                          ),
+                          children: [
+                            const TextSpan(text: "I agree to the "),
+                            TextSpan(
+                              text: "Terms",
+                              style: const TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Color(0xFF1F2A6E),
+                                fontWeight: FontWeight.bold,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Navigator.of(context).pushNamed('/terms');
+                                },
+                            ),
+                            const TextSpan(text: " and "),
+                            TextSpan(
+                              text: "Privacy Policy",
+                              style: const TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Color(0xFF1F2A6E),
+                                fontWeight: FontWeight.bold,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Navigator.of(context).pushNamed('/privacy');
+                                },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
 
                 SizedBox(height: 20),
-                _loading
+                loading
                     ? CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: register,
@@ -365,18 +400,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _socialButton(IconData icon) {
-    return Container(
-      width: 58,
-      height: 50,
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Icon(icon, color: Colors.grey.shade700, size: 26),
     );
   }
 }
