@@ -1,5 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../models/sms_message.dart';
 import '../screens/sms_detailed_screen.dart';
 import '../services/api_service.dart';
@@ -10,15 +13,15 @@ class SmsScreen extends StatefulWidget {
   const SmsScreen({Key? key}) : super(key: key);
 
   @override
-  State<SmsScreen> createState() => _SmsScreenState();
+  State<SmsScreen> createState() => SmsScreenState();
 }
 
-class _SmsScreenState extends State<SmsScreen> {
-  final SmsService _smsService = SmsService();
-  List<SmsMessageModel> _messages = [];
-  bool _loading = true;
-
-  StreamSubscription? _smsStream;
+class SmsScreenState extends State<SmsScreen> {
+  final SmsService smsService = SmsService();
+  List<SmsMessageModel> messages = [];
+  bool loading = true;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  StreamSubscription? smsStream;
 
   @override
   void initState() {
@@ -28,26 +31,26 @@ class _SmsScreenState extends State<SmsScreen> {
 
   @override
   void dispose() {
-    _smsService.disconnect();
-    _smsStream?.cancel();
+    smsService.disconnect();
+    smsStream?.cancel();
     super.dispose();
   }
 
   Future<void> initSmsFlow() async {
     try {
-      await _smsService.syncSmsToBackend();
-      final fetched = await _smsService.fetchAllFromBackend();
+      await smsService.syncSmsToBackend();
+      final fetched = await smsService.fetchAllFromBackend();
       setState(() {
-        _messages = fetched;
-        _loading = false;
+        messages = fetched;
+        loading = false;
       });
 
-      _smsService.connectWebSocket((newMsg) {
-        setState(() => _messages.insert(0, newMsg));
+      smsService.connectWebSocket((newMsg) {
+        setState(() => messages.insert(0, newMsg));
       });
     } catch (e) {
-      print("Error initializing SMS: $e");
-      setState(() => _loading = false);
+      // print("❌ Error initializing SMS: $e");
+      setState(() => loading = false);
     }
   }
 
@@ -60,11 +63,10 @@ class _SmsScreenState extends State<SmsScreen> {
     return address;
   }
 
-  Future<void> _handleManualInput() async {
+  Future<void> handleManualInput() async {
     final controller = TextEditingController();
     String prediction = "";
     String confidence = "";
-
     await showDialog(
       context: context,
       barrierDismissible: true,
@@ -151,14 +153,18 @@ class _SmsScreenState extends State<SmsScreen> {
                       margin: const EdgeInsets.only(bottom: 10),
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: prediction == "SPAM"
+                        color:
+                            double.tryParse(confidence) != null &&
+                                double.parse(confidence) > 50.0
                             ? Colors.red.shade50
                             : Colors.green.shade50,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: prediction == "SPAM"
-                              ? Colors.red.shade200
-                              : Colors.green.shade200,
+                          color:
+                              double.tryParse(confidence) != null &&
+                                  double.parse(confidence) > 50.0
+                              ? Colors.red.shade50
+                              : Colors.green.shade50,
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -175,7 +181,9 @@ class _SmsScreenState extends State<SmsScreen> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: prediction == "SPAM"
+                              color:
+                                  double.tryParse(confidence) != null &&
+                                      double.parse(confidence) > 50.0
                                   ? Colors.red.shade700
                                   : Colors.green.shade700,
                             ),
@@ -186,7 +194,9 @@ class _SmsScreenState extends State<SmsScreen> {
                               "Confidence: $confidence",
                               style: TextStyle(
                                 fontSize: 14,
-                                color: prediction == "SPAM"
+                                color:
+                                    double.tryParse(confidence) != null &&
+                                        double.parse(confidence) > 50.0
                                     ? Colors.red.shade700
                                     : Colors.green.shade700,
                               ),
@@ -194,7 +204,6 @@ class _SmsScreenState extends State<SmsScreen> {
                         ],
                       ),
                     ),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -221,12 +230,25 @@ class _SmsScreenState extends State<SmsScreen> {
                             final result = await ApiService.analyzeText(
                               inputText,
                             );
-                            final confStr = result['prediction'] ?? "0.0";
-                            final conf = double.tryParse(confStr) ?? 0.0;
-                            final label = conf >= 0.5 ? "SPAM" : "HAM";
+                            final rawScore =
+                                result['spam_prediction'] ??
+                                result['prediction'] ??
+                                0;
+                            final conf = (result['confidence'] is num)
+                                ? (result['confidence'] as num).toDouble()
+                                : double.tryParse(
+                                        result['confidence']?.toString() ?? '',
+                                      ) ??
+                                      0.0;
+
+                            final decision = (result['final_decision'] ?? '')
+                                .toString()
+                                .toUpperCase();
 
                             setStateDialog(() {
-                              prediction = label;
+                              prediction = decision.isNotEmpty
+                                  ? decision
+                                  : "UNKNOWN";
                               confidence = conf.toStringAsFixed(2);
                             });
                           } catch (e) {
@@ -267,7 +289,7 @@ class _SmsScreenState extends State<SmsScreen> {
     );
   }
 
-  Widget _buildMessageTile(SmsMessageModel msg) {
+  Widget buildMessageTile(SmsMessageModel msg) {
     final sender = getDisplayName(msg.address, null);
     final body = msg.body;
     final score = msg.spamScore ?? 0.0;
@@ -276,10 +298,34 @@ class _SmsScreenState extends State<SmsScreen> {
     final formattedTime =
         "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
 
-    final color = score >= 0.5 ? Colors.red.shade100 : Colors.green.shade100;
-    final scoreTextColor = score >= 0.5
-        ? Colors.red.shade800
-        : Colors.green.shade800;
+    final double scoreNormalized = score.clamp(0.0, 100.0);
+
+    Color getSpamColor(double score) {
+      if (score < 25) {
+        return Colors.green.shade100;
+      } else if (score < 50) {
+        return Colors.yellow.shade100;
+      } else if (score < 75) {
+        return Colors.orange.shade100;
+      } else {
+        return Colors.red.shade100;
+      }
+    }
+
+    Color getSpamTextColor(double score) {
+      if (score < 25) {
+        return Colors.green.shade700;
+      } else if (score < 50) {
+        return Colors.amber.shade700;
+      } else if (score < 75) {
+        return Colors.deepOrange.shade700;
+      } else {
+        return Colors.red.shade700;
+      }
+    }
+
+    final spamColor = getSpamColor(scoreNormalized);
+    final spamTextColor = getSpamTextColor(scoreNormalized);
 
     return GestureDetector(
       onTap: () {
@@ -291,13 +337,13 @@ class _SmsScreenState extends State<SmsScreen> {
         );
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 2),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.shade200,
+              color: Colors.grey.shade300,
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -350,19 +396,20 @@ class _SmsScreenState extends State<SmsScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
+                      horizontal: 10,
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: color,
+                      color: spamColor,
                       borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: spamTextColor.withOpacity(0.3)),
                     ),
                     child: Text(
-                      score.toStringAsFixed(2),
+                      scoreNormalized.toStringAsFixed(2),
                       style: TextStyle(
-                        color: scoreTextColor,
+                        fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        fontSize: 13,
+                        color: spamTextColor,
                       ),
                     ),
                   ),
@@ -394,53 +441,93 @@ class _SmsScreenState extends State<SmsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      key: _scaffoldKey,
+      drawer: Sidebar(
+        onClose: () => _scaffoldKey.currentState?.closeDrawer(),
+        onLogoutTap: () async {
+          _scaffoldKey.currentState?.closeDrawer();
+          await Future.delayed(const Duration(milliseconds: 150));
+
+          final confirmed = await showDialog<bool>(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                elevation: 10,
+                title: Row(
+                  children: const [
+                    Icon(Icons.logout, color: Color(0xFF1F2A6E)),
+                    SizedBox(width: 10),
+                    Text(
+                      "Confirm Sign Out",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                content: const Text(
+                  "Are you sure you want to sign out from your account?",
+                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                ),
+                actionsPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.grey.shade700,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                    ),
+                    child: const Text("Cancel"),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF1F2A6E),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(Icons.exit_to_app, size: 18),
+                    label: const Text(
+                      "Sign Out",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+
+          if (confirmed == true) {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.remove('jwt_token');
+            Navigator.of(
+              context,
+              rootNavigator: true,
+            ).pushNamedAndRemoveUntil('/login', (route) => false);
+          }
+        },
+      ),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.menu, color: Colors.black87),
-          onPressed: () {
-            showGeneralDialog(
-              context: context,
-              barrierDismissible: true,
-              barrierLabel: '',
-              barrierColor: Colors.black54.withOpacity(0.3),
-              transitionDuration: const Duration(milliseconds: 300),
-              pageBuilder: (context, anim1, anim2) {
-                return Align(
-                  alignment: Alignment.centerLeft,
-                  child: Sidebar(
-                    onClose: () => Navigator.of(context).pop(),
-                    onMessagesTap: () {
-                      Navigator.of(context).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("You are already on Messages!"),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
-              transitionBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                    return SlideTransition(
-                      position:
-                          Tween(
-                            begin: const Offset(-1, 0),
-                            end: Offset.zero,
-                          ).animate(
-                            CurvedAnimation(
-                              parent: animation,
-                              curve: Curves.easeOutCubic,
-                            ),
-                          ),
-                      child: child,
-                    );
-                  },
-            );
-          },
+          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
         ),
         title: const Text(
           "SMS Home Page",
@@ -452,9 +539,9 @@ class _SmsScreenState extends State<SmsScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add, color: Colors.black87),
+            icon: const Icon(Icons.edit_note, color: Colors.black87),
             tooltip: "Manual text input",
-            onPressed: _handleManualInput,
+            onPressed: handleManualInput,
           ),
           IconButton(
             icon: const Icon(Icons.search, color: Colors.black87),
@@ -462,24 +549,27 @@ class _SmsScreenState extends State<SmsScreen> {
             onPressed: () {
               showSearch(
                 context: context,
-                delegate: SmsSearchDelegate(_messages),
+                delegate: SmsSearchDelegate(messages),
               );
             },
           ),
         ],
       ),
-      body: _loading
+      body: loading
           ? const Center(child: CircularProgressIndicator())
-          : _messages.isEmpty
+          : messages.isEmpty
           ? const Center(child: Text("No messages found"))
           : RefreshIndicator(
               onRefresh: initSmsFlow,
               child: ListView.separated(
-                itemCount: _messages.length,
-                separatorBuilder: (_, __) =>
-                    const Divider(height: 0, thickness: 0.3),
+                itemCount: messages.length,
+                separatorBuilder: (_, __) => Divider(
+                  height: 0.5,
+                  thickness: 0.5,
+                  color: Colors.grey.shade300,
+                ),
                 itemBuilder: (context, index) =>
-                    _buildMessageTile(_messages[index]),
+                    buildMessageTile(messages[index]),
               ),
             ),
     );
@@ -528,17 +618,40 @@ class SmsSearchDelegate extends SearchDelegate<String> {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
       itemCount: filtered.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      separatorBuilder: (_, __) =>
+          Divider(height: 0.5, thickness: 0.5, color: Colors.grey.shade300),
       itemBuilder: (context, index) {
         final msg = filtered[index];
         final sender = msg.address;
         final score = msg.spamScore ?? 0.0;
-        final isSpam = score >= 0.5;
+        final double scoreNormalized = score.clamp(0.0, 100.0);
 
-        final spamColor = isSpam ? Colors.red.shade100 : Colors.green.shade100;
-        final spamTextColor = isSpam
-            ? Colors.red.shade700
-            : Colors.green.shade700;
+        Color getSpamColor(double score) {
+          if (score < 25) {
+            return Colors.green.shade100;
+          } else if (score < 50) {
+            return Colors.yellow.shade100;
+          } else if (score < 75) {
+            return Colors.orange.shade100;
+          } else {
+            return Colors.red.shade100;
+          }
+        }
+
+        Color getSpamTextColor(double score) {
+          if (score < 25) {
+            return Colors.green.shade700;
+          } else if (score < 50) {
+            return Colors.amber.shade700;
+          } else if (score < 75) {
+            return Colors.deepOrange.shade700;
+          } else {
+            return Colors.red.shade700;
+          }
+        }
+
+        final spamColor = getSpamColor(scoreNormalized);
+        final spamTextColor = getSpamTextColor(scoreNormalized);
 
         final time = DateTime.fromMillisecondsSinceEpoch(msg.dateMs).toLocal();
         final formattedTime =
@@ -556,7 +669,7 @@ class SmsSearchDelegate extends SearchDelegate<String> {
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+              border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
@@ -613,7 +726,7 @@ class SmsSearchDelegate extends SearchDelegate<String> {
                         ),
                       ),
                       child: Text(
-                        isSpam ? "SPAM" : "HAM",
+                        scoreNormalized.toStringAsFixed(2),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,

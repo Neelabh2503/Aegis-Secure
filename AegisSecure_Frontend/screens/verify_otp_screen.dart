@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
@@ -14,7 +15,7 @@ class VerifyOtpScreen extends StatefulWidget {
 
 class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   String otp = "";
-  bool _loading = false;
+  bool loading = false;
   int _remainingSeconds = 300;
   Timer? _timer;
   @override
@@ -56,7 +57,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
       return;
     }
 
-    setState(() => _loading = true);
+    setState(() => loading = true);
 
     final res = await ApiService.verifyOtp(widget.email, otp);
     if (res.statusCode == 200) {
@@ -72,7 +73,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
       );
     }
 
-    setState(() => _loading = false);
+    setState(() => loading = false);
   }
 
   Future<void> resendOtp() async {
@@ -160,7 +161,6 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                 ),
                 enableActiveFill: true,
               ),
-
               const SizedBox(height: 12),
               Center(
                 child: _remainingSeconds > 0
@@ -198,7 +198,6 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                         ],
                       ),
               ),
-
               const SizedBox(height: 35),
               Row(
                 children: [
@@ -233,7 +232,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: _loading
+                      child: loading
                           ? const SizedBox(
                               height: 22,
                               width: 22,

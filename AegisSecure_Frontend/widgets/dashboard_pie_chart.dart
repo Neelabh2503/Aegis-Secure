@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class DashboardPieChart extends StatelessWidget {
   final List<String> labels;
   final List<int> values;
-  final double size;
+  final double size; 
 
   const DashboardPieChart({
     Key? key,

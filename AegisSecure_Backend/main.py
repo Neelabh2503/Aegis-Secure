@@ -4,12 +4,9 @@ from dotenv import load_dotenv
 from fastapi import WebSocket
 from database import avatars_col
 from websocket_manager import connect, disconnect
-load_dotenv()
+from routes import auth, gmail, Oauth,notifications,sms,analysis,dashboard
 
-from routes import auth, gmail, Oauth,notifications,otp,sms,analysis
-from websocket_manager import active_connections  
-from websocket_manager import broadcast_new_email
-import asyncio
+load_dotenv()
 app = FastAPI(title="Mail Backend")
 
 app.add_middleware(
@@ -26,6 +23,8 @@ app.include_router(Oauth.router, prefix="/auth")
 app.include_router(notifications.router)
 app.include_router(analysis.router)
 app.include_router(sms.router, prefix="/sms", tags=["SMS"])
+app.include_router(dashboard.router)
+
 ws_router = APIRouter()
 
 

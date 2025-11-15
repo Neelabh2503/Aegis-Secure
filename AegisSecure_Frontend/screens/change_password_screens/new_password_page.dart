@@ -46,7 +46,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
     );
   }
 
-  void _validatePassword(String password) {
+  void validatePassword(String password) {
     setState(() {
       hasUppercase = password.contains(RegExp(r'[A-Z]'));
       hasLowercase = password.contains(RegExp(r'[a-z]'));
@@ -131,7 +131,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
             TextField(
               controller: newPasswordController,
               obscureText: !showPassword,
-              onChanged: _validatePassword, 
+              onChanged: validatePassword,
               decoration: InputDecoration(
                 labelText: "New Password",
                 border: OutlineInputBorder(

@@ -31,7 +31,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     super.dispose();
   }
 
-  void _startTimer() {
+  void startTimer() {
     _timer?.cancel();
     setState(() => _remainingSeconds = 300);
 
@@ -66,7 +66,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
     if (res.statusCode == 200) {
       setState(() => otpSent = true);
-      _startTimer();
+      startTimer();
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('OTP sent successfully!')));
@@ -78,8 +78,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   Future<void> resendOtp() async {
-
-    _startTimer();
+    startTimer();
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text("Resending OTP...")));

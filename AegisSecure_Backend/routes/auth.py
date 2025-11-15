@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException,Depends
+from fastapi import APIRouter, HTTPException,Depends,File, UploadFile, Depends, HTTPException
 from pydantic import BaseModel
 from passlib.context import CryptContext
 import jwt
@@ -9,11 +9,14 @@ from dotenv import load_dotenv
 from passlib.context import CryptContext
 from typing import Optional
 import datetime
+from fastapi.responses import JSONResponse
+import base64
 
 security = HTTPBearer()
 load_dotenv()
 from database import users_col ,auth_db,otps_col
 from routes import otp
+
 
 router = APIRouter()
 JWT_SECRET = os.getenv("JWT_SECRET", "supersecret")  
@@ -47,8 +50,6 @@ class UserResponse(BaseModel):
     email: str
     user_id: str
 
-
-#--⭐️
 
 class VerifyOTPRequest(BaseModel):
     email: EmailStr
@@ -88,9 +89,6 @@ def decode_reset_jwt(token: str) -> dict:
         raise HTTPException(status_code=401, detail="Reset token expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid reset token")
-
-#--⭐️
-
     
 @router.post("/register")
 async def register_user(req: RegisterRequest):
@@ -101,14 +99,14 @@ async def register_user(req: RegisterRequest):
     # print("Parsed:", req.dict())
     hashed_password = pwd_context.hash(req.password)
     user_doc = {
-        "name": req.name, 
+        "name": req.name,  
         "email": req.email,
         "password": hashed_password,
         "verified": False,
-        "user_id": str(datetime.datetime.now().timestamp())
+        "user_id": str(datetime.datetime.now().timestamp()),
+        "avatar_base64": "",
     }
     await users_col.insert_one(user_doc)
-    #<--⭐️
     otp_code = otp.generate_otp()
     await otp.store_otp(req.email, otp_code)
     sent = await otp.send_otp_email_async(req.email, otp_code)
@@ -117,6 +115,7 @@ async def register_user(req: RegisterRequest):
         return {"message": "User registered. OTP sent to email."}
     else:
         return {"message": f"User registered. OTP (dev mode): {otp_code}"}
+
 
 @router.post("/login", response_model=LoginResponse)
 async def login_user(req: LoginRequest):
@@ -136,12 +135,13 @@ async def login_user(req: LoginRequest):
     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
     return {"token": token,"verified": user.get("verified", False)}
 
+
 @router.post("/send-otp")
 async def send_otp(req: SendOTPRequest):
     user = await users_col.find_one({"email": req.email})
     if not user:
         raise HTTPException(status_code=400, detail="User not found")
-    
+
     otp_code = otp.generate_otp()
     await otp.store_otp(req.email, otp_code)
     sent = await otp.send_otp_email_async(req.email, otp_code)
@@ -152,22 +152,22 @@ async def send_otp(req: SendOTPRequest):
 
 @router.post("/verify-otp")
 async def verify_otp(req: VerifyOTPRequest):
-    print("📩Incoming OTP verification request:", req.dict())  
+    print("Incoming OTP verification request:", req.dict())
 
     try:
         is_valid = await otp.verify_otp_in_db(req.email, req.otp)
-        print(f"🧩 OTP validation result for {req.email}: {is_valid}")
+        print(f"OTP validation result for {req.email}: {is_valid}")
 
         if not is_valid:
             raise HTTPException(status_code=400, detail="Invalid or expired OTP")
 
         await users_col.update_one({"email": req.email}, {"$set": {"verified": True}})
-        print(f"✅ User {req.email} marked as verified")
+        print(f"User {req.email} marked as verified")
 
         return {"message": "OTP verified successfully, user is now verified."}
 
     except Exception as e:
-        print(f"❌ Exception during OTP verify: {e}")
+        print(f"Exception during OTP verify: {e}")
         raise
 
 
@@ -194,8 +194,25 @@ async def get_user_info(credentials: HTTPAuthorizationCredentials = Depends(secu
         "name": user["name"],
         "email": user["email"],
         "verified": user.get("verified", False),
+        "avatar_base64": user.get("avatar_base64", ""),
     }
 
+@router.post("/me/avatar")
+async def upload_avatar(credentials: HTTPAuthorizationCredentials = Depends(security), file: UploadFile = File(...)):
+    token = credentials.credentials
+    decoded = decode_jwt(token)
+    user = await users_col.find_one({"email": decoded["email"]})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    contents = await file.read()
+    avatar_base64 = base64.b64encode(contents).decode('utf-8')
+    
+    await users_col.update_one(
+        {"email": decoded["email"]},
+        {"$set": {"avatar_base64": avatar_base64}}
+    )
+    return JSONResponse({"avatar_base64": avatar_base64})
 
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
@@ -240,11 +257,11 @@ async def forgot_password(req: SendOTPRequest):
 
 @router.post("/verify-reset-otp")
 async def verify_reset_otp(req: VerifyResetOTPRequest):
-    """Verify OTP for password reset. If valid, return a short-lived reset token."""
     email = req.email.lower()
     is_valid = await otp.verify_otp_in_db(email, req.otp)
     if not is_valid:
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+
     reset_token = create_reset_jwt(email)
     return {"reset_token": reset_token, "expires_in_minutes": RESET_JWT_TTL_MINUTES}
 
@@ -260,14 +277,13 @@ async def reset_password(data: dict):
     otp_doc = await otps_col.find_one({"email": email, "otp": otp})
     if not otp_doc:
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
-
     hashed_pw = pwd_context.hash(new_password)
     result = await users_col.update_one(
         {"email": email},
         {"$set": {"password": hashed_pw}}
     )
-
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="User not found")
+
     await otps_col.delete_many({"email": email})
     return {"message": "Password updated successfully"}

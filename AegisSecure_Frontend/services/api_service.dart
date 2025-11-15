@@ -6,11 +6,12 @@ import 'package:telephony/telephony.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ApiService {
-  // static const String baseUrl = "https://aegissecurebackend.onrender.com";
+  static String? selectedEmailAccount;
+  static const String baseUrl = "https://aegissecurebackend.onrender.com";
+  // static const String CyberUrl ="https://cybersecure-backend-api.onrender.com/predict";
   static const String CyberUrl =
-      "https://cybersecure-backend-api.onrender.com/predict";
-  static const String baseUrl =
-      "https://aidyn-findable-greedily.ngrok-free.dev";
+      "https://marinda-tetrapterous-eva.ngrok-free.dev/predict";
+  // static const String baseUrl ="https://aidyn-findable-greedily.ngrok-free.dev";
   // neEd to store the JWT tokn in sharedPreferences so that user dont have to logIn again and again every time he opens the App.
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
@@ -47,11 +48,6 @@ class ApiService {
     String password,
   ) async {
     final url = Uri.parse('$baseUrl/auth/register');
-    // return await http.post(
-    //   url,
-    //   headers: {'Content-Type': 'application/json'},
-    //   body: jsonEncode({'name': name, 'email': email, 'password': password}),
-    // );
     final res = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -120,8 +116,11 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> analyzeText(String text) async {
+    // final url = Uri.parse(
+    //   "https://cybersecure-backend-api.onrender.com/predict",
+    // );
     final url = Uri.parse(
-      "https://cybersecure-backend-api.onrender.com/predict",
+      "https://marinda-tetrapterous-eva.ngrok-free.dev/predict",
     );
     print("DEBUG: Sending POST request to $url with text='$text'");
 
@@ -131,23 +130,22 @@ class ApiService {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"text": text}),
       );
-//       print('''
-// ✅⭐️ DEBUG: Sending POST request
-// URL: $url
-// Headers: {"Content-Type": "application/json"}
-// 🔹Body: ${jsonEncode({"text": text})}
-// ''');
-
+      //       print('''
+      // ✅⭐️ DEBUG: Sending POST request
+      // URL: $url
+      // Headers: {"Content-Type": "application/json"}
+      // 🔹Body: ${jsonEncode({"text": text})}
+      // ''');
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
-        print("DEBUG: Decoded API JSON = $decoded");
+        // print("DEBUG: Decoded API JSON = $decoded");
         return decoded;
       } else {
-        print("DEBUG: Non-200 response: ${response.statusCode}");
+        // print("DEBUG: Non-200 response: ${response.statusCode}");
         return {"prediction": "0.0"};
       }
     } catch (e) {
-      print("DEBUG: Exception during API call: $e");
+      // print("DEBUG: Exception during API call: $e");
       return {"prediction": "0.0"};
     }
   }
@@ -190,7 +188,8 @@ class ApiService {
     final clientId =
         "365011130597-3bv38b9aubtt65rebnbl673c2cogt7j3.apps.googleusercontent.com";
     // final redirectUri ="https://aidyn-findable-greedily.ngrok-free.dev/auth/google/callback";
-    final redirectUri ="https://aegissecurebackend.onrender.com/auth/google/callback";
+    final redirectUri =
+        "https://aegissecurebackend.onrender.com/auth/google/callback";
     final userId = await getUserId();
     if (userId == null) {
       print("No user logged in");
@@ -222,6 +221,7 @@ class ApiService {
       print("Can't launch $url");
     }
   }
+
   static Future<http.Response> sendOtp(String email) async {
     final url = Uri.parse('$baseUrl/auth/send-otp');
     return await http.post(
@@ -240,7 +240,7 @@ class ApiService {
     );
 
     print("Verify OTP response: ${response.statusCode} -> ${response.body}");
-    return response; 
+    return response;
   }
 
   static Future<http.Response> checkEmailVerification(String email) async {
@@ -259,6 +259,7 @@ class ApiService {
       return http.Response('{"error": "network"}', 500);
     }
   }
+
   static Future<Map<String, dynamic>> fetchConnectedAccounts() async {
     final token = await getToken();
     final url = Uri.parse('$baseUrl/gmail/accounts');
@@ -312,6 +313,7 @@ class ApiService {
       throw Exception('Failed to fetch connected accounts');
     }
   }
+
   static Future<void> deleteConnectedAccount(String gmailEmail) async {
     final url = Uri.parse('$baseUrl/accounts/delete');
     try {
@@ -346,13 +348,10 @@ class ApiService {
     }
   }
 
-
   static Future<Map<String, dynamic>> analyzeSmsList(
     List<SmsMessage> messages,
   ) async {
-    final url = Uri.parse(
-      '$baseUrl/analyze_sms_list',
-    );
+    final url = Uri.parse('$baseUrl/analyze_sms_list');
     final token = await getToken();
 
     if (token == null) {

@@ -9,18 +9,18 @@ import '../services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  bool _loading = false;
+  bool loading = false;
   String? emailError;
   String? passwordError;
   bool _showPassword = false;
 
-  void _showErrorDialog(BuildContext context, String message) {
+  void showErrorDialog(BuildContext context, String message) {
     showDialog(
       context: context,
       builder: (context) {
@@ -50,34 +50,26 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     if (emailError != null || passwordError != null) return;
-
-    setState(() => _loading = true);
-
+    setState(() => loading = true);
     try {
       final res = await ApiService.loginUser(email, password);
-
       // print("DEBUG: Response status = ${res.statusCode}");
       // print("DEBUG: Response body = ${res.body}");
-
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
-
         final token = data['token'];
         final verifiedRaw = data['verified'];
         final isVerified =
             verifiedRaw == true || verifiedRaw == "true" || verifiedRaw == 1;
-
         // print("DEBUG: Raw verified value = $verifiedRaw");
         // print("DEBUG: Parsed isVerified = $isVerified");
         // print("DEBUG: Token = $token");
-
         if (!isVerified) {
           setState(() {
             passwordError = "Please verify your email before logging in.";
           });
           return;
         }
-
         if (token == null || token.isEmpty) {
           setState(() {
             passwordError = "Failed to get authentication token.";
@@ -89,13 +81,24 @@ class _LoginScreenState extends State<LoginScreen> {
         List<String> savedAccounts =
             prefs.getStringList('saved_accounts') ?? [];
         final newAccount = '$email:$password';
-        if (!savedAccounts.contains(newAccount)) {
-          savedAccounts.add(newAccount);
-          await prefs.setStringList('saved_accounts', savedAccounts);
+        bool accountUpdated = false;
+        for (int i = 0; i < savedAccounts.length; i++) {
+          final parts = savedAccounts[i].split(':');
+          if (parts.isNotEmpty && parts[0] == email) {
+            savedAccounts[i] = newAccount;
+            accountUpdated = true;
+            break;
+          }
         }
+        if (!accountUpdated) {
+          savedAccounts.add(newAccount);
+        }
+        await prefs.setStringList('saved_accounts', savedAccounts);
         try {
           final userRes = await ApiService.fetchCurrentUser();
+          print("DEBUG: Current user = $userRes");
         } catch (e) {
+          print("DEBUG: Could not fetch current user: $e");
         }
         Navigator.pushReplacementNamed(context, '/home');
       } else if (res.statusCode == 401 || res.statusCode == 400) {
@@ -108,11 +111,12 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       }
     } catch (e) {
+      // print("DEBUG: Exception caught during login: $e");
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Error connecting to server: $e")));
     } finally {
-      setState(() => _loading = false);
+      setState(() => loading = false);
     }
   }
 
@@ -182,7 +186,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-
                 SizedBox(height: 16),
                 TextField(
                   controller: passwordController,
@@ -212,7 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: _loading
+                    onPressed: loading
                         ? null
                         : () {
                             Navigator.push(
@@ -233,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 SizedBox(height: 12),
-                _loading
+                loading
                     ? CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: login,
@@ -254,16 +257,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-
                 SizedBox(height: 5),
-
                 Text(
                   "OR",
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                 ),
-
                 SizedBox(height: 5),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -272,7 +271,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         final prefs = await SharedPreferences.getInstance();
                         final savedAccounts =
                             prefs.getStringList('saved_accounts') ?? [];
-
                         if (savedAccounts.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -283,7 +281,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                           return;
                         }
-
                         if (savedAccounts.length == 1) {
                           final parts = savedAccounts.first.split(':');
                           if (parts.length == 2) {
@@ -293,7 +290,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           }
                           return;
                         }
-
                         showDialog(
                           context: context,
                           builder: (context) {
@@ -346,7 +342,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                           final parts = savedAccounts[index]
                                               .split(':');
                                           final email = parts.first;
-
                                           return Container(
                                             margin: const EdgeInsets.symmetric(
                                               vertical: 4,
@@ -387,8 +382,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               title: Text(
                                                 email,
                                                 style: const TextStyle(
-                                                  fontSize:
-                                                      14,
+                                                  fontSize: 14,
                                                   fontWeight: FontWeight.w500,
                                                   color: Colors.black87,
                                                 ),
@@ -446,13 +440,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                         );
                       },
-                      icon: Image.asset(
-                        'assets/images/google_logo.png',
-                        height: 24,
-                        width: 24,
-                      ),
                       label: const Text(
-                        "Sign in with Google",
+                        "Already Have an Account?",
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 16,
@@ -472,8 +461,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         foregroundColor: Colors.white,
                         surfaceTintColor: Colors.transparent,
-                        shadowColor:
-                            Colors.transparent,
+                        shadowColor: Colors.transparent,
                       ),
                     ),
                   ],
@@ -497,18 +485,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 20),
                 Align(
                   alignment: Alignment.center,
                   child: TextButton(
-                    onPressed: _loading
+                    onPressed: loading
                         ? null
                         : () async {
-                            final outerContext =
-                                context; 
+                            final outerContext = context;
                             final emailControllerDialog =
                                 TextEditingController();
-
                             await showDialog(
                               context: context,
                               builder: (dialogContext) {
@@ -579,11 +566,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                             .trim();
                                         if (email.isEmpty) return;
 
-                                        Navigator.pop(
-                                          dialogContext,
-                                        );
+                                        Navigator.pop(dialogContext);
                                         Future.microtask(() async {
-                                          setState(() => _loading = true);
+                                          setState(() => loading = true);
                                           try {
                                             final resCheck =
                                                 await ApiService.checkEmailVerification(
@@ -596,9 +581,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                               );
                                               final isVerified =
                                                   data['verified'] ?? false;
-
                                               if (isVerified) {
-                                                _showErrorDialog(
+                                                showErrorDialog(
                                                   outerContext,
                                                   "This email is already verified. Please login instead.",
                                                 );
@@ -618,7 +602,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                     ),
                                                   );
                                                 } else {
-                                                  _showErrorDialog(
+                                                  showErrorDialog(
                                                     outerContext,
                                                     "Failed to send verification email. Please try again.",
                                                   );
@@ -641,30 +625,30 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   ),
                                                 );
                                               } else {
-                                                _showErrorDialog(
+                                                showErrorDialog(
                                                   outerContext,
                                                   "Failed to send verification email. Please try again.",
                                                 );
                                               }
                                             } else if (resCheck.statusCode ==
                                                 400) {
-                                              _showErrorDialog(
+                                              showErrorDialog(
                                                 outerContext,
                                                 "Email not registered. Please sign up first.",
                                               );
                                             } else {
-                                              _showErrorDialog(
+                                              showErrorDialog(
                                                 outerContext,
                                                 "Something went wrong. Please try again.",
                                               );
                                             }
                                           } catch (e) {
-                                            _showErrorDialog(
+                                            showErrorDialog(
                                               outerContext,
                                               "Error connecting to server. Please check your network.",
                                             );
                                           } finally {
-                                            setState(() => _loading = false);
+                                            setState(() => loading = false);
                                           }
                                         });
                                       },
@@ -693,18 +677,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _socialButton(IconData icon) {
-    return Container(
-      width: 58,
-      height: 50,
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Icon(icon, color: Colors.grey.shade700, size: 26),
     );
   }
 }

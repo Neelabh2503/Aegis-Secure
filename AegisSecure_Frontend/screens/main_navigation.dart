@@ -5,16 +5,17 @@ import 'package:gmailclone/screens/sms_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({Key? key}) : super(key: key);
-
   @override
-  State<MainNavigation> createState() => _MainNavigationState();
+  State<MainNavigation> createState() => mainNavigationState();
 }
 
-class _MainNavigationState extends State<MainNavigation> {
-  int _currentIndex = 1; 
+class mainNavigationState extends State<MainNavigation> {
+  int currentIndex = 1;
+
   final List<Widget> _pages = const [SmsScreen(), HomeScreen(), GmailScreen()];
+
   void _onTabTapped(int index) {
-    setState(() => _currentIndex = index);
+    setState(() => currentIndex = index);
   }
 
   @override
@@ -27,7 +28,7 @@ class _MainNavigationState extends State<MainNavigation> {
         duration: const Duration(milliseconds: 300),
         transitionBuilder: (child, animation) =>
             FadeTransition(opacity: animation, child: child),
-        child: _pages[_currentIndex],
+        child: _pages[currentIndex],
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
@@ -54,7 +55,7 @@ class _MainNavigationState extends State<MainNavigation> {
                 child: Icon(
                   Icons.chat_bubble_outline,
                   size: 28,
-                  color: _currentIndex == 0 ? activeColor : inactiveColor,
+                  color: currentIndex == 0 ? activeColor : inactiveColor,
                 ),
               ),
               GestureDetector(
@@ -62,7 +63,7 @@ class _MainNavigationState extends State<MainNavigation> {
                 child: Icon(
                   Icons.home_outlined,
                   size: 28,
-                  color: _currentIndex == 1 ? activeColor : inactiveColor,
+                  color: currentIndex == 1 ? activeColor : inactiveColor,
                 ),
               ),
               GestureDetector(
@@ -70,7 +71,7 @@ class _MainNavigationState extends State<MainNavigation> {
                 child: Icon(
                   Icons.mail_outline,
                   size: 28,
-                  color: _currentIndex == 2 ? activeColor : inactiveColor,
+                  color: currentIndex == 2 ? activeColor : inactiveColor,
                 ),
               ),
             ],
