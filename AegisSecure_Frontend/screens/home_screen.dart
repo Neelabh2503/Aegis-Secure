@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,32 +12,126 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
+class UserAvatar extends StatelessWidget {
+  final String? avatarBase64;
+  final String? userName;
+  final Color backgroundColor;
+  final VoidCallback onTap;
+  const UserAvatar({
+    Key? key,
+    required this.avatarBase64,
+    required this.userName,
+    required this.backgroundColor,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final String initial = (userName != null && userName!.isNotEmpty)
+        ? userName![0].toUpperCase()
+        : '?';
+    return GestureDetector(
+      onTap: onTap,
+      child: CircleAvatar(
+        radius: 20,
+        backgroundColor: backgroundColor,
+        backgroundImage: avatarBase64 != null && avatarBase64!.isNotEmpty
+            ? MemoryImage(base64Decode(avatarBase64!))
+            : null,
+        child: avatarBase64 == null || avatarBase64!.isEmpty
+            ? Text(
+                initial,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              )
+            : null,
+      ),
+    );
+  }
+}
+
+class DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String? avatarBase64;
+  final String? userName;
+  final bool userLoading;
+  final VoidCallback onMenuTap;
+  final VoidCallback onAvatarTap;
+
+  const DashboardAppBar({
+    Key? key,
+    required this.avatarBase64,
+    required this.userName,
+    required this.userLoading,
+    required this.onMenuTap,
+    required this.onAvatarTap,
+  }) : super(key: key);
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 1,
+      leading: IconButton(
+        icon: const Icon(Icons.menu, color: Colors.black87),
+        onPressed: onMenuTap,
+      ),
+      title: const Text(
+        "AegisSecure Home",
+        style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+      ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 14.0),
+          child: userLoading
+              ? const CircleAvatar(
+                  backgroundColor: Colors.grey,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : UserAvatar(
+                  avatarBase64: avatarBase64,
+                  userName: userName,
+                  backgroundColor: const Color(0xFF1F2A6E),
+                  onTap: onAvatarTap,
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+class HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   String? currentUserName;
-  bool _userLoading = true;
+  String? currentUserAvatar;
+  bool userLoading = true;
 
   String _dashboardMode = 'both';
-  bool _dashboardLoading = false;
+  bool dashboardLoading = false;
+
   List<String> _dashLabels = [];
   List<int> _dashValues = [];
   int _dashTotal = 0;
-  String _dashSummary = "";
-  List<String> _dashTrends = [];
+  String dashInsights = "";
 
-  int? _hoverIndex;
+  static const Color primaryColor = Color(0xFF1F2A6E);
 
-  static const List<Color> _colors = [
-    Color(0xFF27AE60),
-    Color(0xFFF39C12),
-    Color(0xFFE67E22),
-    Color(0xFFE74C3C),
-  ];
+  static const Color mailColor = Color(0xFF4A90E2);
+  static const Color smsColor = Color(0xFF556B9D);
+  static const Color bothColor = Color(0xFF7B8DB5);
 
   late final AnimationController _animController;
+  final GlobalKey<DashboardPieChartState> pieChartKey =
+      GlobalKey<DashboardPieChartState>();
 
   @override
   void initState() {
@@ -43,12 +139,9 @@ class _HomeScreenState extends State<HomeScreen>
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
-    )..addListener(() => setState(() {}));
-
-    loadCurrentUser();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _loadDashboard(mode: _dashboardMode),
     );
+
+    Future.wait([loadCurrentUser(), _loadDashboard(mode: _dashboardMode)]);
   }
 
   @override
@@ -60,30 +153,23 @@ class _HomeScreenState extends State<HomeScreen>
   Future<void> loadCurrentUser() async {
     try {
       final user = await ApiService.fetchCurrentUser();
-      setState(() {
-        currentUserName = user['name'] ?? 'U';
-        _userLoading = false;
-      });
-    } catch (e) {
-      setState(() => _userLoading = false);
+      if (mounted) {
+        setState(() {
+          currentUserName = user['name'] ?? 'U';
+          currentUserAvatar = user['avatar_base64'];
+          userLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => userLoading = false);
     }
   }
 
-  Future<void> _logout(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('jwt_token');
-    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-  }
-
-  Future<void> _loadDashboard({String mode = 'both'}) async {
-    setState(() {
-      _dashboardLoading = true;
-      _dashboardMode = mode;
-    });
-
+  Future<void> _loadDashboard({required String mode}) async {
+    setState(() => dashboardLoading = true);
     try {
       final res = await DashboardApi.fetchDashboard(mode: mode);
-      if (res != null) {
+      if (res != null && mounted) {
         final labels = List<String>.from(res['labels'] ?? []);
         final values =
             (res['values'] as List<dynamic>?)
@@ -92,335 +178,480 @@ class _HomeScreenState extends State<HomeScreen>
             List<int>.filled(labels.isNotEmpty ? labels.length : 4, 0);
         final total =
             (res['total'] ?? values.fold<int>(0, (a, b) => a + b)) as int;
-        final summary = (res['summary'] ?? '') as String;
-        final trends = List<String>.from(res['trends'] ?? []);
 
-        setState(() {
-          _dashLabels = labels.isNotEmpty
-              ? labels
-              : ["Secure", "Suspicious", "Threat", "Critical"];
-          _dashValues = values.isNotEmpty ? values : [0, 0, 0, 0];
-          _dashTotal = total;
-          _dashSummary = summary;
-          _dashTrends = trends;
-        });
+        final insightsData = res['insights'];
+        String fact1 = "";
+        String fact2 = "";
+        if (insightsData is Map<String, dynamic>) {
+          fact1 = insightsData['fact1'] ?? "";
+          fact2 = insightsData['fact2'] ?? "";
+        }
 
-        await Future.delayed(const Duration(milliseconds: 50));
-        if (mounted) _animController.forward(from: 0);
+        if (mode == 'mail' || mode == 'sms') {
+          // update pie chart only for mail or sms mode without rebuilding whole screen
+          pieChartKey.currentState?.updateData(values, labels, total);
+        } else {
+          // 'both' mode or others reload whole UI
+          setState(() {
+            _dashboardMode = mode;
+            _dashLabels = labels.isNotEmpty
+                ? labels
+                : ["Secure", "Suspicious", "Threat", "Critical"];
+            _dashValues = values.isNotEmpty ? values : [0, 0, 0, 0];
+            _dashTotal = total;
+            dashInsights = jsonEncode({"fact1": fact1, "fact2": fact2});
+          });
+          _animController.forward(from: 0);
+        }
+
+        // Always update dashInsights and mode on any load for consistency
+        if (mounted && !(mode == 'mail' || mode == 'sms')) {
+          // done above for 'both' already
+        } else if (mounted) {
+          // update mode and insights for 'mail' or 'sms' mode as well
+          setState(() {
+            _dashboardMode = mode;
+            dashInsights = jsonEncode({"fact1": fact1, "fact2": fact2});
+          });
+          _animController.forward(from: 0);
+        }
       }
     } catch (e) {
       debugPrint("Failed to load dashboard: $e");
     } finally {
-      setState(() => _dashboardLoading = false);
+      if (mounted) setState(() => dashboardLoading = false);
     }
   }
 
-  // --- Drawer Key
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  Future<void> _handleLogout() async {
+    _scaffoldKey.currentState?.closeDrawer();
+    await Future.delayed(const Duration(milliseconds: 150));
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 15,
+          title: Row(
+            children: [
+              Icon(Icons.logout, color: primaryColor),
+              const SizedBox(width: 12),
+              const Text(
+                "Confirm Sign Out",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+            ],
+          ),
+          content: const Text(
+            "Are you sure you want to sign out from your account?",
+            style: TextStyle(fontSize: 16, color: Colors.black87),
+          ),
+          actionsPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 10,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.grey.shade700,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+              ),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton.icon(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              icon: const Icon(Icons.exit_to_app, size: 20),
+              label: const Text(
+                "Sign Out",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('jwt_token');
+      Navigator.of(
+        context,
+        rootNavigator: true,
+      ).pushNamedAndRemoveUntil('/login', (route) => false);
+    }
+  }
+
+  Widget buildModeButton(String label, String mode, Color color) {
+    final bool selected = _dashboardMode == mode;
+    return ChoiceChip(
+      label: Text(
+        label,
+        style: TextStyle(
+          color: selected ? Colors.white : color,
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
+        ),
+      ),
+      selected: selected,
+      selectedColor: color,
+      backgroundColor: color.withOpacity(0.25),
+      elevation: 2,
+      shadowColor: Colors.black12,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      onSelected: (v) {
+        if (v && _dashboardMode != mode) _loadDashboard(mode: mode);
+      },
+    );
+  }
+
+  Widget _buildCyberFacts(Map<String, dynamic> facts) {
+    final List<String> points = [
+      facts['fact1']?.toString() ?? '',
+      facts['fact2']?.toString() ?? '',
+    ].where((f) => f.isNotEmpty).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: points.map((point) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "• ",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  height: 1.6,
+                  color: Colors.black87,
+                  fontFamily: 'Inter',
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  point,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    height: 1.6,
+                    color: Colors.black87,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final firstLetter = (currentUserName != null && currentUserName!.isNotEmpty)
-        ? currentUserName![0].toUpperCase()
-        : '?';
-
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.grey.shade100,
-
-      // ✅ Replace dialog with Drawer-style Sidebar
+      backgroundColor: Colors.grey.shade50,
       drawer: Sidebar(
-        onClose: () => Navigator.of(context).pop(),
-        onLogoutTap: () => _logout(context),
+        onClose: () => _scaffoldKey.currentState?.closeDrawer(),
+        onLogoutTap: _handleLogout,
       ),
-
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black87),
-          onPressed: () {
-            _scaffoldKey.currentState?.openDrawer();
-          },
-        ),
-        title: const Text(
-          "Dashboard",
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: _userLoading
-                ? const CircleAvatar(
-                    backgroundColor: Colors.grey,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : CircleAvatar(
-                    backgroundColor: Colors.deepPurple,
-                    child: Text(
-                      firstLetter,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-          ),
-        ],
+      appBar: DashboardAppBar(
+        avatarBase64: currentUserAvatar,
+        userName: currentUserName,
+        userLoading: userLoading,
+        onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
+        onAvatarTap: () {
+          Navigator.of(
+            context,
+          ).pushNamed('/account', arguments: currentUserName);
+        },
       ),
-
-      // === BODY ===
-      body: _dashboardLoading
+      body: dashboardLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 24,
+                horizontal: 24,
+                vertical: 30,
               ).copyWith(bottom: 120),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- Mode Selector ---
+                  DashboardPieChart(
+                    key: pieChartKey,
+                    values: _dashValues,
+                    labels: _dashLabels,
+                    total: _dashTotal,
+                  ),
+                  const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildModeButton("Mail", "mail", Colors.deepPurple),
-                      const SizedBox(width: 8),
-                      _buildModeButton("SMS", "sms", Colors.orange),
-                      const SizedBox(width: 8),
-                      _buildModeButton("Both", "both", Colors.green),
+                      buildModeButton("Mail", "mail", mailColor),
+                      const SizedBox(width: 12),
+                      buildModeButton("SMS", "sms", smsColor),
+                      const SizedBox(width: 12),
+                      buildModeButton("Both", "both", bothColor),
                     ],
                   ),
-                  const SizedBox(height: 28),
-
-                  // --- Chart Section ---
-                  Center(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        SizedBox(
-                          height: 260,
-                          child: PieChart(
-                            PieChartData(
-                              sectionsSpace: 1,
-                              centerSpaceRadius: 95,
-                              pieTouchData: PieTouchData(
-                                touchCallback: (event, response) {
-                                  if (!event.isInterestedForInteractions)
-                                    return;
-                                  if (response != null &&
-                                      response.touchedSection != null &&
-                                      response
-                                              .touchedSection!
-                                              .touchedSectionIndex >=
-                                          0) {
-                                    setState(() {
-                                      _hoverIndex = response
-                                          .touchedSection!
-                                          .touchedSectionIndex;
-                                    });
-                                  } else {
-                                    setState(() => _hoverIndex = null);
-                                  }
-                                },
+                  const SizedBox(height: 24),
+                  Wrap(
+                    spacing: 18,
+                    runSpacing: 12,
+                    children: List.generate(_dashLabels.length, (i) {
+                      return SizedBox(
+                        width: (MediaQuery.of(context).size.width / 2) - 36,
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 14,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color:
+                                    DashboardPieChart.brightChartColors[i %
+                                        DashboardPieChart
+                                            .brightChartColors
+                                            .length],
+                                borderRadius: BorderRadius.circular(6),
                               ),
-                              sections: List.generate(_dashValues.length, (i) {
-                                final isTouched = _hoverIndex == i;
-                                final double percentage = _dashTotal == 0
-                                    ? 0
-                                    : (_dashValues[i] / _dashTotal) * 100;
-                                return PieChartSectionData(
-                                  color: _colors[i % _colors.length],
-                                  value: _dashValues[i].toDouble(),
-                                  title: "",
-                                  radius: isTouched ? 70 : 60,
-                                  badgeWidget: isTouched
-                                      ? AnimatedContainer(
-                                          duration: const Duration(
-                                            milliseconds: 200,
-                                          ),
-                                          padding: const EdgeInsets.all(6),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Colors.black12,
-                                                blurRadius: 4,
-                                              ),
-                                            ],
-                                          ),
-                                          child: Text(
-                                            "${percentage.toStringAsFixed(1)}%",
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        )
-                                      : null,
-                                  badgePositionPercentageOffset: 1.3,
-                                );
-                              }),
                             ),
-                          ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                _dashLabels[i],
+                                style: const TextStyle(fontSize: 15),
+                              ),
+                            ),
+                            Text(
+                              "${_dashValues[i]}",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
                         ),
-                        GestureDetector(
-                          onTap: () => setState(() => _hoverIndex = null),
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 250),
-                            child: _hoverIndex == null
-                                ? Column(
-                                    key: const ValueKey("total"),
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        '$_dashTotal',
-                                        style: const TextStyle(
-                                          fontSize: 34,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.deepPurple,
-                                        ),
-                                      ),
-                                      const Text(
-                                        "Messages Analyzed",
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                : Column(
-                                    key: ValueKey(_hoverIndex),
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        "${_dashValues[_hoverIndex!]}",
-                                        style: TextStyle(
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.bold,
-                                          color: _colors[_hoverIndex!],
-                                        ),
-                                      ),
-                                      Text(
-                                        _dashLabels[_hoverIndex!],
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                          ),
-                        ),
-                      ],
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 32),
+                  Text(
+                    "💡Cyber Insights",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
                     ),
                   ),
-                  const SizedBox(height: 28),
-
-                  // --- Legend ---
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 10,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: List.generate(_dashLabels.length, (i) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  color: _colors[i % _colors.length],
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  _dashLabels[i],
-                                  style: const TextStyle(fontSize: 14.5),
-                                ),
-                              ),
-                              Text(
-                                "${_dashValues[i]}",
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }),
-                    ),
-                  ),
-
-                  const SizedBox(height: 28),
-
-                  const Text(
-                    "Security Summary",
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 22,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.deepPurple.withOpacity(0.06),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFABE3FF), Color(0xFFFFFFFF)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: primaryColor.withOpacity(0.15),
+                          blurRadius: 10,
+                          offset: const Offset(0, 7),
+                        ),
+                      ],
                       border: Border.all(
-                        color: Colors.deepPurpleAccent.withOpacity(0.4),
+                        color: primaryColor.withOpacity(0.3),
                         width: 0.7,
                       ),
-                      borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Text(
-                      _dashSummary.isNotEmpty
-                          ? _dashSummary
-                          : "No summary available yet.",
-                      style: const TextStyle(
-                        fontSize: 14.5,
-                        height: 1.5,
-                        color: Colors.black87,
-                      ),
-                    ),
+                    child: dashInsights.isNotEmpty
+                        ? _buildCyberFacts(jsonDecode(dashInsights))
+                        : const Text(
+                            "No insights available yet.",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              height: 1.6,
+                              color: Colors.black87,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
                   ),
                 ],
               ),
             ),
     );
   }
+}
 
-  Widget _buildModeButton(String label, String mode, Color color) {
-    final bool selected = _dashboardMode == mode;
-    return ChoiceChip(
-      label: Text(
-        label,
-        style: TextStyle(
-          color: selected ? Colors.white : Colors.black87,
-          fontWeight: FontWeight.w600,
-        ),
+class DashboardPieChart extends StatefulWidget {
+  final List<int> values;
+  final List<String> labels;
+  final int total;
+
+  const DashboardPieChart({
+    super.key,
+    required this.values,
+    required this.labels,
+    required this.total,
+  });
+
+  static const List<Color> brightChartColors = [
+    Color(0xFF2B3E7F),
+    Color(0xFF556B9D),
+    Color(0xFF7B8DB5),
+    Color(0xFFA5B3D4),
+  ];
+
+  static const Color primaryColor = Color(0xFF1F2A6E);
+
+  @override
+  State<DashboardPieChart> createState() => DashboardPieChartState();
+}
+
+class DashboardPieChartState extends State<DashboardPieChart> {
+  int? hoverIndex;
+  late List<int> values;
+  late List<String> labels;
+  late int total;
+
+  @override
+  void initState() {
+    super.initState();
+    values = widget.values;
+    labels = widget.labels;
+    total = widget.total;
+  }
+
+  void updateData(List<int> values, List<String> labels, int total) {
+    setState(() {
+      values = values;
+      labels = labels;
+      total = total;
+      hoverIndex = null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          SizedBox(
+            height: 280,
+            width: 280,
+            child: PieChart(
+              PieChartData(
+                sectionsSpace: 2,
+                centerSpaceRadius: 90,
+                pieTouchData: PieTouchData(
+                  touchCallback: (event, response) {
+                    if (!event.isInterestedForInteractions) return;
+                    setState(() {
+                      if (response?.touchedSection?.touchedSectionIndex !=
+                          null) {
+                        hoverIndex =
+                            response!.touchedSection!.touchedSectionIndex;
+                      } else {
+                        hoverIndex = null;
+                      }
+                    });
+                  },
+                ),
+                sections: List.generate(values.length, (i) {
+                  final isTouched = hoverIndex == i;
+                  return PieChartSectionData(
+                    color:
+                        DashboardPieChart.brightChartColors[i %
+                            DashboardPieChart.brightChartColors.length],
+                    value: values[i].toDouble(),
+                    title: "",
+                    radius: isTouched ? 70 : 60,
+                  );
+                }),
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => setState(() => hoverIndex = null),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: hoverIndex == null
+                  ? Column(
+                      key: const ValueKey("total"),
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '$total',
+                          style: const TextStyle(
+                            fontSize: 38,
+                            fontWeight: FontWeight.bold,
+                            color: DashboardPieChart.primaryColor,
+                          ),
+                        ),
+                        const Text(
+                          "Messages Analyzed",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      key: ValueKey(hoverIndex),
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "${values[hoverIndex!]}",
+                          style: TextStyle(
+                            fontSize: 34,
+                            fontWeight: FontWeight.bold,
+                            color: DashboardPieChart
+                                .brightChartColors[hoverIndex!],
+                          ),
+                        ),
+                        Text(
+                          labels[hoverIndex!],
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+        ],
       ),
-      selected: selected,
-      selectedColor: color,
-      backgroundColor: Colors.grey.shade200,
-      onSelected: (v) {
-        if (v && _dashboardMode != mode) _loadDashboard(mode: mode);
-      },
     );
   }
 }

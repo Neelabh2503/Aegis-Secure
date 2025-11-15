@@ -12,11 +12,9 @@ class DashboardApi {
     final token = await ApiService.getToken();
     if (token == null) return null;
 
-    // Build query parameters
     final queryParameters = <String, String>{'mode': mode};
     if (days != null) queryParameters['days'] = days.toString();
 
-    // Build final URL
     final uri = Uri.parse(
       '${ApiService.baseUrl}/dashboard',
     ).replace(queryParameters: queryParameters);
@@ -31,15 +29,14 @@ class DashboardApi {
       );
 
       if (res.statusCode == 200) {
-        // The response now contains: labels, values, total, summary, trends
         final Map<String, dynamic> data = jsonDecode(res.body);
         return data;
       } else {
-        print('Dashboard fetch failed: ${res.statusCode} -> ${res.body}');
+        // print('Dashboard fetch failed: ${res.statusCode} -> ${res.body}');
         return null;
       }
     } catch (e) {
-      print('Dashboard fetch exception: $e');
+      // print('Dashboard fetch exception: $e');
       return null;
     }
   }
