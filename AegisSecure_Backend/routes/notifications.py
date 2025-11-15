@@ -1,58 +1,28 @@
 from fastapi import APIRouter, Request
-import httpx
-from database import messages_col, accounts_col
-import os, json, base64
-from dotenv import load_dotenv
-from websocket_manager import broadcast_new_email
+import httpx, os, json, base64
 from datetime import datetime, timezone
-from pydantic import BaseModel
+from dotenv import load_dotenv
+from bson import ObjectId
+
+from database import messages_col, accounts_col, users_col
+from websocket_manager import broadcast_new_email
+from .fcm_service import send_fcm_notification_for_user
+
 load_dotenv()
+
 router = APIRouter()
+
+# Environment
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
-CYBER_SECURE_URI=os.getenv("CYBER_SECURE_API_URI")
+CYBER_SECURE_URI = os.getenv("CYBER_SECURE_API_URI")
+
 if not GOOGLE_CLIENT_ID or not GOOGLE_CLIENT_SECRET:
-    raise Exception("Google OAuth credentials are missing in .env")
+    raise Exception("Google OAuth credentials missing.")
 
-class Spam_request(BaseModel):
-    sender: str
-    subject: str
-    body: str
-    
-async def get_spam_prediction(req:Spam_request):
-    try:
-        async with httpx.AsyncClient() as client:
-            sender=req.sender
-            subject=req.subject
-            body=req.body
-            resp = await client.post(
-                CYBER_SECURE_URI,
-                json={
-                    "sender": sender,
-                    "subject": subject,
-                    "body": body
-                },
-                timeout=30.0
-            )
-            resp.raise_for_status()
-            data = resp.json()
-            if isinstance(data, dict):
-                return data
-            return {"confidence": data, "reasoning": None}
 
-    except Exception as e:
-        print("### Spam prediction failed:", repr(e))
-        return {
-            "confidence": "unknown",
-            "reasoning": None,
-            "highlighted_text": None,
-            "suggestion": None,
-            "final_decision": "unknown"
-        }
-
+#  Fetch access token
 async def get_access_token_from_refresh(refresh_token: str):
-    """Get a new Google access token using the refresh token."""
     async with httpx.AsyncClient() as client:
         resp = await client.post(
             "https://oauth2.googleapis.com/token",
@@ -67,47 +37,20 @@ async def get_access_token_from_refresh(refresh_token: str):
         return data.get("access_token")
 
 
-
-@router.post("/analyze_text")
-async def analyze_text_endpoint(data: dict):
-    text = data.get("text", "")
-    if not text:
-        return {"prediction": "UNKNOWN"} 
-
+#  Call ML model for spam prediction
+async def get_spam_prediction(text: str):
     try:
-        
-        prediction = await get_spam_prediction(text)
-        prediction_str = str(prediction).strip().upper() 
-        if prediction_str not in ["SPAM", "HAM"]:
-            prediction_str = "UNKNOWN"
-        return {"prediction": prediction_str}
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(CYBER_SECURE_URI, json={"text": text}, timeout=60)
+            resp.raise_for_status()
+            data = resp.json()
+            return data.get("prediction", "unknown")
     except Exception as e:
-        print("Error in analyze_text_endpoint:", e)
-        return {"prediction": "UNKNOWN"}
-    
-
-def extract_body(payload):
-    """Recursively extract text/plain body from Gmail message payload."""
-    if not payload:
-        return None
-
-    mime_type = payload.get("mimeType", "")
-    body_data = payload.get("body", {}).get("data")
-
-    if body_data and ("text/plain" in mime_type or "text/html" in mime_type):
-        try:
-            return base64.urlsafe_b64decode(body_data).decode("utf-8", errors="ignore")
-        except Exception:
-            return None
-
-    for part in payload.get("parts", []):
-        text = extract_body(part)
-        if text:
-            return text
-
-    return None
+        print("### Spam prediction failed:", repr(e))
+        return "unknown"
 
 
+#  Gmail Push Notifications
 @router.post("/gmail/notifications")
 async def gmail_notifications(request: Request):
     try:
@@ -115,31 +58,34 @@ async def gmail_notifications(request: Request):
         if "message" not in raw_data:
             return {"status": "ignored"}
 
-        
         msg_str = base64.b64decode(raw_data["message"]["data"]).decode("utf-8")
         msg = json.loads(msg_str)
 
         email_address = msg.get("emailAddress")
         history_id = msg.get("historyId")
-        print(f"Gmail Push Notification for {email_address} | historyId={history_id}")
+        print(f"📬 Gmail Push Notification for {email_address} | historyId={history_id}")
 
         if not email_address:
-            return {"status": "error", "message": "Missing emailAddress in notification"}
+            return {"status": "error", "message": "Missing emailAddress"}
 
-        
+        # Lookup Gmail account
         user = await accounts_col.find_one({"gmail_email": email_address})
         if not user or "refresh_token" not in user:
-            print(f"Missing refresh_token for {email_address}")
+            print(f"⚠️ Missing refresh_token for {email_address}")
             return {"status": "ignored"}
+
         access_token = await get_access_token_from_refresh(user["refresh_token"])
         if not access_token:
-            print(f"Failed to get access_token for {email_address}")
+            print(f"⚠️ Failed to get access_token for {email_address}")
             return {"status": "error"}
+
+        # Default spam_prediction to safe value (in case nothing is found)
+        spam_prediction = 0.0
 
         async with httpx.AsyncClient() as client:
             start_history_id = user.get("last_history_id", history_id)
             history_resp = await client.get(
-                f"https://gmail.googleapis.com/gmail/v1/users/me/history",
+                "https://gmail.googleapis.com/gmail/v1/users/me/history",
                 params={"startHistoryId": start_history_id},
                 headers={"Authorization": f"Bearer {access_token}"}
             )
@@ -147,46 +93,89 @@ async def gmail_notifications(request: Request):
 
             for record in history_data.get("history", []):
                 for msg_event in record.get("messages", []):
-                    msg_id = msg_event["id"]
+                    msg_id = msg_event.get("id")
+                    if not msg_id:
+                        continue
+
                     msg_resp = await client.get(
                         f"https://gmail.googleapis.com/gmail/v1/users/me/messages/{msg_id}?format=full",
                         headers={"Authorization": f"Bearer {access_token}"}
                     )
                     msg_data = msg_resp.json()
+
                     headers = msg_data.get("payload", {}).get("headers", [])
                     subject = next((h["value"] for h in headers if h["name"] == "Subject"), "")
                     sender = next((h["value"] for h in headers if h["name"] == "From"), "")
                     snippet = msg_data.get("snippet", "")
-                    body = extract_body(msg_data.get("payload", {})) or snippet
-                    combined_text = f"{sender}{subject} {body}"
+                    combined_text = f"{subject} {snippet}"
+
                     spam_prediction = await get_spam_prediction(combined_text)
+                    if spam_prediction == "unknown":
+                        spam_prediction = 0.0  # Treat unknown as safe (0)
+
                     await messages_col.update_one(
-                        {"user_id": user["user_id"], "gmail_email": email_address, "gmail_id": msg_id},
+                        {
+                            "user_id": user["user_id"],
+                            "gmail_email": email_address,
+                            "gmail_id": msg_id
+                        },
                         {"$set": {
                             "subject": subject,
                             "from": sender,
                             "snippet": snippet,
-                            "body": body,
-                            "timestamp": int(msg_data.get("internalDate", datetime.now(timezone.utc).timestamp() * 1000)),
-                            "spam_prediction": spam_prediction.get("confidence"),
-                            "spam_reasoning": spam_prediction.get("reasoning"),
-                            "spam_highlighted_text": spam_prediction.get("highlighted_text"),
-                            "spam_suggestion": spam_prediction.get("suggestion"),
-                            "spam_verdict": spam_prediction.get("final_decision"),
+                            "timestamp": int(
+                                msg_data.get("internalDate", datetime.now(timezone.utc).timestamp() * 1000)
+                            ),
+                            "spam_prediction": spam_prediction,
                         }},
                         upsert=True
                     )
-        # print(f"Stored email: {subject[:40]} | body length={len(body)} | sender={sender}")
+
+        # Update Gmail last history ID
         await accounts_col.update_one(
             {"gmail_email": email_address},
             {"$set": {"last_history_id": history_id}}
         )
+
+        # Notify all connected clients via WebSocket
         await broadcast_new_email(email_address)
+
+        # Send FCM push (with guaranteed variable existence)
+        try:
+            uid = user.get("user_id")
+            query = {"$or": [{"user_id": uid}, {"_id": ObjectId(uid) if len(uid) == 24 else uid}]}
+            user_doc = await users_col.find_one(query)
+
+            if not user_doc:
+                print(f"⚠️ No user_doc found for user_id={uid} (gmail={email_address})")
+            else:
+                print(f"🔍 Found user_doc for {user_doc.get('email')} with {len(user_doc.get('fcm_tokens', []))} tokens.")
+
+            if user_doc:
+                user_id = user_doc.get("user_id") or str(user_doc.get("_id"))
+                label = str(spam_prediction)
+                try:
+                    score = float(label)
+                except:
+                    score = 100.0 if label.upper() == "SPAM" else 0.0
+
+                await send_fcm_notification_for_user(
+                    user_id,
+                    title="📧 New Email Received",
+                    body=f"Spam Score: {int(score)}%",
+                    data={
+                        "type": "mail",
+                        "score": str(int(score)),
+                        "email": email_address
+                    },
+                )
+        except Exception as fcm_err:
+            print("⚠️ FCM Gmail error:", fcm_err)
 
         return {"status": "processed"}
 
     except Exception as e:
         import traceback
-        print("Error in gmail_notifications:", str(e))
+        print("❌ Error in gmail_notifications:", str(e))
         traceback.print_exc()
         return {"status": "error", "message": str(e)}
