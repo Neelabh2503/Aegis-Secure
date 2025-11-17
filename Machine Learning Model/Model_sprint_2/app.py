@@ -8,7 +8,7 @@ from typing import List, Dict, Optional
 from urllib.parse import urlparse
 import socket
 import httpx
-
+import uvicorn
 import joblib
 import torch
 import numpy as np
@@ -121,13 +121,23 @@ def load_models():
                 print(f"⚠ Warning: Could not load semantic model from checkpoint: {e}")
     
     groq_api_key = os.environ.get('GROQ_API_KEY')
-    print(groq_api_key)
     if groq_api_key:
         groq_async_client = AsyncGroq(api_key=groq_api_key)
         print("✓ Initialized Groq API Client")
     else:
         print("⚠ Warning: GROQ_API_KEY not set. Set it as environment variable.")
         print("   Example: export GROQ_API_KEY='your-api-key-here'")
+
+def extract_visible_text(html_body: str) -> str:
+    soup = BeautifulSoup(html_body, 'html.parser')
+
+    for tag in soup(["script", "style", "nav", "header", "footer", "link", "meta"]):
+        tag.decompose()
+
+    text = soup.get_text(separator=' ', strip=True)
+    text = re.sub(r'\s+', ' ', text).strip()
+    
+    return text
 
 def parse_message(text: str) -> tuple:
     url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+|(?:www\.)?[a-zA-Z0-9-]+\.[a-z]{2,12}\b(?:/[^\s]*)?'
@@ -165,59 +175,59 @@ def get_model_predictions(features_df: pd.DataFrame, message_text: str) -> Dict:
     numerical_features = config.NUMERICAL_FEATURES
     categorical_features = config.CATEGORICAL_FEATURES
     
-    try:
-        X = features_df[numerical_features + categorical_features]
-    except KeyError as e:
-        print(f"Error: Missing columns in features_df. {e}")
-        print(f"Available columns: {features_df.columns.tolist()}")
-        X = pd.DataFrame(columns=numerical_features + categorical_features)
-    
-    if not X.empty:
-        X.loc[:, numerical_features] = X.loc[:, numerical_features].fillna(-1)
-        X.loc[:, categorical_features] = X.loc[:, categorical_features].fillna('N/A')
-
-        for model_name, model in ml_models.items():
-            try:
-                all_probas = model.predict_proba(X)[:, 1]  
-                raw_score = np.max(all_probas)      
-                
-                scaled_score = custom_boundary(raw_score, MODEL_BOUNDARIES[model_name])
-                predictions[model_name] = {
-                    'raw_score': float(raw_score),
-                    'scaled_score': float(scaled_score)
-                }
-            except Exception as e:
-                print(f"Error with {model_name} (Prediction Step): {e}") 
-        
-        X_numerical = X[numerical_features].values 
-        
-        for model_name, model in dl_models.items():
-            try:
-                X_tensor = torch.tensor(X_numerical, dtype=torch.float32)
-                with torch.no_grad():
-                    all_scores = model(X_tensor)
-                    raw_score = torch.max(all_scores).item()
-                    
-                scaled_score = custom_boundary(raw_score, MODEL_BOUNDARIES[model_name])
-                predictions[model_name] = {
-                    'raw_score': float(raw_score),
-                    'scaled_score': float(scaled_score)
-                }
-            except Exception as e:
-                print(f"Error with {model_name}: {e}")
-    
-    if bert_model and len(features_df) > 0:
+    if not features_df.empty:
         try:
-            urls = features_df['url'].tolist()
-            raw_scores = bert_model.predict_proba(urls)
-            avg_raw_score = np.mean([score[1] for score in raw_scores])
-            scaled_score = custom_boundary(avg_raw_score, MODEL_BOUNDARIES['bert'])
-            predictions['bert'] = {
-                'raw_score': float(avg_raw_score),
-                'scaled_score': float(scaled_score)
-            }
-        except Exception as e:
-            print(f"Error with BERT: {e}")
+            X = features_df[numerical_features + categorical_features]
+
+            X.loc[:, numerical_features] = X.loc[:, numerical_features].fillna(-1)
+            X.loc[:, categorical_features] = X.loc[:, categorical_features].fillna('N/A')
+
+            for model_name, model in ml_models.items():
+                try:
+                    all_probas = model.predict_proba(X)[:, 1]  
+                    raw_score = np.max(all_probas)      
+                    
+                    scaled_score = custom_boundary(raw_score, MODEL_BOUNDARIES[model_name])
+                    predictions[model_name] = {
+                        'raw_score': float(raw_score),
+                        'scaled_score': float(scaled_score)
+                    }
+                except Exception as e:
+                    print(f"Error with {model_name} (Prediction Step): {e}") 
+            
+            X_numerical = X[numerical_features].values 
+            
+            for model_name, model in dl_models.items():
+                try:
+                    X_tensor = torch.tensor(X_numerical, dtype=torch.float32)
+                    with torch.no_grad():
+                        all_scores = model(X_tensor)
+                        raw_score = torch.max(all_scores).item()
+                        
+                    scaled_score = custom_boundary(raw_score, MODEL_BOUNDARIES[model_name])
+                    predictions[model_name] = {
+                        'raw_score': float(raw_score),
+                        'scaled_score': float(scaled_score)
+                    }
+                except Exception as e:
+                    print(f"Error with {model_name}: {e}")
+        
+        except KeyError as e:
+            print(f"Error: Missing columns in features_df. {e}")
+            print(f"Available columns: {features_df.columns.tolist()}")
+
+        if bert_model:
+            try:
+                urls = features_df['url'].tolist()
+                raw_scores = bert_model.predict_proba(urls)
+                avg_raw_score = np.mean([score[1] for score in raw_scores])
+                scaled_score = custom_boundary(avg_raw_score, MODEL_BOUNDARIES['bert'])
+                predictions['bert'] = {
+                    'raw_score': float(avg_raw_score),
+                    'scaled_score': float(scaled_score)
+                }
+            except Exception as e:
+                print(f"Error with BERT: {e}")
     
     if semantic_model and message_text:
         try:
@@ -282,86 +292,208 @@ async def get_network_features_for_gemini(urls: List[str]) -> str:
 
     return "\n".join(results)
 
-SYSTEM_PROMPT = """You are the FINAL JUDGE in a phishing detection system. Your role is critical: analyze ALL available evidence and make the ultimate decision.
+SYSTEM_PROMPT = """You are an expert JSON-only phishing detection judge. Your sole purpose is to analyze input data and return a JSON object in the exact format requested. Do not output any text before or after the JSON.
 
-IMPORTANT INSTRUCTIONS:
-1. You have FULL AUTHORITY to override model predictions if evidence suggests they're wrong.
-2. **TRUST THE 'INDEPENDENT NETWORK & GEO-DATA' OVER 'URL FEATURES'.** The ML model features (like `domain_age: -1`) can be wrong due to lookup failures. The 'INDEPENDENT' data is a real-time check.
-3. If 'INDEPENDENT' data shows a legitimate organization (e.g., "Cloudflare", "Google", "Codeforces") for a known domain, but the models score it as phishing (due to `domain_age: -1`), you **should override** and classify as 'legitimate'.
-4. Your confidence score is DIRECTIONAL (0-100):
-    - Scores > 50.0 mean 'phishing'.
-    - Scores < 50.0 mean 'legitimate'.
-    - 50.0 is neutral.
-    - The magnitude indicates certainty (e.g., 95.0 is 'very confident phishing'; 5.0 is 'very confident legitimate').
-    - Your confidence score MUST match your 'final_decision'.
-5. BE WARY OF FALSE POSITIVES. Legitimate messages (bank alerts, contest notifications) can seem urgent.
-
-PRIORITY GUIDANCE (Use this logic):
-- IF URLs are present: Focus heavily on URL features.
-  - Examine 'URL FEATURES' for patterns (e.g., domain_age: -1 or 0, high special_chars).
-  - **CRITICAL:** Cross-reference this with the 'INDEPENDENT NETWORK & GEO-DATA'. This real-time data (IP, Location, ISP) is your ground truth.
-  - **If `domain_age` is -1, it's a lookup failure.** IGNORE IT and trust the 'INDEPENDENT NETWORK & GEO-DATA' to see if the domain is real (e.g., 'codeforces.com' with a valid IP).
-  - Then supplement with message content analysis.
-- IF NO URLs are present: Focus entirely on message content and semantics.
-  - Analyze language patterns, urgency tactics, and social engineering techniques
-  - Look for credential requests, financial solicitations, or threats
-  - Evaluate the semantic model's assessment heavily
+**Core Rules:**
+1.  **You are the Final Judge:** Your primary role is to make a final, correct decision. Use all evidence: Sender, Subject, Message Text, Model Scores, and Network Data.
+2.  **Prioritize Ground Truth:** 'INDEPENDENT NETWORK & GEO-DATA' is ground truth and **MUST** be trusted over 'URL FEATURES' (which can fail, e.g., `domain_age: -1`). If ML/DL 'Model Scores' contradict clear network data (e.g., a known brand like 'Google' or 'Cloudflare'), you **MUST** override the models and rule 'legitimate'. Your reasoning should explain this override.
+3.  **Confidence Score:** 0-100. >50.0 = phishing. <50.0 = legitimate. Must match `final_decision`.
+4.  **Highlighting:** Return the *entire* original message in `highlighted_text`. Wrap suspicious parts (URLs, urgency words, deceptive claims) in `@@...@@`. If legitimate, use NO `@@` markers.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FEW-SHOT EXAMPLES FOR GUIDANCE:
+**FEW-SHOT EXAMPLES:**
 
-Example 1 - Clear Phishing:
-Message: "URGENT! Click: http://paypa1-secure.xyz/verify"
+**Example 1: Clear Phishing (Typosquat)**
+Sender: no-reply@paypa1-secure.xyz
+Subject: URGENT! Your Account is Suspended!
+Message: "URGENT! Your account has suspicious activity. Click: http://paypa1-secure.xyz/verify to login and verify."
 URL Features: domain_age: 5
 Network Data: IP: 123.45.67.89, Location: Russia, ISP: Shady-Host
 Model Scores: All positive
 Correct Decision: {{
-  "confidence": 95.0,
-  "reasoning": "Classic phishing. Misspelled domain, new age, and network data points to a suspicious ISP in Russia.",
-  "highlighted_text": "URGENT! Click: $$http://paypa1-secure.xyz/verify$$",
-  "final_decision": "phishing",
-  "suggestion": "Do NOT click. Delete immediately."
+    "confidence": 98.0,
+    "reasoning": "Phishing. Typosquatted domain 'paypa1', new age, suspicious ISP, and urgency tactics.",
+    "highlighted_text": "@@URGENT!@@ Your account has suspicious activity. Click: @@http://paypa1-secure.xyz/verify@@ to login and verify.",
+    "final_decision": "phishing",
+    "suggestion": "Do NOT click. This is a clear attempt to steal your credentials. Delete immediately."
 }}
 
-Example 2 - Legitimate (False Positive Case):
+**Example 2: Legitimate (False Positive Case)**
+Sender: notifications@codeforces.com
+Subject: Codeforces Round 184 Reminder
 Message: "Hi, join Codeforces Round 184. ... Unsubscribe: https://codeforces.com/unsubscribe/..."
 URL Features: domain_age: -1 (This is a lookup failure!)
 Network Data: URL (codeforces.com): IP: 104.22.6.109, Location: San Francisco, USA, ISP: Cloudflare, Inc.
-Model Scores: Mixed (some positive due to domain_age: -1)
+Model Scores: Mixed
 Correct Decision: {{
-  "confidence": 10.0,
-  "reasoning": "OVERRIDING models. The 'URL FEATURES' show a 'domain_age: -1' which is a clear lookup error that confused the models. The 'INDEPENDENT NETWORK & GEO-DATA' confirms the domain 'codeforces.com' is real and hosted on Cloudflare, a legitimate provider. The message content is a standard, safe notification.",
-  "highlighted_text": "Hi, join Codeforces Round 184. ... Unsubscribe: https://codeforces.com/unsubscribe/...",
-  "final_decision": "legitimate",
-  "suggestion": "This message is safe. It is a legitimate notification from Codeforces."
+    "confidence": 10.0,
+    "reasoning": "Legitimate. Override models. `domain_age: -1` is a lookup failure. Network data confirms 'codeforces.com' is real (Cloudflare).",
+    "highlighted_text": "Hi, join Codeforces Round 184. ... Unsubscribe: https://codeforces.com/unsubscribe/...",
+    "final_decision": "legitimate",
+    "suggestion": "This message is safe. It is a legitimate notification from Codeforces."
 }}
 
-Example 3 - Legitimate (Long Formal Text):
+**Example 3: Legitimate (Formal Text)**
+Sender: investor.relations@tatamotors.com
+Subject: TATA MOTORS GENERAL GUIDANCE NOTE
 Message: "TATA MOTORS PASSENGER VEHICLES LIMITED... GENERAL GUIDANCE NOTE... [TRUNCATED]"
 URL Features: domain_age: 8414
-Network Data: URL (cars.tatamotors.com): IP: 23.209.113.12, Location: Boardman, USA, ISP: Akamai Technologies
+Network Data: URL (cars.tatamotors.com): IP: 23.209.113.12, Location: Boardman, USA, ISP: Akamai
 Model Scores: All negative
 Correct Decision: {{
-  "confidence": 5.0,
-  "reasoning": "This is a legitimate corporate communication. The text, although truncated, is clearly a formal guidance note for shareholders. The network data confirms 'cars.tatamotors.com' is hosted on Akamai, a major CDN used by large corporations. The models correctly identify this as safe.",
-  "highlighted_text": "TATA MOTORS PASSENGER VEHICLES LIMITED... GENERAL GUIDANCE NOTE... [TRUNCATED]",
-  "final_decision": "legitimate",
-  "suggestion": "This message is a legitimate corporate communication and appears safe."
+    "confidence": 5.0,
+    "reasoning": "Legitimate. Formal corporate text. Network data confirms 'tatamotors.com' on Akamai. Models are correct.",
+    "highlighted_text": "TATA MOTORS PASSENGER VEHICLES LIMITED... GENERAL GUIDANCE NOTE... [TRUNCATED]",
+    "final_decision": "legitimate",
+    "suggestion": "This message is a legitimate corporate communication and appears safe."
+}}
+
+**Example 4: No URL Phishing (Scam)**
+Sender: it-support@yourcompany.org
+Subject: Employee Appreciation Reward
+Message: "To thank you for your hard work, please reply with your personal email address and mobile phone number to receive your $500 gift card."
+URL Features: No URLs detected
+Network Data: No URLs detected
+Model Scores: semantic: positive
+Correct Decision: {{
+    "confidence": 85.0,
+    "reasoning": "Phishing. No URL. This is a data harvesting scam. The sender is suspicious and is requesting sensitive personal information.",
+    "highlighted_text": "To thank you for your hard work, @@please reply with your personal email address and mobile phone number@@ to receive your $500 gift card.",
+    "final_decision": "phishing",
+    "suggestion": "Do not reply. This is a scam to steal your personal information. Report this email to your IT department."
+}}
+
+**Example 5: Legitimate Transaction (No URL)**
+Sender: VM-SBIUPI
+Subject: N/A
+Message: "Dear UPI user A/C X1243 debited by 16.0 on date 16Nov25 trf to Kuldevi Caterers Refno 532032534589 If not u? call-1800111109 for other services-18001234-SBI"
+URL Features: No URLs detected
+Network Data: No URLs detected
+Model Scores: semantic: negative
+Correct Decision: {{
+    "confidence": 10.0,
+    "reasoning": "Legitimate. This is a standard, informational banking transaction alert (UPI debit). It contains no URLs and the phone numbers appear to be standard toll-free support lines.",
+    "highlighted_text": "Dear UPI user A/C X1243 debited by 16.0 on date 16Nov25 trf to Kuldevi Caterers Refno 532032534589 If not u? call-1800111109 for other services-18001234-SBI",
+    "final_decision": "legitimate",
+    "suggestion": "This message is a legitimate transaction alert and appears safe. No action is needed unless you do not recognize this transaction."
+}}
+
+**Example 6: Clear Phishing (Prize Scam)**
+Sender: meta-rewards@hacker-round.com
+Subject: hooray you have won a prize!!!
+Message: "You have won Rs 5000 for the meta hacker round 2 , for getting into top 2500 click here to claim you prize : https:// www.dghjdgf.com/paypal.co.uk/cycgi-bin/webscrcmd=_home-customer&nav=1/loading.php"
+URL Features: domain_age: 1, count_dot: 4, count_special_chars: 12
+Network Data: URL (dghjdgf.com): IP: 1.2.3.4, Location: Unknown, ISP: Random-Host-Provider
+Model Scores: All positive
+Correct Decision: {{
+    "confidence": 99.0,
+    "reasoning": "Phishing. This is a classic prize scam. The URL is highly suspicious, using a random domain ('dghjdgf.com') to impersonate PayPal. The lure of money and call to action are clear phishing tactics.",
+    "highlighted_text": "@@You have won Rs 5000 for the meta hacker round 2@@ , for getting into top 2500 @@click here to claim you prize : https:// www.dghjdgf.com/paypal.co.uk/cycgi-bin/webscrcmd=_home-customer&nav=1/loading.php@@",
+    "final_decision": "phishing",
+    "suggestion": "Do NOT click this link. This is a scam to steal your information. Delete this email immediately."
+}}
+
+**Example 7: Legitimate University Event (Internal)**
+Sender: AI Club <ai_club@dau.ac.in>
+Subject: Invitation to iPrompt ’25 & AI Triathlon — 15th November at iFest’25
+Message: "Dear Students, The AI Club, DA-IICT, is delighted to invite you... Register: https://ifest25.vercel.app ... Participants’ WhatsApp Group: https://chat.whatsapp.com/EeJ1XeNxcgM7w7gVBjKjox ... Warm regards, AI Club, DA-IICT"
+URL Features: domain_age: -1 (vercel.app), domain_age: 7500 (whatsapp.com)
+Network Data: URL (ifest25.vercel.app): IP: 76.76.21.21, Location: USA, ISP: Vercel Inc. URL (chat.whatsapp.com): IP: 157.240.22.60, Location: USA, ISP: Meta Platforms, Inc.
+Model Scores: Mixed (semantic: negative, some URL models might flag vercel.app)
+Correct Decision: {{
+    "confidence": 5.0,
+    "reasoning": "Legitimate. This is an internal university announcement from a trusted sender domain (@dau.ac.in). The links to Vercel (common for student projects) and WhatsApp are legitimate and verified by network data.",
+    "highlighted_text": "Dear Students, The AI Club, DA-IICT, is delighted to invite you... Register: https://ifest25.vercel.app ... Participants’ WhatsApp Group: https://chat.whatsapp.com/EeJ1XeNxcgM7w7gVBjKjox ... Warm regards, AI Club, DA-IICT",
+    "final_decision": "legitimate",
+    "suggestion": "This email is a safe internal announcement about a university event."
+}}
+
+**Example 8: Legitimate Corporate Policy Update**
+Sender: YouTube <no-reply@youtube.com>
+Subject: Annual reminder about YouTube’s Terms of Service, Community Guidelines and Privacy Policy
+Message: "This email is an annual reminder that your use of YouTube is subject to the Terms of Service, Community Guidelines and Google’s Privacy Policy... © 2025 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA, 94043"
+URL Features: domain_age: 10000+ (youtube.com, google.com)
+Network Data: URL (youtube.com): IP: 142.250.196.222, Location: USA, ISP: Google LLC
+Model Scores: All negative
+Correct Decision: {{
+    "confidence": 1.0,
+    "reasoning": "Legitimate. This is a standard, text-heavy legal/policy notification from a trusted sender (@youtube.com). Network data confirms the domain belongs to Google. There is no suspicious call to action.",
+    "highlighted_text": "This email is an annual reminder that your use of YouTube is subject to the Terms of Service, Community Guidelines and Google’s Privacy Policy... © 2025 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA, 94043",
+    "final_decision": "legitimate",
+    "suggestion": "This is a standard policy update from YouTube. It is safe."
+}}
+
+**Example 9: Legitimate Service Notification (Google)**
+Sender: 2022 01224 (Classroom) <no-reply@classroom.google.com>
+Subject: Due tomorrow: "Lab 09"
+Message: "Aaditya_CT303 Due tomorrow Lab 09 Follow these instructions... View assignment Google LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA"
+URL Features: domain_age: 10000+ (classroom.google.com)
+Network Data: URL (classroom.google.com): IP: 142.250.196.206, Location: USA, ISP: Google LLC
+Model Scores: All negative
+Correct Decision: {{
+    "confidence": 2.0,
+    "reasoning": "Legitimate. This is an automated notification from Google Classroom. The sender (@classroom.google.com) and network data confirm it's a real Google service. The 'urgency' (Due tomorrow) is part of the service's function.",
+    "highlighted_text": "Aaditya_CT303 Due tomorrow Lab 09 Follow these instructions... View assignment Google LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA",
+    "final_decision": "legitimate",
+    "suggestion": "This is a safe and legitimate assignment reminder from Google Classroom."
+}}
+
+**Example 10: Legitimate Internal Announcement (No URL)**
+Sender: iFest DAU <ifest@dau.ac.in>
+Subject: Instruction for i.Fest' 25
+Message: "Hello everyone, As we all know, i.Fest’ 25 begins today! Here are some important guidelines... Entry will be permitted only with a valid Student ID card... Best Regards, Team i.Fest"
+URL Features: No URLs detected
+Network Data: No URLs detected
+Model Scores: semantic: negative
+Correct Decision: {{
+    "confidence": 5.0,
+    "reasoning": "Legitimate. This is a text-only informational email from a trusted internal university domain (@dau.ac.in). It contains instructions, not suspicious links or requests.",
+    "highlighted_text": "Hello everyone, As we all know, i.Fest’ 25 begins today! Here are some important guidelines... Entry will be permitted only with a valid Student ID card... Best Regards, Team i.Fest",
+    "final_decision": "legitimate",
+    "suggestion": "This is a safe internal announcement for university students."
+}}
+
+**Example 11: Legitimate Marketing (Clickbait Subject)**
+Sender: Jia from Unstop <noreply@dare2compete.news>
+Subject: [Congrats] Intern with Panasonic - Earn a stipend of ₹35,000!
+Message: "Hi Akshat, here are some top opportunities curated just for you! ... Software Engineering Internship Panasonic... Explore more Internships... © 2025 Unstop. All rights reserved."
+URL Features: domain_age: 3000+ (dare2compete.news)
+Network Data: URL (dare2compete.news): IP: 104.26.10.168, Location: USA, ISP: Cloudflare, Inc.
+Model Scores: Mixed (Subject line '[Congrats]' might trigger semantic model)
+Correct Decision: {{
+    "confidence": 15.0,
+    "reasoning": "Legitimate. Although the subject line '[Congrats]' is clickbait, the sender domain ('dare2compete.news') is established and network data (Cloudflare) checks out. The content is a standard job/internship digest from a known platform.",
+    "highlighted_text": "Hi Akshat, here are some top opportunities curated just for you! ... Software Engineering Internship Panasonic... Explore more Internships... © 2025 Unstop. All rights reserved.",
+    "final_decision": "legitimate",
+    "suggestion": "This is a legitimate promotional email from Unstop. It is safe."
+}}
+
+**Example 12: Legitimate Marketing (SaaS)**
+Sender: Numerade <ace@email.numerade.com>
+Subject: Your All-In-One Finals Prep Toolkit
+Message: "Finals can be overwhelming. Numerade’s textbook solutions give you instant access to step-by-step explanations... Find Your Textbook Answers ... © 2025, Numerade, All rights reserved."
+URL Features: domain_age: 2000+ (email.numerade.com)
+Network Data: URL (email.numerade.com): IP: 149.72.215.153, Location: USA, ISP: SendGrid, Inc.
+Model Scores: All negative
+Correct Decision: {{
+    "confidence": 8.0,
+    "reasoning": "Legitimate. This is a standard marketing email from a known company (Numerade) sent via a reputable email service (SendGrid), as confirmed by network data. It has clear unsubscribe links and branding.",
+    "highlighted_text": "Finals can be overwhelming. Numerade’s textbook solutions give you instant access to step-by-step explanations... Find Your Textbook Answers ... © 2025, Numerade, All rights reserved.",
+    "final_decision": "legitimate",
+    "suggestion": "This is a safe marketing email from Numerade."
 }}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-YOUR ANALYSIS TASK:
-Analyze the message data provided by the user (in the 'user' message) following the steps and logic outlined above.
+**YOUR ANALYSIS TASK:**
+Analyze the message data provided by the user (in the 'user' message) following all rules. Respond ONLY with the JSON object.
 
-**CRITICAL for `highlighted_text`:** You MUST return the *entire original message*. Only wrap the specific words/URLs that are suspicious with `$$...$$`. If nothing is suspicious (i.e., `final_decision` is 'legitimate'), return the original message with NO `$$` markers.
-
-OUTPUT FORMAT (respond with ONLY this JSON, no markdown, no explanation):
+**OUTPUT FORMAT (JSON ONLY):**
 {{
-  "confidence": <float (0-100, directional score where >50 is phishing)>,
-  "reasoning": "<your detailed analysis explaining why this is/isn't phishing, mentioning why you trust/override models>",
-  "highlighted_text": "<THE FULL, ENTIRE original message with suspicious parts marked as $$suspicious text$$>",
-  "final_decision": "phishing" or "legitimate",
-  "suggestion": "<specific, actionable advice for the user on how to handle this message - what to do or not do>"
+    "confidence": <float (0-100, directional score where >50 is phishing)>,
+    "reasoning": "<your brief analysis explaining why this is/isn't phishing, mentioning key evidence>",
+    "highlighted_text": "<THE FULL, ENTIRE original message with suspicious parts marked as @@suspicious text@@>",
+    "final_decision": "phishing" or "legitimate",
+    "suggestion": "<specific, actionable advice for the user on how to handle this message>"
 }}"""
 
 async def get_groq_final_decision(urls: List[str], features_df: pd.DataFrame, 
@@ -384,7 +516,7 @@ async def get_groq_final_decision(urls: List[str], features_df: pd.DataFrame,
         }
     
     url_features_summary = "No URLs detected in message"
-    if len(features_df) > 0:
+    if not features_df.empty:
         feature_summary_parts = []
         for idx, row in features_df.iterrows():
             url = row.get('url', 'Unknown')
@@ -590,8 +722,7 @@ async def predict(message_input: MessageInput):
         sender = message_input.sender
         subject = message_input.subject
         
-        soup = BeautifulSoup(html_body, 'html.parser')
-        original_text = soup.get_text(separator=' ', strip=True)
+        original_text = extract_visible_text(html_body)
         
         if not original_text or not original_text.strip():
             raise HTTPException(status_code=400, detail="Message text (after HTML parsing) cannot be empty")
@@ -603,7 +734,7 @@ async def predict(message_input: MessageInput):
             features_df = await extract_url_features(urls)
         
         predictions = {}
-        if len(features_df) > 0 or (cleaned_text and semantic_model):
+        if not features_df.empty or (cleaned_text and semantic_model):
             predictions = await asyncio.to_thread(get_model_predictions, features_df, cleaned_text)
         
         if not predictions:
@@ -636,5 +767,5 @@ async def predict(message_input: MessageInput):
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 if __name__ == "__main__":
-    import uvicorn
+    
     uvicorn.run(app, host="0.0.0.0", port=8000)
