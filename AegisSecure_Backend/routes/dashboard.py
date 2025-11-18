@@ -13,6 +13,14 @@ router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 LABELS = ["Secure", "Suspicious", "Threat", "Critical"]
 BUCKET_BOUNDS = [0, 26, 51, 76, 101]
 
+CYBER_TRENDS = [
+    "Beware of SMS phishing links claiming lottery wins",
+    "Do not open emails from unknown senders with attachments",
+    "Enable Multi-factor Authentication (MFA)",
+    "Recent phishing campaigns mimic banking institutions"
+]
+
+
 def _format_response(counts: Dict[int, int], summary: str = "", trends: list = []) -> Dict[str, Any]:
     values = [counts.get(i, 0) for i in range(len(LABELS))]
     return {
@@ -77,7 +85,6 @@ async def _aggregate_collection_by_buckets(col, user_id_field, score_field, user
 
     return counts
 
-
 async def generate_cyber_facts_ai() -> dict:
     try:
         prompt = """
@@ -115,9 +122,8 @@ async def generate_cyber_facts_ai() -> dict:
             "fact1": "*** Unable to fetch cybersecurity insights right now.",
             "fact2": "Please try again later."
         }
-
+    
     except Exception as e:
-        # print(f"*** Groq AI call failed: {e}")
         return {"fact1": "","fact2": ""}
 
 
@@ -132,24 +138,32 @@ async def get_dashboard(
     if not user_id:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    total_counts = {}
+    sms_counts, mail_counts = {}, {}
     if mode in ("sms", "both"):
         sms_counts = await _aggregate_collection_by_buckets(
             sms_messages_col, "user_id", "spam_score", user_id, days
         )
-        for k, v in sms_counts.items():
-            total_counts[k] = total_counts.get(k, 0) + v
-
     if mode in ("mail", "both"):
         mail_counts = await _aggregate_collection_by_buckets(
             messages_col, "user_id", "spam_prediction", user_id, days
         )
-        for k, v in mail_counts.items():
-            total_counts[k] = total_counts.get(k, 0) + v
+
+    if mode == "both":
+        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+        counts_to_send = combined_counts
+    elif mode == "sms":
+        counts_to_send = sms_counts
+    elif mode == "mail":
+        counts_to_send = mail_counts
+
+    for i in range(len(LABELS)):
+        counts_to_send.setdefault(i, 0)
 
     insights = await generate_cyber_facts_ai()
-    # print("Insights form GENAI:\n");
-    # print(insights);
-    response = _format_response(total_counts)
-    response["insights"] = insights;
-    return response
+
+    return {
+        "labels": LABELS,
+        "values": [counts_to_send[i] for i in range(len(LABELS))],
+        "total": sum(counts_to_send.values()),
+        "insights": insights
+    }
