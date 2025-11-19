@@ -4,6 +4,21 @@ import '../models/sms_message.dart';
 
 class SmsDetailedScreen extends StatelessWidget {
   final SmsMessageModel message;
+  Color generateColorFromString(String input) {
+    final colors = [
+      Colors.red,
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.purple,
+      Colors.teal,
+      Colors.brown,
+      Colors.indigo,
+    ];
+    final hash = input.hashCode;
+    final index = hash % colors.length;
+    return colors[index];
+  }
 
   const SmsDetailedScreen({Key? key, required this.message}) : super(key: key);
   String getDisplayName(String address, String? contactName) {
@@ -22,7 +37,7 @@ class SmsDetailedScreen extends StatelessWidget {
   ) {
     final List<TextSpan> spans = [];
     int last = 0;
-    final regex = RegExp(r'\$(.*?)\$');
+    final regex = RegExp(r'\@\@(.*?)\@\@');
     final matches = regex.allMatches(text);
     for (final match in matches) {
       if (match.start > last) {
@@ -124,9 +139,9 @@ class SmsDetailedScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 28,
-                  backgroundColor: parseColor(
-                    message.address.isNotEmpty ? message.address : '#888888',
-                  ),
+                  backgroundColor: message.address.isNotEmpty
+                      ? generateColorFromString(message.address)
+                      : Colors.grey.shade400,
                   child: Text(
                     sender.isNotEmpty ? sender[0].toUpperCase() : "?",
                     style: const TextStyle(

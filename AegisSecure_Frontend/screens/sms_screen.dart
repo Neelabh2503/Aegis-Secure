@@ -21,7 +21,6 @@ class SmsScreenState extends State<SmsScreen> {
   List<SmsMessageModel> messages = [];
   bool loading = true;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  StreamSubscription? smsStream;
 
   @override
   void initState() {
@@ -31,8 +30,6 @@ class SmsScreenState extends State<SmsScreen> {
 
   @override
   void dispose() {
-    smsService.disconnect();
-    smsStream?.cancel();
     super.dispose();
   }
 
@@ -44,12 +41,7 @@ class SmsScreenState extends State<SmsScreen> {
         messages = fetched;
         loading = false;
       });
-
-      smsService.connectWebSocket((newMsg) {
-        setState(() => messages.insert(0, newMsg));
-      });
     } catch (e) {
-      // print("❌ Error initializing SMS: $e");
       setState(() => loading = false);
     }
   }
@@ -230,10 +222,12 @@ class SmsScreenState extends State<SmsScreen> {
                             final result = await ApiService.analyzeText(
                               inputText,
                             );
+
                             final rawScore =
                                 result['spam_prediction'] ??
                                 result['prediction'] ??
                                 0;
+
                             final conf = (result['confidence'] is num)
                                 ? (result['confidence'] as num).toDouble()
                                 : double.tryParse(
@@ -424,8 +418,6 @@ class SmsScreenState extends State<SmsScreen> {
                           fontSize: 12,
                         ),
                       ),
-                      const SizedBox(width: 20),
-                      const Icon(Icons.more_vert, size: 18, color: Colors.grey),
                       const SizedBox(width: 13),
                     ],
                   ),
@@ -557,20 +549,30 @@ class SmsScreenState extends State<SmsScreen> {
       ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
-          : messages.isEmpty
-          ? const Center(child: Text("No messages found"))
           : RefreshIndicator(
               onRefresh: initSmsFlow,
-              child: ListView.separated(
-                itemCount: messages.length,
-                separatorBuilder: (_, __) => Divider(
-                  height: 0.5,
-                  thickness: 0.5,
-                  color: Colors.grey.shade300,
-                ),
-                itemBuilder: (context, index) =>
-                    buildMessageTile(messages[index]),
-              ),
+              child: messages.isEmpty
+                  ? ListView(
+                      children: const [
+                        SizedBox(height: 200),
+                        Center(
+                          child: Text(
+                            "No messages found",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ],
+                    )
+                  : ListView.separated(
+                      itemCount: messages.length,
+                      separatorBuilder: (_, __) => Divider(
+                        height: 0.5,
+                        thickness: 0.5,
+                        color: Colors.grey,
+                      ),
+                      itemBuilder: (context, index) =>
+                          buildMessageTile(messages[index]),
+                    ),
             ),
     );
   }
@@ -789,3 +791,4 @@ class SmsSearchDelegate extends SearchDelegate<String> {
     );
   }
 }
+

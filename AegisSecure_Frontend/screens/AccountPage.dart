@@ -38,9 +38,6 @@ class _AccountPageState extends State<AccountPage> {
         email = user['email'] ?? "Unknown";
         avatarBase64 = user['avatar_base64'];
       });
-      if (ApiService.selectedEmailAccount == null) {
-        ApiService.selectedEmailAccount = email;
-      }
     } catch (e) {
       setState(() {
         errorMsg = "Failed to load user info";

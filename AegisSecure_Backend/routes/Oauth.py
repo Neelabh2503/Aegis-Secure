@@ -1,19 +1,28 @@
-import os,re,random,base64,httpx
 from fastapi import APIRouter, HTTPException, Request
+import httpx
 from database import messages_col, accounts_col,avatars_col
+import os
 from jose import jwt
+from dotenv import load_dotenv
 from .notifications import get_spam_prediction
 from datetime import datetime
+import base64, json
+import random
+import re
 from fastapi.responses import HTMLResponse
-from dotenv import load_dotenv
+from pydantic import BaseModel
+from websocket_manager import broadcast_new_email
 load_dotenv()
-
 router = APIRouter()
-
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
 JWT_SECRET = os.getenv("JWT_SECRET")
+class Spam_request(BaseModel):
+    sender: str
+    subject: str
+    text: str
+
 
 if not JWT_SECRET:
     raise Exception("JWT_SECRET is not set in .env")
@@ -49,7 +58,6 @@ async def refresh_access_token(user_id: str, gmail_email: str):
     return {"access_token": access_token}
 
 def extract_body(payload):
-    """Recursively extract plain text or HTML email body from Gmail payload."""
     if not payload:
         return ""
 
@@ -60,7 +68,6 @@ def extract_body(payload):
             text = base64.urlsafe_b64decode(body_data).decode("utf-8", errors="ignore")
             return text.strip()
         except Exception as e:
-            # print("Decode error:", e)
             return ""
     for part in payload.get("parts", []):
         text = extract_body(part)
@@ -140,31 +147,36 @@ async def google_callback(code: str, state: str = None):
             subject = next((h["value"] for h in msg_data["payload"]["headers"] if h["name"] == "Subject"), "")
             from_header = next((h["value"] for h in msg_data["payload"]["headers"] if h["name"] == "From"), "")
             match = re.search(r"<(.+?)>", from_header)
-            sender_email = match.group(1) if match else from_header
+            sender = match.group(1) if match else from_header
             snippet = msg_data.get("snippet", "")
             body = extract_body(msg_data.get("payload", {}))
-            combined_text = f"{sender_email}{subject} {body}"
-
-            # print("This is new Email"+body);
-            spam_result = await get_spam_prediction(combined_text)
-            char_color = await get_sender_avatar_color(sender_email)
-
+            if body:
+                        body = body.strip()
+                        if len(body) > 3000:
+                            body = body[:3000]
+            # combined_text = f"{subject} {snippet}"
+            if not sender:
+                continue
+            if not body: 
+                continue
+            # spam_result = await get_spam_prediction(req)
+            char_color = await get_sender_avatar_color(sender)
             emails.append({
                 "gmail_id": msg_id,
                 "gmail_email": gmail_email,
                 "user_id": user_id,
                 "subject": subject,
                 "from": from_header,
-                "from_email": sender_email,
+                "from_email": sender,
                 "char_color": char_color,
                 "snippet": snippet,
                 "body": body,
                 "timestamp": int(msg_data["internalDate"]),
-                "spam_prediction": spam_result.get("confidence"),
-                "spam_reasoning": spam_result.get("reasoning"),
-                "spam_highlighted_text": spam_result.get("highlighted_text"),
-                "spam_suggestion": spam_result.get("suggestion"),
-                "spam_verdict": spam_result.get("final_decision"),
+                "spam_prediction": None,  
+                "spam_reasoning": None,
+                "spam_highlighted_text": None,
+                "spam_suggestion": None,
+                "spam_verdict": None,
             })
 
 
@@ -315,7 +327,7 @@ async def google_callback(code: str, state: str = None):
         Return to AegisSecure App
       </a>
 
-      <div class="note">If your app doesn't open automatically, tap the button above.</div>
+      <div class="note">If your app doesn’t open automatically, tap the button above.</div>
     </div>
     <footer>© 2025 AegisSecure — Protecting You from Online Mishaps</footer>
   </body>
@@ -332,15 +344,15 @@ COLOR_PALETTE = [
 ]
 
 
-async def get_sender_avatar_color(sender_email: str):
+async def get_sender_avatar_color(sender: str):
     """Assign or fetch a fixed color for each sender email."""
-    existing = await avatars_col.find_one({"email": sender_email})
+    existing = await avatars_col.find_one({"email": sender})
     if existing and "char_color" in existing:
         return existing["char_color"]
 
     random_color = random.choice(COLOR_PALETTE)
     await avatars_col.update_one(
-        {"email": sender_email},
+        {"email": sender},
         {"$set": {"char_color": random_color}},
         upsert=True
     )

@@ -29,16 +29,12 @@ class SmsMessageModel {
       body: json['body'] ?? '',
       dateMs: json['timestamp'] ?? json['date_ms'] ?? 0,
       type: json['type'] ?? 'inbox',
-
-      // Handle spam score and confidence
       spamScore: (json['spam_score'] is num)
           ? json['spam_score'].toDouble()
           : null,
       confidence: (json['confidence'] is num)
           ? json['confidence'].toDouble()
           : null,
-
-      // 🟩 Map multiple possible key names
       reasoning: json['reasoning'] ?? json['spam_reasoning'] ?? '',
       highlightedText:
           json['highlighted_text'] ?? json['spam_highlighted_text'] ?? '',

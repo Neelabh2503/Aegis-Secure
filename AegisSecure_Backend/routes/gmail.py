@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from database import messages_col, accounts_col,avatars_col
-from typing import Optional
 import time,os
 import re
 router = APIRouter()
@@ -33,7 +32,7 @@ async def get_current_user_id(token: str = Depends(oauth2_scheme)):
 @router.get("/emails")
 async def get_emails(
     user_id: str = Depends(get_current_user_id),
-    account: Optional[str] = None,
+    account: str | None = None,
 ):
     try:
         query = {"user_id": user_id}
@@ -62,9 +61,6 @@ async def get_emails(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-
 
 @router.get("/user/me")
 async def get_current_user(user_id: str):

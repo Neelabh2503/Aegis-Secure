@@ -6,13 +6,11 @@ from database import messages_col, sms_messages_col
 from typing import Dict, Any
 from groq import Groq
 
-
 client = Groq(api_key=os.environ.get("GROQ_API_KEY", ""))
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
 LABELS = ["Secure", "Suspicious", "Threat", "Critical"]
 BUCKET_BOUNDS = [0, 26, 51, 76, 101]
-
 CYBER_TRENDS = [
     "Beware of SMS phishing links claiming lottery wins",
     "Do not open emails from unknown senders with attachments",
@@ -20,19 +18,7 @@ CYBER_TRENDS = [
     "Recent phishing campaigns mimic banking institutions"
 ]
 
-
-def _format_response(counts: Dict[int, int], summary: str = "", trends: list = []) -> Dict[str, Any]:
-    values = [counts.get(i, 0) for i in range(len(LABELS))]
-    return {
-        "labels": LABELS,
-        "values": values,
-        "total": sum(values),
-        "summary": summary,
-        "trends": trends
-    }
-
-
-async def _aggregate_collection_by_buckets(col, user_id_field, score_field, user_id, days: int = None):
+async def aggregate_collection_by_buckets(col, user_id_field, score_field, user_id, days: int = None):
     match_stage = {"$match": {user_id_field: user_id}}
     if days is not None:
         since_ms = int((datetime.utcnow() - timedelta(days=days)).timestamp() * 1000)
@@ -137,17 +123,15 @@ async def get_dashboard(
     user_id = current_user.get("user_id")
     if not user_id:
         raise HTTPException(status_code=401, detail="Unauthorized")
-
     sms_counts, mail_counts = {}, {}
     if mode in ("sms", "both"):
-        sms_counts = await _aggregate_collection_by_buckets(
+        sms_counts = await aggregate_collection_by_buckets(
             sms_messages_col, "user_id", "spam_score", user_id, days
         )
     if mode in ("mail", "both"):
-        mail_counts = await _aggregate_collection_by_buckets(
+        mail_counts = await aggregate_collection_by_buckets(
             messages_col, "user_id", "spam_prediction", user_id, days
         )
-
     if mode == "both":
         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
         counts_to_send = combined_counts
@@ -155,7 +139,6 @@ async def get_dashboard(
         counts_to_send = sms_counts
     elif mode == "mail":
         counts_to_send = mail_counts
-
     for i in range(len(LABELS)):
         counts_to_send.setdefault(i, 0)
 

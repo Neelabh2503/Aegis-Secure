@@ -7,11 +7,11 @@ import 'package:url_launcher/url_launcher.dart';
 
 class ApiService {
   static String? selectedEmailAccount;
-  static const String baseUrl = "https://aegissecurebackend.onrender.com";
-  // static const String CyberUrl ="https://cybersecure-backend-api.onrender.com/predict";
+  static const String baseUrl ="https://AEGIS14211-AegisSecureBackend.hf.space";
+  // static const String baseUrl = "https://dodgily-kempt-bert.ngrok-free.dev";
   static const String CyberUrl =
-      "https://marinda-tetrapterous-eva.ngrok-free.dev/predict";
-  // static const String baseUrl ="https://aidyn-findable-greedily.ngrok-free.dev";
+      "https://akshatbhatt515334-aegis-secure-api.hf.space/predict";
+  // static const String CyberUrl ="https://marinda-tetrapterous-eva.ngrok-free.dev/predict";
   // neEd to store the JWT tokn in sharedPreferences so that user dont have to logIn again and again every time he opens the App.
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
@@ -58,10 +58,15 @@ class ApiService {
   }
 
   static Future<http.Response> loginUser(String email, String password) async {
+    print("⭐️$baseUrl/auth/login");
     final url = Uri.parse('$baseUrl/auth/login');
     final res = await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      },
+
       body: jsonEncode({'email': email, 'password': password}),
     );
 
@@ -116,26 +121,13 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> analyzeText(String text) async {
-    // final url = Uri.parse(
-    //   "https://cybersecure-backend-api.onrender.com/predict",
-    // );
-    final url = Uri.parse(
-      "https://marinda-tetrapterous-eva.ngrok-free.dev/predict",
-    );
-    print("DEBUG: Sending POST request to $url with text='$text'");
-
+    final url = Uri.parse("$CyberUrl");
     try {
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"text": text}),
+        body: jsonEncode({"sender": "", "subject": "", "text": text}),
       );
-      //       print('''
-      // ✅⭐️ DEBUG: Sending POST request
-      // URL: $url
-      // Headers: {"Content-Type": "application/json"}
-      // 🔹Body: ${jsonEncode({"text": text})}
-      // ''');
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         // print("DEBUG: Decoded API JSON = $decoded");
@@ -152,6 +144,8 @@ class ApiService {
 
   static Future<List<dynamic>> fetchEmails({String? gmailEmail}) async {
     String? token;
+    print("⭐️");
+    print(gmailEmail);
     if (gmailEmail != null) {
       token = await getGoogleAccessToken(gmailEmail);
       if (token == null) {
@@ -187,9 +181,9 @@ class ApiService {
   static Future<void> launchGoogleLogin() async {
     final clientId =
         "365011130597-3bv38b9aubtt65rebnbl673c2cogt7j3.apps.googleusercontent.com";
-    // final redirectUri ="https://aidyn-findable-greedily.ngrok-free.dev/auth/google/callback";
-    final redirectUri =
-        "https://aegissecurebackend.onrender.com/auth/google/callback";
+    final redirectUri = "$baseUrl/auth/google/callback";
+    // final redirectUri =
+    "https://aegissecurebackend.onrender.com/auth/google/callback";
     final userId = await getUserId();
     if (userId == null) {
       print("No user logged in");
@@ -275,6 +269,7 @@ class ApiService {
   }
 
   static Future<List<dynamic>> fetchEmailsForAccount(String gmailEmail) async {
+    print("⭐️Fetchiong for $gmailEmail");
     final token = await getToken();
     final url = Uri.parse('$baseUrl/emails?account=$gmailEmail');
     final res = await http.get(

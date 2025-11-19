@@ -1,13 +1,19 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, APIRouter, Request, status
+from fastapi import FastAPI, APIRouter, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from dotenv import load_dotenv
+from database import avatars_col
+import os
+load_dotenv()
+
+from routes import auth, gmail, Oauth,notifications,sms,analysis,dashboard
+import asyncio
 from contextlib import asynccontextmanager
 import asyncio
-
 from config import settings
 from database import avatars_col
-from websocket_manager import connect, disconnect, active_connections, broadcast_new_email
+from websocket_manager import connect, disconnect, active_connections
 from routes import auth, gmail, Oauth, notifications, otp, sms, analysis
 from middleware import (
     RateLimitMiddleware,
@@ -23,11 +29,7 @@ from db_utils import db_manager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Manage application lifecycle - startup and shutdown events."""
-    # Startup
     log_startup_message()
-    
-    # Validate configuration
     config_errors = settings.validate()
     if config_errors:
         logger.error("Configuration errors found:")
@@ -36,8 +38,6 @@ async def lifespan(app: FastAPI):
         logger.warning("Some features may not work correctly!")
     else:
         logger.info("✅ Configuration validated successfully")
-    
-    # Connect to database
     try:
         await db_manager.connect()
         logger.info("✅ Database connection established")
@@ -73,7 +73,6 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Add middleware (order matters - first added is outermost)
 app.add_middleware(ErrorHandlerMiddleware)
 app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
@@ -151,29 +150,37 @@ async def ping():
     """Simple ping endpoint for monitoring."""
     return {"ping": "pong"}
 
-@app.websocket("/ws/emails")
-async def websocket_endpoint(websocket: WebSocket):
-    """Handle real-time email update connections."""
-    await connect(websocket)
-    try:
-        while True:
-            await websocket.receive_text()
-    except WebSocketDisconnect:
-        await disconnect(websocket)
-    except Exception as e:
-        print(f"WebSocket error: {e}")
-        await disconnect(websocket)
 
-@app.websocket("/ws/sms")
-async def websocket_sms_endpoint(websocket: WebSocket):
-    """Handle real-time SMS update connections."""
-    await connect(websocket)
-    try:
-        while True:
-            await websocket.receive_text()  
-    except WebSocketDisconnect:
-        await disconnect(websocket)
-    except Exception as e:
-        print(f"WebSocket SMS error: {e}")
-        await disconnect(websocket)
+app = FastAPI(title="Aegis Backend")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(auth.router, prefix="/auth")
+app.include_router(gmail.router)
+app.include_router(Oauth.router)
+app.include_router(Oauth.router, prefix="/auth")
+app.include_router(notifications.router)
+app.include_router(analysis.router)
+app.include_router(sms.router, prefix="/sms", tags=["SMS"])
+app.include_router(dashboard.router)
+
+ws_router = APIRouter()
+
+@app.on_event("startup")
+async def init_indexes():
+    if os.environ.get("UVICORN_RELOADER") != "true":
+        try:
+            print("Starting retry_failed_predictions loop...")
+            asyncio.create_task(notifications.retry_failed_predictions())
+            print("Starting clean_invalid_messages loop...")
+            asyncio.create_task(notifications.clean_invalid_messages())
+            
+        except Exception as e:
+            print(f"Failed to start notifications retry loop: {e}")
+    asyncio.create_task(sms.retry_failed_sms_predictions())
+    await avatars_col.create_index("email", unique=True)

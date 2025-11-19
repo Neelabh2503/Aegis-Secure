@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../models/gmail_model.dart';
 import '../screens/Email_detail_screen.dart';
@@ -56,7 +54,6 @@ class GmailScreenState extends State<GmailScreen> {
   bool loading = true;
   bool userLoading = true;
   Timer? _pollingTimer;
-  late WebSocketChannel channel;
 
   Future<void> loadConnectedAccounts() async {
     try {
@@ -64,72 +61,27 @@ class GmailScreenState extends State<GmailScreen> {
       final accounts = List<String>.from(
         res['accounts'].map((a) => a['gmail_email']),
       );
+      final prefs = await SharedPreferences.getInstance();
+      String? savedAccount = prefs.getString('selectedGmailAccount');
+
+      String? accountToSelect;
+
+      if (savedAccount != null && accounts.contains(savedAccount)) {
+        accountToSelect = savedAccount;
+      } else if (ApiService.selectedEmailAccount != null &&
+          accounts.contains(ApiService.selectedEmailAccount)) {
+        accountToSelect = ApiService.selectedEmailAccount;
+      } else {
+        accountToSelect = accounts.isNotEmpty ? accounts.last : null;
+      }
       setState(() {
         connectedAccounts = accounts;
-        // print("⭐️");
-        print(ApiService.selectedEmailAccount);
-        if (ApiService.selectedEmailAccount != null &&
-            accounts.contains(ApiService.selectedEmailAccount)) {
-          selectedGmailAccount = ApiService.selectedEmailAccount;
-        } else {
-          selectedGmailAccount = accounts.isNotEmpty ? accounts.last : null;
-          ApiService.selectedEmailAccount = selectedGmailAccount;
-        }
+        selectedGmailAccount = accountToSelect;
+        ApiService.selectedEmailAccount = accountToSelect;
       });
     } catch (e) {
       print("**** Failed to load connected Gmail accounts: $e");
     }
-  }
-
-  Future<void> _showSearchDialog() async {
-    final searchController = TextEditingController();
-
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Search Emails"),
-        content: TextField(
-          controller: searchController,
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: "Search subject, sender, etc...",
-            icon: Icon(Icons.search),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final query = searchController.text.trim();
-              if (query.isEmpty) return;
-              Navigator.pop(context);
-              setState(() => loading = true);
-              try {
-                final results = await ApiService.searchEmails(query);
-                setState(() {
-                  emails = results
-                      .map((e) => EmailMessage.fromJson(e))
-                      .toList();
-                });
-              } catch (e) {
-                print("Search failed: $e");
-                if (mounted) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text("Search failed: $e")));
-                }
-              } finally {
-                setState(() => loading = false);
-              }
-            },
-            child: const Text("Search"),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -137,18 +89,18 @@ class GmailScreenState extends State<GmailScreen> {
     super.initState();
     loadCurrentUser();
     loadConnectedAccounts().then((_) async {
+      await loadEmails();
       if (mounted && selectedGmailAccount != null) {
         ApiService.selectedEmailAccount = selectedGmailAccount;
-        await loadEmails();
       }
     });
-    connectWebSocket();
+    // connectWebSocket();
   }
 
   @override
   void dispose() {
     _pollingTimer?.cancel();
-    channel.sink.close();
+    // channel?.sink.close();
     super.dispose();
   }
 
@@ -163,35 +115,6 @@ class GmailScreenState extends State<GmailScreen> {
       print("***** Failed to load user: $e");
       setState(() => userLoading = false);
     }
-  }
-
-  /// Live WebSocket updates
-  void connectWebSocket() async {
-    channel = WebSocketChannel.connect(
-      // Uri.parse('wss://aidyn-findable-greedily.ngrok-free.dev/ws/emails'),
-      Uri.parse('wss://aegissecurebackend.onrender.com/ws/emails'),
-    );
-
-    channel.stream.listen(
-      (event) async {
-        final data = jsonDecode(event);
-        if (data['new_email'] == true &&
-            data['gmail_email'] == selectedGmailAccount) {
-          // print("New mail for $selectedGmailAccount → refreshing inbox");
-          final refreshed = await ApiService.fetchEmailsForAccount(
-            selectedGmailAccount!,
-          );
-          setState(() {
-            emails = refreshed.map((e) => EmailMessage.fromJson(e)).toList();
-          });
-        }
-      },
-      onError: (err) => print("WebSocket error: $err"),
-      onDone: () {
-        print("WS closed, retrying in 5s...");
-        Future.delayed(const Duration(seconds: 5), connectWebSocket);
-      },
-    );
   }
 
   Future<void> loadEmails() async {
@@ -655,150 +578,149 @@ class GmailScreenState extends State<GmailScreen> {
       ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
-          : emails.isEmpty
-          ? const Center(child: Text("No emails found"))
           : RefreshIndicator(
               onRefresh: loadEmails,
-              child: ListView.separated(
-                itemCount: emails.length,
-                separatorBuilder: (_, __) => Divider(
-                  height: 0.5,
-                  thickness: 1.0,
-                  color: Colors.grey.shade300,
-                ),
-                itemBuilder: (context, index) {
-                  final email = emails[index];
-                  final rawPred =
-                      (email.spamPrediction?.toUpperCase() ?? "--") == "UNKNOWN"
-                      ? "--"
-                      : (email.spamPrediction?.toUpperCase() ?? "--");
-                  final predValue = double.tryParse(rawPred);
-                  final isSpam =
-                      (rawPred == "SPAM") ||
-                      (predValue != null && predValue >= 50);
-                  Color spamColor;
-                  Color spamTextColor;
-                  Color getColorForScore(double? score) {
-                    if (score == null) return Colors.grey.shade300;
-                    if (score < 25) return Colors.green.shade100;
-                    if (score < 50) return Colors.yellow.shade100;
-                    if (score < 75) return Colors.orange.shade100;
-                    return Colors.red.shade100;
-                  }
-
-                  Color getTextColorForScore(double? score) {
-                    if (score == null) return Colors.grey.shade600;
-                    if (score < 25) return Colors.green.shade700;
-                    if (score < 50) return Colors.amber.shade700;
-                    if (score < 75) return Colors.deepOrange.shade700;
-                    return Colors.red.shade700;
-                  }
-
-                  spamColor = getColorForScore(predValue);
-                  spamTextColor = getTextColorForScore(predValue);
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => EmailDetailScreen(email: email),
-                        ),
-                      );
-                    },
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+              child: emails.isEmpty
+                  ? ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: const [
+                        SizedBox(height: 200),
+                        Center(child: Text("No emails found")),
+                      ],
+                    )
+                  : ListView.separated(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: emails.length,
+                      separatorBuilder: (_, __) => Divider(
+                        height: 0.5,
+                        thickness: 1.0,
+                        color: Colors.grey.shade300,
                       ),
-                      color: Colors.white,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: parseColor(
-                              email.charColor ?? "#9E9E9E",
-                            ),
-                            child: Text(
-                              email.sender.isNotEmpty
-                                  ? email.sender[0].toUpperCase()
-                                  : 'A',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                      itemBuilder: (context, index) {
+                        final email = emails[index];
+                        final rawPred =
+                            (email.spamPrediction?.toUpperCase() ?? "--") ==
+                                "UNKNOWN"
+                            ? "--"
+                            : (email.spamPrediction?.toUpperCase() ?? "--");
+                        final predValue = double.tryParse(rawPred);
+
+                        Color getColorForScore(double? score) {
+                          if (score == null) return Colors.grey.shade300;
+                          if (score < 25) return Colors.green.shade100;
+                          if (score < 50) return Colors.yellow.shade100;
+                          if (score < 75) return Colors.orange.shade100;
+                          return Colors.red.shade100;
+                        }
+
+                        Color getTextColorForScore(double? score) {
+                          if (score == null) return Colors.grey.shade600;
+                          if (score < 25) return Colors.green.shade700;
+                          if (score < 50) return Colors.amber.shade700;
+                          if (score < 75) return Colors.deepOrange.shade700;
+                          return Colors.red.shade700;
+                        }
+
+                        final spamColor = getColorForScore(predValue);
+                        final spamTextColor = getTextColorForScore(predValue);
+
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => EmailDetailScreen(email: email),
                               ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
+                            color: Colors.white,
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  email.sender,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
+                                CircleAvatar(
+                                  backgroundColor: parseColor(
+                                    email.charColor ?? "#9E9E9E",
+                                  ),
+                                  child: Text(
+                                    email.sender.isNotEmpty
+                                        ? email.sender[0].toUpperCase()
+                                        : 'A',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  email.subject.isEmpty
-                                      ? "(No Subject)"
-                                      : email.subject,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        email.sender,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        email.subject.isEmpty
+                                            ? "(No Subject)"
+                                            : email.subject,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        email.snippet,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  email.snippet,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 13,
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: spamColor,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: spamTextColor.withOpacity(0.3),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    email.spamPrediction.toString(),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: spamTextColor,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: spamColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: spamTextColor.withOpacity(0.3),
-                                  ),
-                                ),
-                                child: Text(
-                                  email.spamPrediction.toString(),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: spamTextColor,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
     );
   }
@@ -856,8 +778,6 @@ class EmailSearchDelegate extends SearchDelegate<String> {
               ? "--"
               : (email.spamPrediction?.toUpperCase() ?? "--");
           final predValue = double.tryParse(rawPred);
-          final isSpam =
-              (rawPred == "SPAM") || (predValue != null && predValue >= 50);
 
           Color spamColor;
           Color spamTextColor;

@@ -186,35 +186,24 @@ class HomeScreenState extends State<HomeScreen>
           fact1 = insightsData['fact1'] ?? "";
           fact2 = insightsData['fact2'] ?? "";
         }
+        print(fact1);
+        print(fact2);
+        setState(() {
+          _dashboardMode = mode;
+          _dashLabels = labels.isNotEmpty
+              ? labels
+              : ["Secure", "Suspicious", "Threat", "Critical"];
+          _dashValues = values.isNotEmpty ? values : [0, 0, 0, 0];
+          _dashTotal = total;
+          dashInsights = jsonEncode({"fact1": fact1, "fact2": fact2});
+        });
 
-        if (mode == 'mail' || mode == 'sms') {
-          // update pie chart only for mail or sms mode without rebuilding whole screen
-          pieChartKey.currentState?.updateData(values, labels, total);
-        } else {
-          // 'both' mode or others reload whole UI
-          setState(() {
-            _dashboardMode = mode;
-            _dashLabels = labels.isNotEmpty
-                ? labels
-                : ["Secure", "Suspicious", "Threat", "Critical"];
-            _dashValues = values.isNotEmpty ? values : [0, 0, 0, 0];
-            _dashTotal = total;
-            dashInsights = jsonEncode({"fact1": fact1, "fact2": fact2});
-          });
-          _animController.forward(from: 0);
-        }
-
-        // Always update dashInsights and mode on any load for consistency
-        if (mounted && !(mode == 'mail' || mode == 'sms')) {
-          // done above for 'both' already
-        } else if (mounted) {
-          // update mode and insights for 'mail' or 'sms' mode as well
-          setState(() {
-            _dashboardMode = mode;
-            dashInsights = jsonEncode({"fact1": fact1, "fact2": fact2});
-          });
-          _animController.forward(from: 0);
-        }
+        pieChartKey.currentState?.updateData(
+          _dashValues,
+          _dashLabels,
+          _dashTotal,
+        );
+        _animController.forward(from: 0);
       }
     } catch (e) {
       debugPrint("Failed to load dashboard: $e");
@@ -389,13 +378,15 @@ class HomeScreenState extends State<HomeScreen>
       ),
       body: dashboardLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 30,
-              ).copyWith(bottom: 120),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          : RefreshIndicator(
+              onRefresh: () async {
+                await _loadDashboard(mode: _dashboardMode);
+              },
+              child: ListView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 30,
+                ).copyWith(bottom: 120),
                 children: [
                   DashboardPieChart(
                     key: pieChartKey,
@@ -404,6 +395,8 @@ class HomeScreenState extends State<HomeScreen>
                     total: _dashTotal,
                   ),
                   const SizedBox(height: 24),
+
+                  // Mode buttons
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -414,7 +407,10 @@ class HomeScreenState extends State<HomeScreen>
                       buildModeButton("Both", "both", bothColor),
                     ],
                   ),
+
                   const SizedBox(height: 24),
+
+                  // Legend items
                   Wrap(
                     spacing: 18,
                     runSpacing: 12,
@@ -454,7 +450,9 @@ class HomeScreenState extends State<HomeScreen>
                       );
                     }),
                   ),
+
                   const SizedBox(height: 32),
+
                   Text(
                     "💡Cyber Insights",
                     style: TextStyle(
@@ -464,6 +462,7 @@ class HomeScreenState extends State<HomeScreen>
                     ),
                   ),
                   const SizedBox(height: 12),
+
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
@@ -547,12 +546,11 @@ class DashboardPieChartState extends State<DashboardPieChart> {
     labels = widget.labels;
     total = widget.total;
   }
-
-  void updateData(List<int> values, List<String> labels, int total) {
+  void updateData(List<int> newValues, List<String> newLabels, int newTotal) {
     setState(() {
-      values = values;
-      labels = labels;
-      total = total;
+      values = newValues;
+      labels = newLabels;
+      total = newTotal;
       hoverIndex = null;
     });
   }
@@ -602,30 +600,11 @@ class DashboardPieChartState extends State<DashboardPieChart> {
             onTap: () => setState(() => hoverIndex = null),
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
-              child: hoverIndex == null
+              child:
+                  (hoverIndex != null &&
+                      hoverIndex! >= 0 &&
+                      hoverIndex! < values.length)
                   ? Column(
-                      key: const ValueKey("total"),
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '$total',
-                          style: const TextStyle(
-                            fontSize: 38,
-                            fontWeight: FontWeight.bold,
-                            color: DashboardPieChart.primaryColor,
-                          ),
-                        ),
-                        const Text(
-                          "Messages Analyzed",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black54,
-                          ),
-                        ),
-                      ],
-                    )
-                  : Column(
                       key: ValueKey(hoverIndex),
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -644,6 +623,28 @@ class DashboardPieChartState extends State<DashboardPieChart> {
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      key: const ValueKey("total"),
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '$total',
+                          style: const TextStyle(
+                            fontSize: 38,
+                            fontWeight: FontWeight.bold,
+                            color: DashboardPieChart.primaryColor,
+                          ),
+                        ),
+                        const Text(
+                          "Messages Analyzed",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black54,
                           ),
                         ),
                       ],

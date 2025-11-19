@@ -20,14 +20,16 @@ class EmailAccountManagerState extends State<EmailAccountManager> {
   bool _loading = true;
   OverlayEntry? _overlayEntry;
   String? activeAccountEmail;
-  @override
+
   @override
   void initState() {
     super.initState();
     loadAccounts();
-    refreshTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      loadAccounts();
-    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future<void> loadAccounts() async {
@@ -70,8 +72,9 @@ class EmailAccountManagerState extends State<EmailAccountManager> {
 
   Future<void> setActiveAccount(String email) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('active_linked_email', email);
     setState(() => activeAccountEmail = email);
+    ApiService.selectedEmailAccount = email;
+    await prefs.setString('active_linked_email', email);
   }
 
   Future<void> deleteAccount(String gmailEmail) async {
@@ -115,7 +118,8 @@ class EmailAccountManagerState extends State<EmailAccountManager> {
         setState(() => activeAccountEmail = newActive);
       }
       showcapsuleMessage("Account removed");
-      loadAccounts();
+      await loadAccounts();
+      setState(() {});
     } catch (e) {
       print("Failed to delete account: $e");
       showcapsuleMessage("Failed to remove account", error: true);

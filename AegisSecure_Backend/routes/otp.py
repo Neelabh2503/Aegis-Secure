@@ -1,15 +1,17 @@
-import os,random,base64,httpx
+import os
+import random
+import base64
 from email.mime.text import MIMEText
+import httpx
 from datetime import datetime,timedelta
 from dotenv import load_dotenv
 load_dotenv()
 from database import auth_db
-
 OTP_EXPIRE_MINUTES = int(os.getenv("OTP_EXPIRE_MINUTES", "10"))
 otp_col = auth_db.otps
 
-SMTP_EMAIL = os.getenv("SMTP_EMAIL")  
-REFRESH_TOKEN = os.getenv("REFRESH_TOKEN")
+SMTP_EMAIL = os.getenv("SMTP_EMAIL")
+REFRESH_TOKEN = os.getenv("REFRESH_TOKEN")  
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 
@@ -49,11 +51,9 @@ async def send_gmail_email(access_token: str, to_email: str, subject: str, body:
         return resp.json()
 
 def generate_otp() -> str:
-    """6-digit OTP as string"""
     return str(random.randint(100000, 999999)).zfill(6)
 
 async def send_otp_email_async(to_email: str, otp: str) -> bool:
-    """Send OTP email via Gmail API."""
     html_body = f"""
     <html>
       <body style="font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: linear-gradient(135deg, #1F2A6E 0%, #283593 100%); margin: 0; padding: 40px 0;">
@@ -120,14 +120,10 @@ async def send_otp_email_async(to_email: str, otp: str) -> bool:
     try:
         access_token = await get_access_token_from_refresh(REFRESH_TOKEN)
         if not access_token:
-            print("[DEBUG] Failed to get access token")
             return False
         await send_gmail_email(access_token, to_email, "AegisSecure OTP", html_body)
-        print(f"[DEBUG] OTP sent via Gmail API to {to_email}")
         return True
     except Exception as e:
-        print("Failed to send OTP via Gmail API:", e)
-        # print(f"[DEV OTP] {to_email} -> {otp}")
         return False
 
 
