@@ -6,7 +6,6 @@ class SmsDetailedScreen extends StatelessWidget {
   final SmsMessageModel message;
 
   const SmsDetailedScreen({Key? key, required this.message}) : super(key: key);
-
   String getDisplayName(String address, String? contactName) {
     if (contactName != null && contactName.isNotEmpty) return contactName;
     final isBusinessSender = RegExp(r'[A-Za-z]').hasMatch(address);
@@ -16,45 +15,118 @@ class SmsDetailedScreen extends StatelessWidget {
     return address;
   }
 
+  List<TextSpan> highlitedText(
+    String text,
+    TextStyle normal,
+    TextStyle highlight,
+  ) {
+    final List<TextSpan> spans = [];
+    int last = 0;
+    final regex = RegExp(r'\$(.*?)\$');
+    final matches = regex.allMatches(text);
+    for (final match in matches) {
+      if (match.start > last) {
+        spans.add(
+          TextSpan(text: text.substring(last, match.start), style: normal),
+        );
+      }
+      spans.add(TextSpan(text: match.group(1), style: highlight));
+      last = match.end;
+    }
+    if (last < text.length) {
+      spans.add(TextSpan(text: text.substring(last), style: normal));
+    }
+    return spans;
+  }
+
+  Color parseColor(String hexColor) {
+    try {
+      hexColor = hexColor.replaceAll("#", "");
+      if (hexColor.length == 6) hexColor = "FF$hexColor";
+      return Color(int.parse(hexColor, radix: 16));
+    } catch (_) {
+      return Colors.grey.shade400;
+    }
+  }
+
+  Color scoreBckClr(double score) {
+    if (score < 25) return const Color(0xFF27AE60);
+    if (score < 50) return const Color(0xFFF39C12);
+    if (score < 75) return const Color(0xFFE67E22);
+    return const Color(0xFFE74C3C);
+  }
+
+  Widget buildSectionHeader(BuildContext context, String title, String icon) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 24, bottom: 8),
+      child: Row(
+        children: [
+          Text(icon, style: const TextStyle(fontSize: 24)),
+          const SizedBox(width: 10),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final sender = getDisplayName(message.address, null);
     final score = message.spamScore ?? 0.0;
+    final badgeColor = scoreBckClr(score);
     final isSpam = score >= 0.5;
-    final bgColor = isSpam ? Colors.red.shade50 : Colors.green.shade50;
-    final textColor = isSpam ? Colors.red.shade700 : Colors.green.shade700;
-    final scoreColor = isSpam ? Colors.red.shade800 : Colors.green.shade800;
-
     final time = DateTime.fromMillisecondsSinceEpoch(message.dateMs).toLocal();
-    final formattedTime =
-        "${time.day}/${time.month}/${time.year} ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
+    final formattedDate =
+        "${time.day.toString().padLeft(2, '0')}/${time.month.toString().padLeft(2, '0')}/${time.year} ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
+
+    final normalStyle =
+        Theme.of(context).textTheme.bodyLarge?.copyWith(
+          color: Colors.black87,
+          fontSize: 16,
+          height: 1.5,
+        ) ??
+        const TextStyle(color: Colors.black87, fontSize: 16, height: 1.5);
+
+    final highlightStyle = normalStyle.copyWith(
+      color: Colors.black,
+      backgroundColor: Colors.red.shade50,
+      fontWeight: FontWeight.w600,
+    );
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
-        iconTheme: const IconThemeData(color: Colors.black),
-        title: Text(
+        iconTheme: const IconThemeData(color: Colors.black87),
+        title: const Text(
           "Message Details",
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.black87,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
       ),
-      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(
-                  radius: 26,
-                  backgroundColor: Colors
-                      .primaries[sender.hashCode % Colors.primaries.length],
+                  radius: 28,
+                  backgroundColor: parseColor(
+                    message.address.isNotEmpty ? message.address : '#888888',
+                  ),
                   child: Text(
                     sender.isNotEmpty ? sender[0].toUpperCase() : "?",
                     style: const TextStyle(
@@ -68,117 +140,103 @@ class SmsDetailedScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     sender,
-                    style: const TextStyle(
-                      fontSize: 18,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      fontSize: 18,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: bgColor,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: textColor.withOpacity(0.3)),
-                  ),
-                  child: Text(
-                    isSpam ? "SPAM" : "HAM",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
+                const SizedBox(width: 12),
+                Column(
+                  children: [
+                    Container(
+                      width: 70,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: badgeColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        score.toStringAsFixed(1),
+                        style: TextStyle(
+                          color: badgeColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 6),
+                    Text(
+                      formattedDate,
+                      style: const TextStyle(fontSize: 13, color: Colors.grey),
+                    ),
+                  ],
                 ),
               ],
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 22),
             Container(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade300),
+                color: badgeColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(14),
               ),
-              child: Text(
-                message.body,
-                style: const TextStyle(
-                  fontSize: 16,
-                  height: 1.4,
-                  color: Colors.black87,
+              child: Row(
+                children: [
+                  Icon(
+                    isSpam ? Icons.warning_amber_rounded : Icons.check_circle,
+                    color: badgeColor,
+                    size: 28,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      message.finalDecision?.isNotEmpty == true
+                          ? "Verdict: ${message.finalDecision}"
+                          : "No verdict available",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
+                        color: badgeColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            RichText(
+              text: TextSpan(
+                children: highlitedText(
+                  (message.highlightedText?.isNotEmpty ?? false)
+                      ? message.highlightedText!
+                      : (message.body ?? ""),
+                  normalStyle,
+                  highlightStyle,
                 ),
               ),
             ),
 
-            const SizedBox(height: 20),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade200,
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Spam Score: ${score.toStringAsFixed(3)}",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: scoreColor,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Received at: $formattedTime",
-                    style: TextStyle(color: Colors.grey.shade700, fontSize: 14),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Sender Address: ${message.address}",
-                    style: TextStyle(color: Colors.grey.shade700, fontSize: 14),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            if (message.spamScore != null)
-              Center(
-                child: Column(
-                  children: [
-                    Icon(
-                      isSpam ? Icons.warning_amber_rounded : Icons.check_circle,
-                      size: 48,
-                      color: textColor,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      isSpam
-                          ? "This message is likely spam."
-                          : "This message appears safe.",
-                      style: TextStyle(
-                        color: textColor,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            if (message.reasoning?.isNotEmpty == true) ...[
+              buildSectionHeader(context, "Reasoning", "🧠"),
+              const SizedBox(height: 6),
+              Text(message.reasoning!, style: normalStyle),
+            ],
+
+            if (message.suggestion?.isNotEmpty == true) ...[
+              buildSectionHeader(context, "Suggestion", "💡"),
+              const SizedBox(height: 6),
+              Text(message.suggestion!, style: normalStyle),
+            ],
+            const SizedBox(height: 32),
           ],
         ),
       ),

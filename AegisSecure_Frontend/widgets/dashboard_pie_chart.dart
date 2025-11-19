@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 
 class DashboardPieChart extends StatelessWidget {
   final List<String> labels;
   final List<int> values;
-  final double size; // width/height
+  final double size; 
 
   const DashboardPieChart({
     Key? key,
@@ -14,10 +14,10 @@ class DashboardPieChart extends StatelessWidget {
   }) : super(key: key);
 
   static const List<Color> _colors = [
-    Color(0xFF22C55E), // Safe - green
-    Color(0xFFFACC15), // Less Safe - yellow
-    Color(0xFFFB923C), // Less Scam - orange
-    Color(0xFFEF4444), // High Scam - red
+    Color(0xFF22C55E),
+    Color(0xFFFACC15),
+    Color(0xFFFB923C),
+    Color(0xFFEF4444),
   ];
 
   @override
@@ -28,23 +28,27 @@ class DashboardPieChart extends StatelessWidget {
       final value = values[i].toDouble();
       final percent = total == 0 ? 0.0 : (value / total) * 100;
       if (value <= 0) {
-        sections.add(PieChartSectionData(
-          color: _colors[i].withOpacity(0.12),
-          value: 0.001,
-          showTitle: false,
-        ));
-      } else {
-        sections.add(PieChartSectionData(
-          color: _colors[i],
-          value: value,
-          title: '${percent.toStringAsFixed(0)}%',
-          radius: 56,
-          titleStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+        sections.add(
+          PieChartSectionData(
+            color: _colors[i].withOpacity(0.12),
+            value: 0.001,
+            showTitle: false,
           ),
-        ));
+        );
+      } else {
+        sections.add(
+          PieChartSectionData(
+            color: _colors[i],
+            value: value,
+            title: '${percent.toStringAsFixed(0)}%',
+            radius: 56,
+            titleStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        );
       }
     }
 

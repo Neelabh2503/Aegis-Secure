@@ -118,6 +118,7 @@ app.include_router(Oauth.router, prefix="/auth", tags=["OAuth"])
 app.include_router(notifications.router, prefix="/notifications", tags=["Notifications"])
 app.include_router(analysis.router, prefix="/analysis", tags=["Analysis"])
 app.include_router(sms.router, prefix="/sms", tags=["SMS"])
+app.include_router(dashboard.router)
 
 
 # Health check endpoints

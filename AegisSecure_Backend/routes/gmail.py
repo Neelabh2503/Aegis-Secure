@@ -35,10 +35,6 @@ async def get_emails(
     user_id: str = Depends(get_current_user_id),
     account: Optional[str] = None,
 ):
-    """
-    Fetch emails for the authenticated user.
-    If `account` query param is provided, only return emails for that Gmail account.
-    """
     try:
         query = {"user_id": user_id}
         if account:

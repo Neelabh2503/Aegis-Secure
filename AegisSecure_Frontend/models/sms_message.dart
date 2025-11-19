@@ -1,10 +1,14 @@
-// lib/models/sms_message.dart
 class SmsMessageModel {
   final String address;
   final String body;
   final int dateMs;
   final String type;
   final double? spamScore;
+  final double? confidence;
+  final String? reasoning;
+  final String? highlightedText;
+  final String? finalDecision;
+  final String? suggestion;
 
   SmsMessageModel({
     required this.address,
@@ -12,6 +16,11 @@ class SmsMessageModel {
     required this.dateMs,
     required this.type,
     this.spamScore,
+    this.confidence,
+    this.reasoning,
+    this.highlightedText,
+    this.finalDecision,
+    this.suggestion,
   });
 
   factory SmsMessageModel.fromJson(Map<String, dynamic> json) {
@@ -20,9 +29,21 @@ class SmsMessageModel {
       body: json['body'] ?? '',
       dateMs: json['timestamp'] ?? json['date_ms'] ?? 0,
       type: json['type'] ?? 'inbox',
+
+      // Handle spam score and confidence
       spamScore: (json['spam_score'] is num)
           ? json['spam_score'].toDouble()
           : null,
+      confidence: (json['confidence'] is num)
+          ? json['confidence'].toDouble()
+          : null,
+
+      // 🟩 Map multiple possible key names
+      reasoning: json['reasoning'] ?? json['spam_reasoning'] ?? '',
+      highlightedText:
+          json['highlighted_text'] ?? json['spam_highlighted_text'] ?? '',
+      finalDecision: json['final_decision'] ?? json['spam_verdict'] ?? '',
+      suggestion: json['suggestion'] ?? json['spam_suggestion'] ?? '',
     );
   }
 
@@ -31,5 +52,11 @@ class SmsMessageModel {
     "body": body,
     "date_ms": dateMs,
     "type": type,
+    "spam_score": spamScore,
+    "confidence": confidence,
+    "reasoning": reasoning,
+    "highlighted_text": highlightedText,
+    "final_decision": finalDecision,
+    "suggestion": suggestion,
   };
 }
