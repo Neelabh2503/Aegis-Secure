@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 import httpx
 from database import messages_col, accounts_col
-import os, json, base64
+import os, json, base64, asyncio
 from dotenv import load_dotenv
 from websocket_manager import broadcast_new_email
 from datetime import datetime, timezone
@@ -143,3 +143,21 @@ async def gmail_notifications(request: Request):
         print("Error in gmail_notifications:", str(e))
         traceback.print_exc()
         return {"status": "error", "message": str(e)}
+
+async def clean_invalid_messages():
+    """Background task to clean messages with missing critical fields."""
+    while True:
+        try:
+            result = await messages_col.delete_many({
+                "$or": [
+                    {"from": {"$exists": False}},
+                    {"from": ""},
+                    {"body": {"$exists": False}},
+                    {"body": ""}
+                ]
+            })
+            if result.deleted_count > 0:
+                print(f"🗑️ Cleaned {result.deleted_count} invalid messages")
+        except Exception as e:
+            print("Error in clean_invalid_messages:", e)
+        await asyncio.sleep(300)  # Check every 5 minutes instead of 30 seconds

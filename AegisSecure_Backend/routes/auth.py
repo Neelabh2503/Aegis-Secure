@@ -1,22 +1,26 @@
-from fastapi import APIRouter, HTTPException,Depends
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, Depends, status
+from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
 import jwt
 import os
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials 
-from pydantic import BaseModel, EmailStr
-from dotenv import load_dotenv
-from passlib.context import CryptContext
 from typing import Optional
 import datetime
 
-security = HTTPBearer()
-load_dotenv()
-from database import users_col ,auth_db,otps_col
+from database import users_col, auth_db, otps_col
 from routes import otp
+from config import settings, StatusMessages
+from errors import (
+    AuthenticationError, ValidationError, ResourceNotFoundError,
+    DuplicateResourceError, TokenError, OTPError
+)
+from validators import PasswordValidator, EmailValidator, OTPValidator
+from logger import logger, log_auth_attempt, log_otp_event, log_user_action
 
+security = HTTPBearer()
 router = APIRouter()
-JWT_SECRET = os.getenv("JWT_SECRET", "supersecret")  
+
+# Use settings from config instead of hardcoded values
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -41,19 +45,6 @@ class VerifyOTPRequest(BaseModel):
     email: EmailStr
     otp: str
 
-
-class UserResponse(BaseModel):
-    name: str
-    email: str
-    user_id: str
-
-
-#--⭐️
-
-class VerifyOTPRequest(BaseModel):
-    email: EmailStr
-    otp: str
-
 class VerifyResetOTPRequest(BaseModel):
     email: EmailStr
     otp: str
@@ -63,122 +54,263 @@ class ResetPasswordRequest(BaseModel):
     new_password: str
     confirm_password: str
 
+class UserResponse(BaseModel):
+    name: str
+    email: str
+    user_id: str
 
-RESET_JWT_TTL_MINUTES = int(os.getenv("RESET_JWT_TTL_MINUTES", "15"))
 
-def hash_password(plain: str) -> str:
-    return pwd_context.hash(plain)
-
-def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
 
 def create_reset_jwt(email: str) -> str:
-    exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=RESET_JWT_TTL_MINUTES)
+    """Create a short-lived JWT for password reset."""
+    exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=settings.RESET_JWT_TTL_MINUTES)
     payload = {"sub": email, "purpose": "password_reset", "exp": exp}
-    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    token = jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
     return token
 
 def decode_reset_jwt(token: str) -> dict:
+    """Decode and validate reset JWT token."""
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
         if payload.get("purpose") != "password_reset":
-            raise HTTPException(status_code=401, detail="Invalid token purpose")
+            raise TokenError("Invalid token purpose")
         return payload
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Reset token expired")
+        raise TokenError("Reset token expired")
     except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid reset token")
+        raise TokenError("Invalid reset token")
 
 #--⭐️
 
     
-@router.post("/register")
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(req: RegisterRequest):
-    existing = await users_col.find_one({"email": req.email})
-    if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    # print("Raw request body:", body.decode())
-    # print("Parsed:", req.dict())
-    hashed_password = pwd_context.hash(req.password)
-    user_doc = {
-        "name": req.name, 
-        "email": req.email,
-        "password": hashed_password,
-        "verified": False,
-        "user_id": str(datetime.datetime.now().timestamp())
-    }
-    await users_col.insert_one(user_doc)
-    #<--⭐️
-    otp_code = otp.generate_otp()
-    await otp.store_otp(req.email, otp_code)
-    sent = await otp.send_otp_email_async(req.email, otp_code)
-
-    if sent:
-        return {"message": "User registered. OTP sent to email."}
-    else:
-        return {"message": f"User registered. OTP (dev mode): {otp_code}"}
+    """
+    Register a new user with email verification.
+    Validates password strength and sends OTP for verification.
+    """
+    try:
+        # Normalize email
+        email = req.email.lower().strip()
+        
+        # Validate password strength
+        PasswordValidator.validate_or_raise(req.password)
+        
+        # Check if user already exists
+        existing = await users_col.find_one({"email": email})
+        if existing:
+            log_auth_attempt(email, False, "Email already registered")
+            raise DuplicateResourceError("User", details={"email": email})
+        
+        # Hash password
+        hashed_password = pwd_context.hash(req.password)
+        
+        # Create user document
+        user_doc = {
+            "name": req.name.strip(),
+            "email": email,
+            "password": hashed_password,
+            "verified": False,
+            "user_id": str(datetime.datetime.now().timestamp()),
+            "created_at": datetime.datetime.utcnow(),
+            "updated_at": datetime.datetime.utcnow()
+        }
+        
+        result = await users_col.insert_one(user_doc)
+        logger.info(f"✅ New user registered: {email}")
+        
+        # Generate and send OTP
+        otp_code = otp.generate_otp()
+        await otp.store_otp(email, otp_code)
+        sent = await otp.send_otp_email_async(email, otp_code)
+        
+        log_otp_event(email, "generated", success=True)
+        
+        if sent:
+            return {
+                "message": StatusMessages.REGISTRATION_SUCCESS,
+                "email": email,
+                "otp_sent": True
+            }
+        else:
+            # Development mode - include OTP in response
+            if settings.DEBUG:
+                return {
+                    "message": StatusMessages.REGISTRATION_SUCCESS,
+                    "email": email,
+                    "otp": otp_code,
+                    "otp_sent": False
+                }
+            return {
+                "message": StatusMessages.REGISTRATION_SUCCESS,
+                "email": email,
+                "otp_sent": False
+            }
+    
+    except (DuplicateResourceError, ValidationError):
+        raise
+    except Exception as e:
+        logger.error(f"Registration error for {req.email}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=StatusMessages.INTERNAL_ERROR
+        )
 
 @router.post("/login", response_model=LoginResponse)
 async def login_user(req: LoginRequest):
-    user = await users_col.find_one({"email": req.email})
-    if not user:
-        raise HTTPException(status_code=400, detail="User not found")
+    """
+    Authenticate user and return JWT token.
+    Returns generic error messages to prevent user enumeration.
+    """
+    try:
+        # Normalize email
+        email = req.email.lower().strip()
+        
+        # Find user
+        user = await users_col.find_one({"email": email})
+        
+        # Use generic error message to prevent user enumeration
+        if not user:
+            log_auth_attempt(email, False, "User not found")
+            raise AuthenticationError(StatusMessages.INVALID_CREDENTIALS)
+        
+        # Verify password
+        if not pwd_context.verify(req.password, user["password"]):
+            log_auth_attempt(email, False, "Incorrect password")
+            raise AuthenticationError(StatusMessages.INVALID_CREDENTIALS)
+        
+        # Create JWT token
+        payload = {
+            "email": user["email"],
+            "user_id": str(user["_id"]),
+            "iat": datetime.datetime.utcnow(),
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(
+                hours=settings.JWT_ACCESS_TOKEN_EXPIRE_HOURS
+            )
+        }
+        
+        token = jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+        
+        # Log successful login
+        log_auth_attempt(email, True)
+        log_user_action(str(user["_id"]), "login", {"email": email})
+        
+        return {
+            "token": token,
+            "verified": user.get("verified", False)
+        }
     
-    if not pwd_context.verify(req.password, user["password"]):
-        raise HTTPException(status_code=400, detail="Incorrect password")
-    
-    payload = {
-        "email": user["email"],
-        "user_id": str(user["_id"]),
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
-    }
-    
-    token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
-    return {"token": token,"verified": user.get("verified", False)}
+    except AuthenticationError:
+        raise
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=StatusMessages.INTERNAL_ERROR
+        )
 
 @router.post("/send-otp")
 async def send_otp(req: SendOTPRequest):
-    user = await users_col.find_one({"email": req.email})
-    if not user:
-        raise HTTPException(status_code=400, detail="User not found")
+    """Send OTP to user's email for verification."""
+    try:
+        email = req.email.lower().strip()
+        
+        user = await users_col.find_one({"email": email})
+        if not user:
+            raise ResourceNotFoundError("User")
+        
+        # Generate and store OTP
+        otp_code = otp.generate_otp()
+        await otp.store_otp(email, otp_code)
+        
+        # Send OTP email
+        sent = await otp.send_otp_email_async(email, otp_code)
+        
+        log_otp_event(email, "sent", success=sent)
+        
+        if sent:
+            return {"message": StatusMessages.OTP_SENT}
+        else:
+            # Development mode - include OTP in response
+            if settings.DEBUG:
+                return {
+                    "message": "OTP generated (dev mode)",
+                    "otp": otp_code
+                }
+            return {"message": StatusMessages.OTP_SENT}
     
-    otp_code = otp.generate_otp()
-    await otp.store_otp(req.email, otp_code)
-    sent = await otp.send_otp_email_async(req.email, otp_code)
-    if sent:
-        return {"message": "OTP sent to your email."}
-    else:
-        return {"message": f"OTP generated (dev mode): {otp_code}"}
+    except ResourceNotFoundError:
+        raise
+    except Exception as e:
+        logger.error(f"Send OTP error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=StatusMessages.INTERNAL_ERROR
+        )
 
 @router.post("/verify-otp")
-async def verify_otp(req: VerifyOTPRequest):
-    print("📩Incoming OTP verification request:", req.dict())  
-
+async def verify_otp_endpoint(req: VerifyOTPRequest):
+    """
+    Verify OTP and mark user as verified.
+    Validates OTP format before checking database.
+    """
     try:
-        is_valid = await otp.verify_otp_in_db(req.email, req.otp)
-        print(f"🧩 OTP validation result for {req.email}: {is_valid}")
-
+        email = req.email.lower().strip()
+        
+        # Validate OTP format
+        OTPValidator.validate_or_raise(req.otp)
+        
+        # Verify OTP in database
+        is_valid = await otp.verify_otp_in_db(email, req.otp)
+        
         if not is_valid:
-            raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+            log_otp_event(email, "verification failed", success=False)
+            raise OTPError(StatusMessages.INVALID_OTP)
 
-        await users_col.update_one({"email": req.email}, {"$set": {"verified": True}})
-        print(f"✅ User {req.email} marked as verified")
+        # Mark user as verified
+        result = await users_col.update_one(
+            {"email": email},
+            {
+                "$set": {
+                    "verified": True,
+                    "verified_at": datetime.datetime.utcnow()
+                }
+            }
+        )
+        
+        if result.modified_count == 0:
+            logger.warning(f"User {email} not found during OTP verification")
+        
+        log_otp_event(email, "verified", success=True)
+        logger.info(f"✅ User {email} marked as verified")
 
-        return {"message": "OTP verified successfully, user is now verified."}
+        return {"message": StatusMessages.OTP_VERIFIED}
 
-    except Exception as e:
-        print(f"❌ Exception during OTP verify: {e}")
+    except (OTPError, ValidationError):
         raise
+    except Exception as e:
+        logger.error(f"OTP verification error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=StatusMessages.INTERNAL_ERROR
+        )
 
 
-def decode_jwt(token: str):
+def decode_jwt(token: str) -> dict:
+    """Decode and validate JWT token."""
     try:
-        decoded = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        decoded = jwt.decode(
+            token,
+            settings.JWT_SECRET,
+            algorithms=[settings.JWT_ALGORITHM]
+        )
         return decoded
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
+        logger.warning("Token expired")
+        raise TokenError("Token expired")
     except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        logger.warning("Invalid token")
+        raise TokenError("Invalid token")
 
 
 @router.get("/me")
@@ -199,24 +331,40 @@ async def get_user_info(credentials: HTTPAuthorizationCredentials = Depends(secu
 
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """A dependency to get the current user from a JWT token."""
+    """
+    Dependency to get the current authenticated user from JWT token.
+    Use this in route dependencies to require authentication.
+    """
     token = credentials.credentials
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        payload = jwt.decode(
+            token,
+            settings.JWT_SECRET,
+            algorithms=[settings.JWT_ALGORITHM]
+        )
         email: str = payload.get("email")
         if email is None:
-            raise HTTPException(status_code=403, detail="Invalid token payload")
+            raise TokenError("Invalid token payload")
 
         user = await users_col.find_one({"email": email})
         if user is None:
-            raise HTTPException(status_code=404, detail="User not found")
+            raise ResourceNotFoundError("User")
 
         user["user_id"] = str(user["_id"])
         return user
+    
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=403, detail="Token has expired")
+        raise TokenError("Token has expired")
     except jwt.InvalidTokenError:
-        raise HTTPException(status_code=403, detail="Invalid token")
+        raise TokenError("Invalid token")
+    except (TokenError, ResourceNotFoundError):
+        raise
+    except Exception as e:
+        logger.error(f"Error in get_current_user: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=StatusMessages.INTERNAL_ERROR
+        )
     
 
     
@@ -246,28 +394,69 @@ async def verify_reset_otp(req: VerifyResetOTPRequest):
     if not is_valid:
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
     reset_token = create_reset_jwt(email)
-    return {"reset_token": reset_token, "expires_in_minutes": RESET_JWT_TTL_MINUTES}
+    return {"reset_token": reset_token, "expires_in_minutes": settings.RESET_JWT_TTL_MINUTES}
 
 
 @router.post("/reset-password")
 async def reset_password(data: dict):
-    email = data.get("email")
-    otp = data.get("otp")
-    new_password = data.get("new_password")
+    """
+    Reset password using OTP verification.
+    Validates new password strength before updating.
+    """
+    try:
+        email = data.get("email")
+        otp_code = data.get("otp")
+        new_password = data.get("new_password")
 
-    if not all([email, otp, new_password]):
-        raise HTTPException(status_code=400, detail="Missing fields")
-    otp_doc = await otps_col.find_one({"email": email, "otp": otp})
-    if not otp_doc:
-        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+        # Validate required fields
+        if not all([email, otp_code, new_password]):
+            raise ValidationError("Missing required fields: email, otp, new_password")
+        
+        # Normalize email
+        email = email.lower().strip()
+        
+        # Validate OTP format
+        OTPValidator.validate_or_raise(otp_code)
+        
+        # Validate new password strength
+        PasswordValidator.validate_or_raise(new_password)
+        
+        # Verify OTP
+        otp_doc = await otps_col.find_one({"email": email, "otp": otp_code})
+        if not otp_doc:
+            log_otp_event(email, "verification failed", success=False)
+            raise OTPError(StatusMessages.INVALID_OTP)
 
-    hashed_pw = pwd_context.hash(new_password)
-    result = await users_col.update_one(
-        {"email": email},
-        {"$set": {"password": hashed_pw}}
-    )
+        # Hash new password
+        hashed_pw = pwd_context.hash(new_password)
+        
+        # Update password
+        result = await users_col.update_one(
+            {"email": email},
+            {
+                "$set": {
+                    "password": hashed_pw,
+                    "updated_at": datetime.datetime.utcnow()
+                }
+            }
+        )
 
-    if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail="User not found")
-    await otps_col.delete_many({"email": email})
-    return {"message": "Password updated successfully"}
+        if result.modified_count == 0:
+            raise ResourceNotFoundError("User")
+        
+        # Clean up all OTPs for this email
+        await otps_col.delete_many({"email": email})
+        
+        logger.info(f"✅ Password reset successful for: {email}")
+        log_user_action(email, "password_reset", {"email": email})
+        
+        return {"message": StatusMessages.PASSWORD_RESET_SUCCESS}
+    
+    except (ValidationError, OTPError, ResourceNotFoundError):
+        raise
+    except Exception as e:
+        logger.error(f"Password reset error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=StatusMessages.INTERNAL_ERROR
+        )
