@@ -26,7 +26,7 @@ from database import users_col, otps_col, messages_col, accounts_col
 
 # Mock firebase if not available
 try:
-    import firebase_admin
+    import firebase_admin  # type: ignore
 except ImportError:
     import unittest.mock as mock
     sys.modules['firebase_admin'] = mock.MagicMock()

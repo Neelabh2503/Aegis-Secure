@@ -19,7 +19,8 @@ from routes import otp
 
 
 router = APIRouter()
-JWT_SECRET = os.getenv("JWT_SECRET", "supersecret")  
+JWT_SECRET = os.getenv("JWT_SECRET", "supersecret")
+JWT_ALGORITHM = "HS256"
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
 
