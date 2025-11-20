@@ -5,16 +5,12 @@ from fastapi.exceptions import RequestValidationError
 from dotenv import load_dotenv
 from database import avatars_col
 import os
-load_dotenv()
-
-from routes import auth, gmail, Oauth,notifications,sms,analysis,dashboard
 import asyncio
 from contextlib import asynccontextmanager
-import asyncio
+load_dotenv()
+
 from config import settings
-from database import avatars_col
-from websocket_manager import connect, disconnect, active_connections
-from routes import auth, gmail, Oauth, notifications, otp, sms, analysis
+from routes import auth, gmail, Oauth, notifications, otp, sms, dashboard
 from middleware import (
     RateLimitMiddleware,
     SecurityHeadersMiddleware,
@@ -115,7 +111,6 @@ app.include_router(gmail.router, prefix="/gmail", tags=["Gmail"])
 app.include_router(Oauth.router, prefix="/oauth", tags=["OAuth"])
 app.include_router(Oauth.router, prefix="/auth", tags=["OAuth"])
 app.include_router(notifications.router, prefix="/notifications", tags=["Notifications"])
-app.include_router(analysis.router, prefix="/analysis", tags=["Analysis"])
 app.include_router(sms.router, prefix="/sms", tags=["SMS"])
 app.include_router(dashboard.router)
 
@@ -140,8 +135,7 @@ async def health_check():
     return {
         "status": "healthy" if db_healthy else "degraded",
         "version": settings.APP_VERSION,
-        "database": "connected" if db_healthy else "disconnected",
-        "websocket_connections": len(active_connections)
+        "database": "connected" if db_healthy else "disconnected"
     }
 
 
@@ -165,7 +159,6 @@ app.include_router(gmail.router)
 app.include_router(Oauth.router)
 app.include_router(Oauth.router, prefix="/auth")
 app.include_router(notifications.router)
-app.include_router(analysis.router)
 app.include_router(sms.router, prefix="/sms", tags=["SMS"])
 app.include_router(dashboard.router)
 

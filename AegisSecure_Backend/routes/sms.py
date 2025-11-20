@@ -5,7 +5,6 @@ from datetime import datetime
 from dotenv import load_dotenv
 from .auth import get_current_user
 from database import sms_messages_col
-from websocket_manager import broadcast_new_sms
 import hashlib
 import os
 from bson import ObjectId
@@ -122,5 +121,5 @@ async def retry_failed_sms_predictions():
                     }}
                 )
             except Exception as e:
-                print(f"Failed retry for SMS {_id}: {e}")
+                print(f"Failed retry for SMS {sms.get('_id', 'unknown')}: {e}")
         await asyncio.sleep(60) 

@@ -11,7 +11,6 @@ import random
 import re
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
-from websocket_manager import broadcast_new_email
 load_dotenv()
 router = APIRouter()
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
