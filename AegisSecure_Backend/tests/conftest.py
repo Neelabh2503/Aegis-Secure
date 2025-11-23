@@ -8,14 +8,7 @@ from httpx import AsyncClient
 from fastapi.testclient import TestClient
 import os
 import sys
-from unittest.mock import MagicMock
-
-
-# Python 3.7 compatible AsyncMock
-class AsyncMock(MagicMock):
-    """AsyncMock for Python 3.7 compatibility."""
-    async def __call__(self, *args, **kwargs):
-        return super(AsyncMock, self).__call__(*args, **kwargs)
+from unittest.mock import AsyncMock, MagicMock
 
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
