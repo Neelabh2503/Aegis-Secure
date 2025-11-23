@@ -109,8 +109,8 @@ class TestRouterIntegration:
     def test_routers_imported(self):
         """Test all route modules can be imported."""
         try:
-            from routes import auth, gmail, sms, dashboard, analysis
-            assert all([auth, gmail, sms, dashboard, analysis])
+            from routes import auth, gmail, sms, dashboard, notifications, Oauth, otp
+            assert all([auth, gmail, sms, dashboard, notifications, Oauth, otp])
         except ImportError as e:
             pytest.skip(f"Route import failed: {e}")
     
@@ -288,8 +288,9 @@ class TestMainHealthEndpoints:
     async def test_health_check_healthy(self):
         """Test health check with healthy database."""
         from main import health_check
+        from tests.test_helpers import AsyncMock
         
-        with patch("main.db_manager.ping", return_value=True):
+        with patch("main.db_manager.ping", new_callable=AsyncMock, return_value=True):
             response = await health_check()
             
             assert response["status"] == "healthy"
@@ -299,8 +300,9 @@ class TestMainHealthEndpoints:
     async def test_health_check_degraded(self):
         """Test health check with unhealthy database."""
         from main import health_check
+        from tests.test_helpers import AsyncMock
         
-        with patch("main.db_manager.ping", return_value=False):
+        with patch("main.db_manager.ping", new_callable=AsyncMock, return_value=False):
             response = await health_check()
             
             assert response["status"] == "degraded"
