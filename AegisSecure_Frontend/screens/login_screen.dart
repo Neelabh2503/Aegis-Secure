@@ -96,10 +96,8 @@ class LoginScreenState extends State<LoginScreen> {
         await prefs.setStringList('saved_accounts', savedAccounts);
         try {
           final userRes = await ApiService.fetchCurrentUser();
-          print("DEBUG: Current user = $userRes");
-        } catch (e) {
-          print("DEBUG: Could not fetch current user: $e");
-        }
+        } catch (e) {}
+
         Navigator.pushReplacementNamed(context, '/home');
       } else if (res.statusCode == 401 || res.statusCode == 400) {
         setState(() {
@@ -111,7 +109,6 @@ class LoginScreenState extends State<LoginScreen> {
         });
       }
     } catch (e) {
-      // print("DEBUG: Exception caught during login: $e");
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Error connecting to server: $e")));

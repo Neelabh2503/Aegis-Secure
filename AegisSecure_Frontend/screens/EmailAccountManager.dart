@@ -15,7 +15,6 @@ class EmailAccountManager extends StatefulWidget {
 class EmailAccountManagerState extends State<EmailAccountManager> {
   String? currentUserName;
   String? currentUserEmail;
-  Timer? refreshTimer;
   List<Map<String, String>> connectedAccounts = [];
   bool _loading = true;
   OverlayEntry? _overlayEntry;
@@ -27,12 +26,8 @@ class EmailAccountManagerState extends State<EmailAccountManager> {
     loadAccounts();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   Future<void> loadAccounts() async {
+    setState(() => _loading = true);
     try {
       final user = await ApiService.fetchCurrentUser();
       final accounts = await ApiService.fetchConnectedAccounts();
@@ -99,7 +94,9 @@ class EmailAccountManagerState extends State<EmailAccountManager> {
         ],
       ),
     );
+
     if (confirm != true) return;
+
     try {
       await ApiService.deleteConnectedAccount(gmailEmail);
       if (activeAccountEmail == gmailEmail) {
@@ -119,7 +116,6 @@ class EmailAccountManagerState extends State<EmailAccountManager> {
       }
       showcapsuleMessage("Account removed");
       await loadAccounts();
-      setState(() {});
     } catch (e) {
       print("Failed to delete account: $e");
       showcapsuleMessage("Failed to remove account", error: true);
@@ -167,11 +163,27 @@ class EmailAccountManagerState extends State<EmailAccountManager> {
       ),
     );
 
-    Overlay.of(context).insert(_overlayEntry!);
+    Overlay.of(context)?.insert(_overlayEntry!);
     Future.delayed(const Duration(seconds: 2), () {
       _overlayEntry?.remove();
       _overlayEntry = null;
     });
+  }
+
+  Color getColorforLetter(String text) {
+    final colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.red,
+      Colors.orange,
+      Colors.purple,
+      Colors.teal,
+      Colors.amber,
+      Colors.indigo,
+      Colors.pink,
+      Colors.brown,
+    ];
+    return colors[text.codeUnitAt(0) % colors.length];
   }
 
   @override
@@ -179,6 +191,7 @@ class EmailAccountManagerState extends State<EmailAccountManager> {
     final String avatarLetter = (currentUserName?.isNotEmpty ?? false)
         ? currentUserName![0].toUpperCase()
         : '?';
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -197,211 +210,193 @@ class EmailAccountManagerState extends State<EmailAccountManager> {
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  if (currentUserEmail != null && currentUserEmail!.isNotEmpty)
+          : RefreshIndicator(
+              onRefresh: loadAccounts,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (currentUserEmail != null &&
+                        currentUserEmail!.isNotEmpty)
+                      Text(
+                        currentUserEmail!,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    CircleAvatar(
+                      radius: 38,
+                      backgroundColor: Colors.purple.shade400,
+                      child: Text(
+                        avatarLetter,
+                        style: const TextStyle(
+                          fontSize: 32,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     Text(
-                      currentUserEmail!,
+                      "Hi, ${currentUserName ?? 'there'}!",
                       style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
                         color: Colors.black87,
                       ),
                     ),
-                  const SizedBox(height: 12),
-                  CircleAvatar(
-                    radius: 38,
-                    backgroundColor: Colors.purple.shade400,
-                    child: Text(
-                      avatarLetter,
-                      style: const TextStyle(
-                        fontSize: 32,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    "Hi, ${currentUserName ?? 'there'}!",
-                    style: const TextStyle(fontSize: 16, color: Colors.black87),
-                  ),
-                  const SizedBox(height: 20),
-                  OutlinedButton(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      shape: const StadiumBorder(),
-                      side: BorderSide(color: Colors.grey.shade400),
+                    const SizedBox(height: 20),
+                    Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 10,
                       ),
-                    ),
-                    child: const Text("Manage your Accounts"),
-                  ),
-                  const SizedBox(height: 30),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Switch account",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade800,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: Colors.grey.shade400),
+                      ),
+                      child: const Text(
+                        "Manage your Accounts",
+                        style: TextStyle(fontSize: 14, color: Colors.black87),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.shade200,
-                              blurRadius: 6,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
+                    const SizedBox(height: 30),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Switch account",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade800,
                         ),
-                        child: Column(
-                          children: [
-                            if (connectedAccounts.isEmpty)
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Account List
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.shade200,
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          if (connectedAccounts.isEmpty)
+                            Container(
+                              padding: const EdgeInsets.all(20),
+                              child: const Center(
+                                child: Text(
+                                  "No connected accounts yet.",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ),
+                            )
+                          else
+                            for (
+                              int i = 0;
+                              i < connectedAccounts.length;
+                              i++
+                            ) ...[
                               Container(
-                                padding: const EdgeInsets.all(20),
-                                child: const Center(
-                                  child: Text(
-                                    "No connected accounts yet.",
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                ),
-                              )
-                            else
-                              for (
-                                int i = 0;
-                                i < connectedAccounts.length;
-                                i++
-                              ) ...[
-                                Container(
-                                  color:
-                                      connectedAccounts[i]['email'] ==
-                                          activeAccountEmail
-                                      ? Colors.blue.shade50
-                                      : Colors.transparent,
-                                  child: ListTile(
-                                    leading: CircleAvatar(
-                                      backgroundColor: getColorforLetter(
-                                        connectedAccounts[i]['name'] ??
-                                            connectedAccounts[i]['email'] ??
-                                            '',
-                                      ),
-                                      child: Text(
-                                        (connectedAccounts[i]['name'] ??
-                                                connectedAccounts[i]['email'] ??
-                                                '?')[0]
-                                            .toUpperCase(),
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
+                                color:
+                                    connectedAccounts[i]['email'] ==
+                                        activeAccountEmail
+                                    ? Colors.blue.shade50
+                                    : Colors.transparent,
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: getColorforLetter(
+                                      connectedAccounts[i]['name'] ??
+                                          connectedAccounts[i]['email'] ??
+                                          '',
                                     ),
-                                    title: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            connectedAccounts[i]['name'] ?? '',
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    subtitle: Text(
-                                      connectedAccounts[i]['email'] ?? '',
+                                    child: Text(
+                                      (connectedAccounts[i]['name'] ??
+                                              connectedAccounts[i]['email'] ??
+                                              '?')[0]
+                                          .toUpperCase(),
                                       style: const TextStyle(
-                                        color: Colors.black54,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    trailing: IconButton(
-                                      icon: const Icon(
-                                        Icons.delete_outline,
-                                        color: Colors.redAccent,
-                                      ),
-                                      onPressed: () => deleteAccount(
-                                        connectedAccounts[i]['email'] ?? '',
-                                      ),
-                                    ),
-                                    onTap: () async {
-                                      final email =
-                                          connectedAccounts[i]['email'] ?? '';
-                                      await setActiveAccount(email);
-                                      Navigator.pop(context, email);
-                                    },
                                   ),
+                                  title: Text(
+                                    connectedAccounts[i]['name'] ?? '',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    connectedAccounts[i]['email'] ?? '',
+                                    style: const TextStyle(
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                  trailing: IconButton(
+                                    icon: const Icon(
+                                      Icons.delete_outline,
+                                      color: Colors.redAccent,
+                                    ),
+                                    onPressed: () => deleteAccount(
+                                      connectedAccounts[i]['email'] ?? '',
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    final email =
+                                        connectedAccounts[i]['email'] ?? '';
+                                    await setActiveAccount(email);
+                                    Navigator.pop(context, email);
+                                  },
                                 ),
-                                if (i != connectedAccounts.length - 1)
-                                  Divider(
-                                    height: 1,
-                                    color: Colors.grey.shade300,
-                                  ),
-                              ],
-                            const Divider(height: 1),
-                            ListTile(
-                              leading: const CircleAvatar(
-                                backgroundColor: Colors.transparent,
-                                child: Icon(Icons.add, color: Colors.black54),
                               ),
-                              title: const Text(
-                                "Add another account",
-                                style: TextStyle(fontWeight: FontWeight.w500),
-                              ),
-                              onTap: () async {
-                                await ApiService.launchGoogleLogin();
-                                await Future.delayed(
-                                  const Duration(seconds: 10),
-                                );
-                                await loadAccounts();
-                                showcapsuleMessage(
-                                  "Account added successfully",
-                                );
-                              },
+                              if (i != connectedAccounts.length - 1)
+                                Divider(height: 1, color: Colors.grey.shade300),
+                            ],
+                          const Divider(height: 1),
+                          ListTile(
+                            leading: const CircleAvatar(
+                              backgroundColor: Colors.transparent,
+                              child: Icon(Icons.add, color: Colors.black54),
                             ),
-                          ],
-                        ),
+                            title: const Text(
+                              "Add another account",
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                            onTap: () async {
+                              await ApiService.launchGoogleLogin();
+                              await Future.delayed(const Duration(seconds: 10));
+                              await loadAccounts();
+                              showcapsuleMessage("Account added successfully");
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Privacy Policy • Terms of Service",
-                    style: TextStyle(color: Colors.grey, fontSize: 13),
-                  ),
-                ],
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Privacy Policy • Terms of Service",
+                      style: TextStyle(color: Colors.grey, fontSize: 13),
+                    ),
+                  ],
+                ),
               ),
             ),
     );
-  }
-
-  Color getColorforLetter(String text) {
-    final colors = [
-      Colors.blue,
-      Colors.green,
-      Colors.red,
-      Colors.orange,
-      Colors.purple,
-      Colors.teal,
-      Colors.amber,
-      Colors.indigo,
-      Colors.pink,
-      Colors.brown,
-    ];
-    return colors[text.codeUnitAt(0) % colors.length];
   }
 }

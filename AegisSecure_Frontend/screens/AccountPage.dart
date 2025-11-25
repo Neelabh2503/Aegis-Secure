@@ -147,10 +147,6 @@ class _AccountPageState extends State<AccountPage> {
     }
   }
 
-  void _signOut() {
-    Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
-  }
-
   void _changePassword() {
     Navigator.of(
       context,
@@ -312,7 +308,13 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                   const SizedBox(height: 18),
                   ElevatedButton.icon(
-                    onPressed: _signOut,
+                    onPressed: () async {
+                      await ApiService.clearToken();
+                      if (!mounted) return;
+                      Navigator.of(
+                        context,
+                      ).pushNamedAndRemoveUntil('/login', (route) => false);
+                    },
                     icon: const Icon(
                       Icons.logout,
                       color: Colors.white,
@@ -335,6 +337,7 @@ class _AccountPageState extends State<AccountPage> {
                       elevation: 0,
                     ),
                   ),
+
                   const Spacer(),
                 ],
               ),

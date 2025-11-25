@@ -177,7 +177,7 @@ class SmsDetailedScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        score.toStringAsFixed(1),
+                        score.toStringAsFixed(2),
                         style: TextStyle(
                           color: badgeColor,
                           fontWeight: FontWeight.bold,

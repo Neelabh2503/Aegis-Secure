@@ -86,6 +86,20 @@ class RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    if (!hasMinLength ||
+        !hasUppercase ||
+        !hasLowercase ||
+        !hasNumber ||
+        !hasSpecialChar) {
+      setState(() {
+        passwordError = "Password does not meet all requirements";
+      });
+      setState(() {
+        passwordError = "Password does not meet all requirements";
+      });
+      return;
+    }
+
     if (nameError != null ||
         emailError != null ||
         passwordError != null ||
@@ -106,7 +120,7 @@ class RegisterScreenState extends State<RegisterScreen> {
       } else {
         setState(() {
           print(res.statusCode);
-          emailError = "Registration failed, please try again";
+          emailError = "This Email is Already Registered!";
         });
       }
     } catch (e) {

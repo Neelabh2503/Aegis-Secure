@@ -18,7 +18,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
   bool showConfirmPassword = false;
   bool loading = false;
   String? confirmPasswordError;
-
+  String? newPasswordError;
   bool _showPasswordInfo = false;
   bool hasSpecialChar = false;
   bool hasUppercase = false;
@@ -56,17 +56,77 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
     });
   }
 
+  // Future<void> resetPassword() async {
+  //   final newPassword = newPasswordController.text.trim();
+  //   final confirmPassword = confirmPasswordController.text.trim();
+  //
+  //   if (newPassword.isEmpty || confirmPassword.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text("Please fill in all fields.")),
+  //     );
+  //     return;
+  //   }
+  //
+  //   if (newPassword != confirmPassword) {
+  //     setState(() {
+  //       confirmPasswordError = "Passwords do not match";
+  //     });
+  //     return;
+  //   } else {
+  //     setState(() {
+  //       confirmPasswordError = null;
+  //     });
+  //   }
+  //
+  //   setState(() => loading = true);
+  //   final res = await ApiService.resetPassword(
+  //     widget.email,
+  //     widget.otp,
+  //     newPassword,
+  //   );
+  //   setState(() => loading = false);
+  //
+  //   if (res.statusCode == 200) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text("Password changed successfully.")),
+  //     );
+  //     Navigator.pushReplacementNamed(context, '/login');
+  //   } else {
+  //     ScaffoldMessenger.of(
+  //       context,
+  //     ).showSnackBar(SnackBar(content: Text("Failed: ${res.body}")));
+  //   }
+  // }
+
   Future<void> resetPassword() async {
     final newPassword = newPasswordController.text.trim();
     final confirmPassword = confirmPasswordController.text.trim();
 
+    // 1. Empty fields
     if (newPassword.isEmpty || confirmPassword.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill in all fields.")),
-      );
+      setState(() {
+        newPasswordError = "Password cannot be empty";
+      });
       return;
     }
 
+    // 2. Strength rules
+    if (!hasMinLength ||
+        !hasUppercase ||
+        !hasLowercase ||
+        !hasNumber ||
+        !hasSpecialChar) {
+      setState(() {
+        newPasswordError = "Password does not meet all requirements";
+      });
+      return;
+    } else {
+      setState(() {
+        newPasswordError = null;
+      });
+    }
+
+    // 3. Match check
     if (newPassword != confirmPassword) {
       setState(() {
         confirmPasswordError = "Passwords do not match";
@@ -78,6 +138,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
       });
     }
 
+    // 4. Call API
     setState(() => loading = true);
     final res = await ApiService.resetPassword(
       widget.email,
@@ -134,6 +195,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
               onChanged: validatePassword,
               decoration: InputDecoration(
                 labelText: "New Password",
+                errorText: newPasswordError,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

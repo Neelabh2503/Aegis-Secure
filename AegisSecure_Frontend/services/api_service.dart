@@ -7,15 +7,20 @@ import 'package:url_launcher/url_launcher.dart';
 
 class ApiService {
   static String? selectedEmailAccount;
-  static const String baseUrl ="https://AEGIS14211-AegisSecureBackend.hf.space";
+  static const String baseUrl =
+      "https://AEGIS14211-AegisSecureBackend.hf.space";
   // static const String baseUrl = "https://dodgily-kempt-bert.ngrok-free.dev";
   static const String CyberUrl =
       "https://akshatbhatt515334-aegis-secure-api.hf.space/predict";
   // static const String CyberUrl ="https://marinda-tetrapterous-eva.ngrok-free.dev/predict";
-  // neEd to store the JWT tokn in sharedPreferences so that user dont have to logIn again and again every time he opens the App.
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('jwt_token', token);
+  }
+
+  static Future<void> clearToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('jwt_token');
   }
 
   static Future<Map<String, dynamic>> fetchCurrentUser() async {
@@ -35,9 +40,7 @@ class ApiService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      print(
-        "⚠️ Failed to load user: ${response.statusCode} → ${response.body}",
-      );
+      print("Failed to load user: ${response.statusCode} → ${response.body}");
       throw Exception('Failed to load user');
     }
   }
@@ -58,7 +61,7 @@ class ApiService {
   }
 
   static Future<http.Response> loginUser(String email, String password) async {
-    print("⭐️$baseUrl/auth/login");
+    // print("$baseUrl/auth/login");
     final url = Uri.parse('$baseUrl/auth/login');
     final res = await http.post(
       url,

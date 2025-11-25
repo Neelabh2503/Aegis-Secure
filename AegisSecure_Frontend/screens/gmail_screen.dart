@@ -27,7 +27,8 @@ class GmailScreenState extends State<GmailScreen> {
     });
   }
 
-  Color parseColor(String hexColor) {
+  Color parseColor(String? hexColor) {
+    if (hexColor == null || hexColor.isEmpty) return Colors.grey.shade400;
     try {
       hexColor = hexColor.replaceAll("#", "");
       if (hexColor.length == 6) hexColor = "FF$hexColor";
@@ -35,6 +36,25 @@ class GmailScreenState extends State<GmailScreen> {
     } catch (_) {
       return Colors.grey.shade400;
     }
+  }
+
+  String formatShortDate(DateTime date) {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    return "${months[date.month - 1]} ${date.day}";
   }
 
   String formatTime(DateTime dt) {
@@ -94,7 +114,6 @@ class GmailScreenState extends State<GmailScreen> {
         ApiService.selectedEmailAccount = selectedGmailAccount;
       }
     });
-    // connectWebSocket();
   }
 
   @override
@@ -145,34 +164,7 @@ class GmailScreenState extends State<GmailScreen> {
     }
   }
 
-  void _performSearch(String query) {
-    query = query.toLowerCase();
-
-    if (query.isEmpty) {
-      setState(() => emails = allEmails);
-      return;
-    }
-
-    final filtered = allEmails.where((email) {
-      final from = email.sender.toLowerCase();
-      final subject = email.subject.toLowerCase();
-      final snippet = email.snippet.toLowerCase();
-
-      return from.contains(query) ||
-          subject.contains(query) ||
-          snippet.contains(query);
-    }).toList();
-
-    setState(() => emails = filtered);
-  }
-
-  Future<void> _logout(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('jwt_token');
-    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-  }
-
-  Future<void> _handleManualInput() async {
+  Future<void> handleManualInput() async {
     final controller = TextEditingController();
     String prediction = "";
     String confidence = "";
@@ -524,7 +516,7 @@ class GmailScreenState extends State<GmailScreen> {
           IconButton(
             icon: const Icon(Icons.edit_note, color: Colors.black87),
             tooltip: "Manual text input",
-            onPressed: _handleManualInput,
+            onPressed: handleManualInput,
           ),
           IconButton(
             icon: const Icon(Icons.search, color: Colors.black87),
@@ -601,10 +593,11 @@ class GmailScreenState extends State<GmailScreen> {
                         final rawPred =
                             (email.spamPrediction?.toUpperCase() ?? "--") ==
                                 "UNKNOWN"
-                            ? "--"
+                            ? "0.00"
                             : (email.spamPrediction?.toUpperCase() ?? "--");
                         final predValue = double.tryParse(rawPred);
 
+                        // final spamValue = double.tryParse(email.spamPrediction ?? '') ?? 0.0;
                         Color getColorForScore(double? score) {
                           if (score == null) return Colors.grey.shade300;
                           if (score < 25) return Colors.green.shade100;
@@ -694,26 +687,46 @@ class GmailScreenState extends State<GmailScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: spamColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: spamTextColor.withOpacity(0.3),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: spamColor,
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: spamTextColor.withOpacity(0.3),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        // email.spamPrediction.toStringAsFixed(2),
+                                        predValue != null
+                                            ? predValue.toStringAsFixed(2)
+                                            : "--",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: spamTextColor,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  child: Text(
-                                    email.spamPrediction.toString(),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: spamTextColor,
+
+                                    const SizedBox(height: 6),
+
+                                    Align(
+                                      child: Text(
+                                        formatShortDate(email.timestamp),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -763,6 +776,34 @@ class EmailSearchDelegate extends SearchDelegate<String> {
       );
     }
 
+    String formatShortDate(DateTime date) {
+      const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+
+      return "${months[date.month - 1]} ${date.day}";
+    }
+
+    String formatTime(DateTime dt) {
+      final now = DateTime.now();
+      if (now.difference(dt).inDays == 0) {
+        return "${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}";
+      } else {
+        return "${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}";
+      }
+    }
+
     return Container(
       color: theme.brightness == Brightness.dark
           ? const Color(0xFF121212)
@@ -771,6 +812,7 @@ class EmailSearchDelegate extends SearchDelegate<String> {
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
         itemCount: filtered.length,
         separatorBuilder: (_, __) => const SizedBox(height: 8),
+
         itemBuilder: (context, index) {
           final email = filtered[index];
           final rawPred =
@@ -865,9 +907,8 @@ class EmailSearchDelegate extends SearchDelegate<String> {
                       ],
                     ),
                   ),
-
                   Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -882,7 +923,9 @@ class EmailSearchDelegate extends SearchDelegate<String> {
                           ),
                         ),
                         child: Text(
-                          rawPred.isEmpty ? "--" : rawPred,
+                          predValue != null
+                              ? predValue.toStringAsFixed(2)
+                              : "0.00",
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
@@ -890,8 +933,18 @@ class EmailSearchDelegate extends SearchDelegate<String> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      const Icon(Icons.more_vert, color: Colors.grey, size: 20),
+
+                      const SizedBox(height: 6),
+
+                      Align(
+                        child: Text(
+                          formatShortDate(email.timestamp),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -939,8 +992,14 @@ class EmailSearchDelegate extends SearchDelegate<String> {
     );
   }
 
-  Color parseColor(String hex) {
-    if (hex.startsWith("#")) hex = hex.substring(1);
-    return Color(int.parse("FF$hex", radix: 16));
+  Color parseColor(String? hexColor) {
+    if (hexColor == null || hexColor.isEmpty) return Colors.grey.shade400;
+    try {
+      hexColor = hexColor.replaceAll("#", "");
+      if (hexColor.length == 6) hexColor = "FF$hexColor";
+      return Color(int.parse(hexColor, radix: 16));
+    } catch (_) {
+      return Colors.grey.shade400;
+    }
   }
 }

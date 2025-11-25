@@ -8,7 +8,8 @@ import '../models/sms_message.dart';
 import '../services/api_service.dart';
 
 class SmsService {
-  static const String baseUrl ="https://AEGIS14211-AegisSecureBackend.hf.space";
+  static const String baseUrl =
+      "https://AEGIS14211-AegisSecureBackend.hf.space";
   // static const String baseUrl = "https://dodgily-kempt-bert.ngrok-free.dev";
   final Telephony telephony = Telephony.instance;
 

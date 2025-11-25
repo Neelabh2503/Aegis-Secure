@@ -546,6 +546,7 @@ class DashboardPieChartState extends State<DashboardPieChart> {
     labels = widget.labels;
     total = widget.total;
   }
+
   void updateData(List<int> newValues, List<String> newLabels, int newTotal) {
     setState(() {
       values = newValues;

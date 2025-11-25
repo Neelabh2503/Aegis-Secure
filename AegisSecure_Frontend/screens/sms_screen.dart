@@ -18,6 +18,7 @@ class SmsScreen extends StatefulWidget {
 
 class SmsScreenState extends State<SmsScreen> {
   final SmsService smsService = SmsService();
+
   List<SmsMessageModel> messages = [];
   bool loading = true;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -44,6 +45,25 @@ class SmsScreenState extends State<SmsScreen> {
     } catch (e) {
       setState(() => loading = false);
     }
+  }
+
+  String formatShortDate(DateTime date) {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    return "${months[date.month - 1]} ${date.day}";
   }
 
   String getDisplayName(String address, String? contactName) {
@@ -286,13 +306,11 @@ class SmsScreenState extends State<SmsScreen> {
   Widget buildMessageTile(SmsMessageModel msg) {
     final sender = getDisplayName(msg.address, null);
     final body = msg.body;
-    final score = msg.spamScore ?? 0.0;
-
+    // final scoreRaw = msg.spamScore?.toString() ?? '0.00';
+    // final double score = double.tryParse(scoreRaw) ?? 0.00;
+    // final double scoreNormalized = score.clamp(0.0, 100.0);
+    final double scoreNormalized = (msg.spamScore ?? 0.0).clamp(0.0, 100.0);
     final time = DateTime.fromMillisecondsSinceEpoch(msg.dateMs).toLocal();
-    final formattedTime =
-        "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
-
-    final double scoreNormalized = score.clamp(0.0, 100.0);
 
     Color getSpamColor(double score) {
       if (score < 25) {
@@ -412,13 +430,13 @@ class SmsScreenState extends State<SmsScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        formattedTime,
+                        formatShortDate(time),
                         style: TextStyle(
                           color: Colors.grey.shade600,
                           fontSize: 12,
                         ),
                       ),
-                      const SizedBox(width: 13),
+                      const SizedBox(width: 9),
                     ],
                   ),
                 ],
@@ -580,6 +598,24 @@ class SmsScreenState extends State<SmsScreen> {
 
 class SmsSearchDelegate extends SearchDelegate<String> {
   final List<SmsMessageModel> allMessages;
+  String formatShortDate(DateTime date) {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    return "${months[date.month - 1]} ${date.day}";
+  }
 
   SmsSearchDelegate(this.allMessages);
 
@@ -625,9 +661,10 @@ class SmsSearchDelegate extends SearchDelegate<String> {
       itemBuilder: (context, index) {
         final msg = filtered[index];
         final sender = msg.address;
-        final score = msg.spamScore ?? 0.0;
-        final double scoreNormalized = score.clamp(0.0, 100.0);
-
+        // final scoreRaw = msg.spamScore?.toString() ?? '0.00';
+        // final double score = double.tryParse(scoreRaw) ?? 0.00;
+        // final double scoreNormalized = score.clamp(0.0, 100.0);
+        final double scoreNormalized = (msg.spamScore ?? 0.0).clamp(0.0, 100.0);
         Color getSpamColor(double score) {
           if (score < 25) {
             return Colors.green.shade100;
@@ -736,13 +773,19 @@ class SmsSearchDelegate extends SearchDelegate<String> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      formattedTime,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          formatShortDate(time),
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(width: 9),
+                      ],
                     ),
                   ],
                 ),
@@ -791,4 +834,3 @@ class SmsSearchDelegate extends SearchDelegate<String> {
     );
   }
 }
-
