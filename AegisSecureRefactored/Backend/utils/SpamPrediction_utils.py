@@ -84,7 +84,10 @@ async def retry_email_SpamPrediction():
                 subject=msg["subject"],
                 text=msg["body"]
             )
+            # print("Predicting")
             prediction = await get_spam_prediction(req)
+            # print("got")
+            # print(prediction)
             await messages_col.update_one(
                 {"_id": msg["_id"]},
                 {

@@ -19,15 +19,19 @@ class EmailAccountManagerState extends State<EmailAccountManager> {
   bool _loading = true;
   OverlayEntry? _overlayEntry;
   String? activeAccountEmail;
-
+  bool refreshing = false;
   @override
   void initState() {
     super.initState();
-    loadAccounts();
+    loadAccounts(initial: true);
   }
 
-  Future<void> loadAccounts() async {
-    setState(() => _loading = true);
+  Future<void> loadAccounts({bool initial = false}) async {
+    if (initial) {
+      setState(() => _loading = true);
+    } else {
+      setState(() => refreshing = true);
+    }
     try {
       final user = await ApiService.fetchCurrentUser();
       final accounts = await ApiService.fetchConnectedAccounts();
@@ -58,10 +62,14 @@ class EmailAccountManagerState extends State<EmailAccountManager> {
         connectedAccounts = normalizedAccounts;
         activeAccountEmail = savedActive;
         _loading = false;
+        refreshing = false;
       });
     } catch (e) {
       print("** Failed to load accounts: $e");
-      setState(() => _loading = false);
+      setState(() {
+        _loading = false;
+        refreshing = false;
+      });
     }
   }
 
@@ -211,7 +219,7 @@ class EmailAccountManagerState extends State<EmailAccountManager> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: loadAccounts,
+              onRefresh: () => loadAccounts(initial: false),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.symmetric(

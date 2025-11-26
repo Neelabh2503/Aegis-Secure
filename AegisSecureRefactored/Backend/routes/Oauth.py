@@ -90,7 +90,9 @@ async def google_callback(code: str, state: str = None):
             "https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=5",#number of emails to be fetched.
             headers={"Authorization": f"Bearer {access_token}"}
         )
+        # print(messages_resp.json())
         messages_list = messages_resp.json().get("messages", [])
+
         emails = []
 
         for msg in messages_list:
@@ -100,7 +102,6 @@ async def google_callback(code: str, state: str = None):
                 headers={"Authorization": f"Bearer {access_token}"}
             )
             msg_data = msg_resp.json()
-
             subject = next((h["value"] for h in msg_data["payload"]["headers"] if h["name"] == "Subject"), "")
             from_header = next((h["value"] for h in msg_data["payload"]["headers"] if h["name"] == "From"), "")
             match = re.search(r"<(.+?)>", from_header)
@@ -121,8 +122,7 @@ async def google_callback(code: str, state: str = None):
                 "gmail_email": gmail_email,
                 "user_id": user_id,
                 "subject": subject,
-                "from": from_header,
-                "from_email": sender,
+                "from": sender,
                 "char_color": char_color,
                 "snippet": snippet,
                 "body": body,
@@ -135,8 +135,8 @@ async def google_callback(code: str, state: str = None):
             })
 
         for email in emails:
-            if not email.get("subject") or not email.get("from_email"):
-              continue  
+            if not email.get("subject") or not email.get("from"):
+              continue
             await messages_col.update_one(
                 {"user_id": user_id, "gmail_email": gmail_email, "gmail_id": email["gmail_id"]},
                 {"$set": email},
@@ -156,7 +156,7 @@ async def google_callback(code: str, state: str = None):
 
     #this is the html page which redirects to the APP, I kept the code here Because Argument passing into other file in increment in complexity
     return HTMLResponse(
-        f"""
+      content=f"""
           <html>
             <head>
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -282,7 +282,7 @@ async def google_callback(code: str, state: str = None):
                   Return to AegisSecure App
                 </a>
 
-                <div class="note">If your app doesn’t open automatically, tap the button above.</div>
+                <div class="note">If your app doesn't open automatically, tap the button above.</div>
               </div>
               <footer>© 2025 AegisSecure — Protecting You from Online Mishaps</footer>
             </body>
