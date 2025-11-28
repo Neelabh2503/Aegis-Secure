@@ -1,0 +1,292 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /><link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" /><title>Cosmic Ray Report</title></head><body><div class="container"><h1><p class="text-dark">Cosmic Ray Report</p></h1></div><div class="container"><div class="mb-1" id="summary_info___accordion"><div class="card"><a data-toggle="collapse" data-target="#summary_info___collapse_1" aria-expanded="true" aria-controls="summary_info___collapse_1" href="#"><div class="card-header" id="summary_info___heading_1"><button class="btn btn-outline-dark"><h4 class="m-0">Summary info</h4></button></div></a><div aria-labelledby="summary_info___heading_1" data-parent="#summary_info___accordion" class="collapse show" id="summary_info___collapse_1"><div class="card-body"><p>Date time: 28/11/2025 09:18:28</p><p>Total jobs: 26</p><p>Complete: 26 (100.00%)</p><p>Surviving mutants: 0 (0.00%)</p></div></div></div></div><div class="mb-1" id="job_list___accordion"><div class="card"><a data-toggle="collapse" data-target="#job_list___collapse_1" aria-expanded="false" aria-controls="job_list___collapse_1" href="#"><div class="card-header" id="job_list___heading_1"><button class="btn btn-outline-dark"><h4 class="m-0">Job list</h4></button></div></a><div aria-labelledby="job_list___heading_1" data-parent="#job_list___accordion" class="collapse" id="job_list___collapse_1"><div class="card-body"><div class="text-right mb-1"><div class="mx-1" id="job_item_expand_all"><a href="#" onclick="$('div.job_list___sub_multi_collapse').collapse('show');"><button class="btn btn-outline-dark"><span>Expand All</span></button></a></div><div class="mx-1" id="job_item_collapse_all"><a href="#" onclick="$('div.job_list___sub_multi_collapse').collapse('hide');"><button class="btn btn-outline-dark"><span>Collapse All</span></button></a></div></div><div class="mb-1" id="job_list___sub_accordion_1"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_1_1" aria-expanded="false" aria-controls="job_list___sub_collapse_1_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_1_1"><button class="btn btn-outline-success"><span class="job_id">1 : Job ID c18051160dfe43718ca2d77f05989ff7</span></button></div></a><div aria-labelledby="job_list___sub_heading_1_1" data-parent="#job_list___sub_accordion_1" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_1_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=169" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (169, 42), end pos: (169, 44)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_NotEq_Eq, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -166,7 +166,7 @@
+ 
+ @app.on_event("startup")
+ async def init_indexes():
+-    if os.environ.get("UVICORN_RELOADER") != "true":
++    if os.environ.get("UVICORN_RELOADER") == "true":
+         try:
+             print("Starting retry_failed_predictions loop...")
+             asyncio.create_task(notifications.retry_failed_predictions())</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_2"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_2_1" aria-expanded="false" aria-controls="job_list___sub_collapse_2_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_2_1"><button class="btn btn-outline-success"><span class="job_id">2 : Job ID 26560dc3ca6f4759890701f67048c03d</span></button></div></a><div aria-labelledby="job_list___sub_heading_2_1" data-parent="#job_list___sub_accordion_2" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_2_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=169" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (169, 42), end pos: (169, 44)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_NotEq_Lt, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -166,7 +166,7 @@
+ 
+ @app.on_event("startup")
+ async def init_indexes():
+-    if os.environ.get("UVICORN_RELOADER") != "true":
++    if os.environ.get("UVICORN_RELOADER") &lt; "true":
+         try:
+             print("Starting retry_failed_predictions loop...")
+             asyncio.create_task(notifications.retry_failed_predictions())</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_3"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_3_1" aria-expanded="false" aria-controls="job_list___sub_collapse_3_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_3_1"><button class="btn btn-outline-success"><span class="job_id">3 : Job ID 80a86fc68c854f159c0fd21a0f03b0b2</span></button></div></a><div aria-labelledby="job_list___sub_heading_3_1" data-parent="#job_list___sub_accordion_3" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_3_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=169" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (169, 42), end pos: (169, 44)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_NotEq_LtE, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -166,7 +166,7 @@
+ 
+ @app.on_event("startup")
+ async def init_indexes():
+-    if os.environ.get("UVICORN_RELOADER") != "true":
++    if os.environ.get("UVICORN_RELOADER") &lt;= "true":
+         try:
+             print("Starting retry_failed_predictions loop...")
+             asyncio.create_task(notifications.retry_failed_predictions())</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_4"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_4_1" aria-expanded="false" aria-controls="job_list___sub_collapse_4_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_4_1"><button class="btn btn-outline-success"><span class="job_id">4 : Job ID 3c3aed5a51534a928648054353368312</span></button></div></a><div aria-labelledby="job_list___sub_heading_4_1" data-parent="#job_list___sub_accordion_4" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_4_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=169" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (169, 42), end pos: (169, 44)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_NotEq_Gt, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -166,7 +166,7 @@
+ 
+ @app.on_event("startup")
+ async def init_indexes():
+-    if os.environ.get("UVICORN_RELOADER") != "true":
++    if os.environ.get("UVICORN_RELOADER") &gt; "true":
+         try:
+             print("Starting retry_failed_predictions loop...")
+             asyncio.create_task(notifications.retry_failed_predictions())</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_5"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_5_1" aria-expanded="false" aria-controls="job_list___sub_collapse_5_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_5_1"><button class="btn btn-outline-success"><span class="job_id">5 : Job ID 7715fc7092ca45e0b57d05aa2a923fee</span></button></div></a><div aria-labelledby="job_list___sub_heading_5_1" data-parent="#job_list___sub_accordion_5" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_5_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=169" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (169, 42), end pos: (169, 44)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_NotEq_GtE, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -166,7 +166,7 @@
+ 
+ @app.on_event("startup")
+ async def init_indexes():
+-    if os.environ.get("UVICORN_RELOADER") != "true":
++    if os.environ.get("UVICORN_RELOADER") &gt;= "true":
+         try:
+             print("Starting retry_failed_predictions loop...")
+             asyncio.create_task(notifications.retry_failed_predictions())</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_6"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_6_1" aria-expanded="false" aria-controls="job_list___sub_collapse_6_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_6_1"><button class="btn btn-outline-success"><span class="job_id">6 : Job ID 0e20e8606f234dc89d4b167cacf88b6c</span></button></div></a><div aria-labelledby="job_list___sub_heading_6_1" data-parent="#job_list___sub_accordion_6" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_6_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=169" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (169, 42), end pos: (169, 44)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_NotEq_Is, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -166,7 +166,7 @@
+ 
+ @app.on_event("startup")
+ async def init_indexes():
+-    if os.environ.get("UVICORN_RELOADER") != "true":
++    if os.environ.get("UVICORN_RELOADER") is "true":
+         try:
+             print("Starting retry_failed_predictions loop...")
+             asyncio.create_task(notifications.retry_failed_predictions())</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_7"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_7_1" aria-expanded="false" aria-controls="job_list___sub_collapse_7_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_7_1"><button class="btn btn-outline-success"><span class="job_id">7 : Job ID 7040c09c958b46f699a2aeaa4e141dac</span></button></div></a><div aria-labelledby="job_list___sub_heading_7_1" data-parent="#job_list___sub_accordion_7" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_7_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=169" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (169, 42), end pos: (169, 44)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_NotEq_IsNot, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -166,7 +166,7 @@
+ 
+ @app.on_event("startup")
+ async def init_indexes():
+-    if os.environ.get("UVICORN_RELOADER") != "true":
++    if os.environ.get("UVICORN_RELOADER") is not "true":
+         try:
+             print("Starting retry_failed_predictions loop...")
+             asyncio.create_task(notifications.retry_failed_predictions())</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_8"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_8_1" aria-expanded="false" aria-controls="job_list___sub_collapse_8_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_8_1"><button class="btn btn-outline-success"><span class="job_id">8 : Job ID 0c7e8e1166bd47e39048955603f53a9e</span></button></div></a><div aria-labelledby="job_list___sub_heading_8_1" data-parent="#job_list___sub_accordion_8" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_8_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=30" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (30, 7), end pos: (30, 20)</button></a></pre><pre>operator: core/AddNot, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -27,7 +27,7 @@
+ async def lifespan(app: FastAPI):
+     log_startup_message()
+     config_errors = settings.validate()
+-    if config_errors:
++    if not config_errors:
+         logger.error("Configuration errors found:")
+         for error in config_errors:
+             logger.error(f"  - {error}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_9"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_9_1" aria-expanded="false" aria-controls="job_list___sub_collapse_9_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_9_1"><button class="btn btn-outline-success"><span class="job_id">9 : Job ID cda9ea0628c34a1a92a18ea8665a33a0</span></button></div></a><div aria-labelledby="job_list___sub_heading_9_1" data-parent="#job_list___sub_accordion_9" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_9_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=136" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (136, 31), end pos: (136, 41)</button></a></pre><pre>operator: core/AddNot, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -133,7 +133,7 @@
+     db_healthy = await db_manager.ping()
+     
+     return {
+-        "status": "healthy" if db_healthy else "degraded",
++        "status": "healthy" if not db_healthy else "degraded",
+         "version": settings.APP_VERSION,
+         "database": "connected" if db_healthy else "disconnected"
+     }</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_10"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_10_1" aria-expanded="false" aria-controls="job_list___sub_collapse_10_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_10_1"><button class="btn btn-outline-success"><span class="job_id">10 : Job ID a740fdb21ba44a5aa5eb66eac6070c3a</span></button></div></a><div aria-labelledby="job_list___sub_heading_10_1" data-parent="#job_list___sub_accordion_10" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_10_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=138" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (138, 35), end pos: (138, 45)</button></a></pre><pre>operator: core/AddNot, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -135,7 +135,7 @@
+     return {
+         "status": "healthy" if db_healthy else "degraded",
+         "version": settings.APP_VERSION,
+-        "database": "connected" if db_healthy else "disconnected"
++        "database": "connected" if not db_healthy else "disconnected"
+     }
+ 
+ </pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_11"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_11_1" aria-expanded="false" aria-controls="job_list___sub_collapse_11_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_11_1"><button class="btn btn-outline-success"><span class="job_id">11 : Job ID 5e08ba33981e4915b96daed07c85ef90</span></button></div></a><div aria-labelledby="job_list___sub_heading_11_1" data-parent="#job_list___sub_accordion_11" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_11_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=169" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (169, 7), end pos: (169, 51)</button></a></pre><pre>operator: core/AddNot, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -166,7 +166,7 @@
+ 
+ @app.on_event("startup")
+ async def init_indexes():
+-    if os.environ.get("UVICORN_RELOADER") != "true":
++    if not os.environ.get("UVICORN_RELOADER") != "true":
+         try:
+             print("Starting retry_failed_predictions loop...")
+             asyncio.create_task(notifications.retry_failed_predictions())</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_12"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_12_1" aria-expanded="false" aria-controls="job_list___sub_collapse_12_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_12_1"><button class="btn btn-outline-success"><span class="job_id">12 : Job ID 715760a0f9ea4495870ccd984ee3aa05</span></button></div></a><div aria-labelledby="job_list___sub_heading_12_1" data-parent="#job_list___sub_accordion_12" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_12_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=45" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (45, 55), end pos: (45, 59)</button></a></pre><pre>operator: core/ReplaceTrueWithFalse, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -42,7 +42,7 @@
+     
+     # Create database indexes
+     try:
+-        await avatars_col.create_index("email", unique=True)
++        await avatars_col.create_index("email", unique=False)
+         logger.info("✅ Database indexes created")
+     except Exception as e:
+         logger.warning(f"⚠️ Index creation warning: {str(e)}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_13"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_13_1" aria-expanded="false" aria-controls="job_list___sub_collapse_13_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_13_1"><button class="btn btn-outline-success"><span class="job_id">13 : Job ID edd7dfb623d74c97af49e35c6de06439</span></button></div></a><div aria-labelledby="job_list___sub_heading_13_1" data-parent="#job_list___sub_accordion_13" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_13_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=81" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (81, 22), end pos: (81, 26)</button></a></pre><pre>operator: core/ReplaceTrueWithFalse, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -78,7 +78,7 @@
+ app.add_middleware(
+     CORSMiddleware,
+     allow_origins=settings.CORS_ORIGINS,
+-    allow_credentials=True,
++    allow_credentials=False,
+     allow_methods=["*"],
+     allow_headers=["*"],
+     expose_headers=["*"]</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_14"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_14_1" aria-expanded="false" aria-controls="job_list___sub_collapse_14_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_14_1"><button class="btn btn-outline-success"><span class="job_id">14 : Job ID 299b03497830426487780351894d945b</span></button></div></a><div aria-labelledby="job_list___sub_heading_14_1" data-parent="#job_list___sub_accordion_14" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_14_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=101" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (101, 21), end pos: (101, 25)</button></a></pre><pre>operator: core/ReplaceTrueWithFalse, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -98,7 +98,7 @@
+     return JSONResponse(
+         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+         content={
+-            "error": True,
++            "error": False,
+             "message": "Validation error",
+             "details": exc.errors()
+         }</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_15"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_15_1" aria-expanded="false" aria-controls="job_list___sub_collapse_15_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_15_1"><button class="btn btn-outline-success"><span class="job_id">15 : Job ID 9bcb6df3e1534903b7390f0474d25e6e</span></button></div></a><div aria-labelledby="job_list___sub_heading_15_1" data-parent="#job_list___sub_accordion_15" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_15_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=179" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (179, 51), end pos: (179, 55)</button></a></pre><pre>operator: core/ReplaceTrueWithFalse, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -176,5 +176,5 @@
+         except Exception as e:
+             print(f"Failed to start notifications retry loop: {e}")
+     asyncio.create_task(sms.retry_failed_sms_predictions())
+-    await avatars_col.create_index("email", unique=True)
++    await avatars_col.create_index("email", unique=False)
+ </pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_16"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_16_1" aria-expanded="false" aria-controls="job_list___sub_collapse_16_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_16_1"><button class="btn btn-outline-success"><span class="job_id">16 : Job ID ce0b6a958d76448392dcee721007d4de</span></button></div></a><div aria-labelledby="job_list___sub_heading_16_1" data-parent="#job_list___sub_accordion_16" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_16_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (40, 11), end pos: (40, 20)</button></a></pre><pre>operator: core/ExceptionReplacer, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -37,7 +37,7 @@
+     try:
+         await db_manager.connect()
+         logger.info("✅ Database connection established")
+-    except Exception as e:
++    except CosmicRayTestingException as e:
+         logger.error(f"❌ Failed to connect to database: {str(e)}")
+     
+     # Create database indexes</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_17"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_17_1" aria-expanded="false" aria-controls="job_list___sub_collapse_17_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_17_1"><button class="btn btn-outline-success"><span class="job_id">17 : Job ID 7e12182c04ab4f85818cb691ebe5f909</span></button></div></a><div aria-labelledby="job_list___sub_heading_17_1" data-parent="#job_list___sub_accordion_17" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_17_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=47" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (47, 11), end pos: (47, 20)</button></a></pre><pre>operator: core/ExceptionReplacer, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -44,7 +44,7 @@
+     try:
+         await avatars_col.create_index("email", unique=True)
+         logger.info("✅ Database indexes created")
+-    except Exception as e:
++    except CosmicRayTestingException as e:
+         logger.warning(f"⚠️ Index creation warning: {str(e)}")
+     
+     # Start background cleanup task</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_18"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_18_1" aria-expanded="false" aria-controls="job_list___sub_collapse_18_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_18_1"><button class="btn btn-outline-success"><span class="job_id">18 : Job ID bc6eb66519ed40169aa7677b899417a1</span></button></div></a><div aria-labelledby="job_list___sub_heading_18_1" data-parent="#job_list___sub_accordion_18" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_18_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=176" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (176, 15), end pos: (176, 24)</button></a></pre><pre>operator: core/ExceptionReplacer, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -173,7 +173,7 @@
+             print("Starting clean_invalid_messages loop...")
+             asyncio.create_task(notifications.clean_invalid_messages())
+             
+-        except Exception as e:
++        except CosmicRayTestingException as e:
+             print(f"Failed to start notifications retry loop: {e}")
+     asyncio.create_task(sms.retry_failed_sms_predictions())
+     await avatars_col.create_index("email", unique=True)</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_19"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_19_1" aria-expanded="false" aria-controls="job_list___sub_collapse_19_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_19_1"><button class="btn btn-outline-success"><span class="job_id">19 : Job ID 0c961ab918cf4f68ab3e250622a470b8</span></button></div></a><div aria-labelledby="job_list___sub_heading_19_1" data-parent="#job_list___sub_accordion_19" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_19_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=26" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (26, 0), end pos: (27, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -21,9 +21,6 @@
+ from errors import AegisException, handle_exception
+ from logger import logger, log_startup_message, log_shutdown_message
+ from db_utils import db_manager
+-
+-
+-@asynccontextmanager
+ async def lifespan(app: FastAPI):
+     log_startup_message()
+     config_errors = settings.validate()</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_20"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_20_1" aria-expanded="false" aria-controls="job_list___sub_collapse_20_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_20_1"><button class="btn btn-outline-success"><span class="job_id">20 : Job ID 5065c8d0a7c143d9b1b286228e5e8a1b</span></button></div></a><div aria-labelledby="job_list___sub_heading_20_1" data-parent="#job_list___sub_accordion_20" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_20_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=88" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (88, 0), end pos: (89, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -83,9 +83,6 @@
+     allow_headers=["*"],
+     expose_headers=["*"]
+ )
+-
+-# Exception handlers
+-@app.exception_handler(AegisException)
+ async def aegis_exception_handler(request: Request, exc: AegisException):
+     """Handle custom AegisException errors."""
+     return handle_exception(exc)</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_21"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_21_1" aria-expanded="false" aria-controls="job_list___sub_collapse_21_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_21_1"><button class="btn btn-outline-success"><span class="job_id">21 : Job ID 4fd952e0ec2344cbb5669767206f6429</span></button></div></a><div aria-labelledby="job_list___sub_heading_21_1" data-parent="#job_list___sub_accordion_21" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_21_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=94" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (94, 0), end pos: (95, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -89,9 +89,6 @@
+ async def aegis_exception_handler(request: Request, exc: AegisException):
+     """Handle custom AegisException errors."""
+     return handle_exception(exc)
+-
+-
+-@app.exception_handler(RequestValidationError)
+ async def validation_exception_handler(request: Request, exc: RequestValidationError):
+     """Handle Pydantic validation errors."""
+     logger.warning(f"Validation error on {request.url.path}: {exc.errors()}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_22"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_22_1" aria-expanded="false" aria-controls="job_list___sub_collapse_22_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_22_1"><button class="btn btn-outline-success"><span class="job_id">22 : Job ID ac7f7e7fb68b439e8b0df9822283ed15</span></button></div></a><div aria-labelledby="job_list___sub_heading_22_1" data-parent="#job_list___sub_accordion_22" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_22_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=119" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (119, 0), end pos: (120, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -113,10 +113,6 @@
+ app.include_router(notifications.router, prefix="/notifications", tags=["Notifications"])
+ app.include_router(sms.router, prefix="/sms", tags=["SMS"])
+ app.include_router(dashboard.router)
+-
+-
+-# Health check endpoints
+-@app.get("/", tags=["Health"])
+ async def root():
+     """Root endpoint - API status."""
+     return {</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_23"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_23_1" aria-expanded="false" aria-controls="job_list___sub_collapse_23_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_23_1"><button class="btn btn-outline-success"><span class="job_id">23 : Job ID b1a8bbc145654c6383b24d729ba11a14</span></button></div></a><div aria-labelledby="job_list___sub_heading_23_1" data-parent="#job_list___sub_accordion_23" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_23_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=130" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (130, 0), end pos: (131, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 4</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -125,9 +125,6 @@
+         "version": settings.APP_VERSION,
+         "message": "AegisSecure Backend is running"
+     }
+-
+-
+-@app.get("/health", tags=["Health"])
+ async def health_check():
+     """Health check endpoint with database status."""
+     db_healthy = await db_manager.ping()</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_24"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_24_1" aria-expanded="false" aria-controls="job_list___sub_collapse_24_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_24_1"><button class="btn btn-outline-success"><span class="job_id">24 : Job ID 16fc98335f5d48a2832351300e234c35</span></button></div></a><div aria-labelledby="job_list___sub_heading_24_1" data-parent="#job_list___sub_accordion_24" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_24_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=142" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (142, 0), end pos: (143, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 5</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -137,9 +137,6 @@
+         "version": settings.APP_VERSION,
+         "database": "connected" if db_healthy else "disconnected"
+     }
+-
+-
+-@app.get("/ping", tags=["Health"])
+ async def ping():
+     """Simple ping endpoint for monitoring."""
+     return {"ping": "pong"}</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_25"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_25_1" aria-expanded="false" aria-controls="job_list___sub_collapse_25_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_25_1"><button class="btn btn-outline-success"><span class="job_id">25 : Job ID 9f9bec2041f84c7fb991a1e97f97f629</span></button></div></a><div aria-labelledby="job_list___sub_heading_25_1" data-parent="#job_list___sub_accordion_25" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_25_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=167" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (167, 0), end pos: (168, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 6</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -163,8 +163,6 @@
+ app.include_router(dashboard.router)
+ 
+ ws_router = APIRouter()
+-
+-@app.on_event("startup")
+ async def init_indexes():
+     if os.environ.get("UVICORN_RELOADER") != "true":
+         try:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_26"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_26_1" aria-expanded="false" aria-controls="job_list___sub_collapse_26_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_26_1"><button class="btn btn-outline-success"><span class="job_id">26 : Job ID dce64857e80b421796ba16bd0ea73ae8</span></button></div></a><div aria-labelledby="job_list___sub_heading_26_1" data-parent="#job_list___sub_accordion_26" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_26_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=main.py&amp;line=32" class="text-secondary"><button class="btn btn-outline-dark">main.py, start pos: (32, 21), end pos: (32, 34)</button></a></pre><pre>operator: core/ZeroIterationForLoop, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- amain.py
++++ bmain.py
+@@ -29,7 +29,7 @@
+     config_errors = settings.validate()
+     if config_errors:
+         logger.error("Configuration errors found:")
+-        for error in config_errors:
++        for error in []:
+             logger.error(f"  - {error}")
+         logger.warning("Some features may not work correctly!")
+     else:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div></div></div></div></div></div><script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script><script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script><script type="text/javascript">$('div.job_list___sub_multi_collapse').on('shown.bs.collapse',  function () {    correct_behavior_functional_buttons();  });$('div.job_list___sub_multi_collapse').on('hidden.bs.collapse',  function () {    correct_behavior_functional_buttons();  });function correct_behavior_functional_buttons() {    var expand = false;    var collapse = false;    $('a.job_list___sub_multi_heading').each(function(index) {      if ($(this).attr('aria-expanded') == 'false') {        expand = true;        return false;      };    });    $('a.job_list___sub_multi_heading').each(function(index) {      if ($(this).attr('aria-expanded') == 'true') {        collapse = true;        return false;      };    });    if (expand) {      $('div#job_item_expand_all').css('display', 'inline-block');    } else {      $('div#job_item_expand_all').css('display', 'none');    };    if (collapse) {      $('div#job_item_collapse_all').css('display', 'inline-block');    } else {      $('div#job_item_collapse_all').css('display', 'none');    };  };correct_behavior_functional_buttons();</script></body></html>

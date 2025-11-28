@@ -1,0 +1,8 @@
+[cosmic-ray]
+module-path = "routes/sms.py"
+timeout = 5.0
+test-command = "env PYTHONPATH=/mnt/c/Users/dhruv/VSCodeProjects/Aegis-Secure/AegisSecure_Backend python -m pytest tests/tests_routes_sms.py"
+
+[cosmic-ray.distributor]
+name = "local"
+

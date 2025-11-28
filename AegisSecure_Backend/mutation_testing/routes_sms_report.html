@@ -1,0 +1,351 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /><link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" /><title>Cosmic Ray Report</title></head><body><div class="container"><h1><p class="text-dark">Cosmic Ray Report</p></h1></div><div class="container"><div class="mb-1" id="summary_info___accordion"><div class="card"><a data-toggle="collapse" data-target="#summary_info___collapse_1" aria-expanded="true" aria-controls="summary_info___collapse_1" href="#"><div class="card-header" id="summary_info___heading_1"><button class="btn btn-outline-dark"><h4 class="m-0">Summary info</h4></button></div></a><div aria-labelledby="summary_info___heading_1" data-parent="#summary_info___accordion" class="collapse show" id="summary_info___collapse_1"><div class="card-body"><p>Date time: 28/11/2025 21:14:26</p><p>Total jobs: 32</p><p>Complete: 32 (100.00%)</p><p>Surviving mutants: 0 (0.00%)</p></div></div></div></div><div class="mb-1" id="job_list___accordion"><div class="card"><a data-toggle="collapse" data-target="#job_list___collapse_1" aria-expanded="false" aria-controls="job_list___collapse_1" href="#"><div class="card-header" id="job_list___heading_1"><button class="btn btn-outline-dark"><h4 class="m-0">Job list</h4></button></div></a><div aria-labelledby="job_list___heading_1" data-parent="#job_list___accordion" class="collapse" id="job_list___collapse_1"><div class="card-body"><div class="text-right mb-1"><div class="mx-1" id="job_item_expand_all"><a href="#" onclick="$('div.job_list___sub_multi_collapse').collapse('show');"><button class="btn btn-outline-dark"><span>Expand All</span></button></a></div><div class="mx-1" id="job_item_collapse_all"><a href="#" onclick="$('div.job_list___sub_multi_collapse').collapse('hide');"><button class="btn btn-outline-dark"><span>Collapse All</span></button></a></div></div><div class="mb-1" id="job_list___sub_accordion_1"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_1_1" aria-expanded="false" aria-controls="job_list___sub_collapse_1_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_1_1"><button class="btn btn-outline-success"><span class="job_id">1 : Job ID 3f5fa632bf804c65819f82e797042fb3</span></button></div></a><div aria-labelledby="job_list___sub_heading_1_1" data-parent="#job_list___sub_accordion_1" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_1_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=54" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (54, 83), end pos: (54, 84)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_USub_UAdd, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -51,7 +51,7 @@
+ async def get_all_sms(current_user: dict = Depends(get_current_user)):
+     user_id = current_user.get("user_id")
+ 
+-    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", -1).to_list(200)
++    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", +1).to_list(200)
+     safe_messages = [convert_doc(m) for m in messages]
+ 
+     return {"sms_messages": safe_messages}</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_2"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_2_1" aria-expanded="false" aria-controls="job_list___sub_collapse_2_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_2_1"><button class="btn btn-outline-success"><span class="job_id">2 : Job ID 7318eb1a401443a1965e82f8ac81e0f6</span></button></div></a><div aria-labelledby="job_list___sub_heading_2_1" data-parent="#job_list___sub_accordion_2" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_2_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=54" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (54, 83), end pos: (54, 84)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_USub_Invert, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -51,7 +51,7 @@
+ async def get_all_sms(current_user: dict = Depends(get_current_user)):
+     user_id = current_user.get("user_id")
+ 
+-    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", -1).to_list(200)
++    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", ~1).to_list(200)
+     safe_messages = [convert_doc(m) for m in messages]
+ 
+     return {"sms_messages": safe_messages}</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_3"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_3_1" aria-expanded="false" aria-controls="job_list___sub_collapse_3_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_3_1"><button class="btn btn-outline-success"><span class="job_id">3 : Job ID e819c57a3b7944509ef850fd91e15196</span></button></div></a><div aria-labelledby="job_list___sub_heading_3_1" data-parent="#job_list___sub_accordion_3" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_3_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=54" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (54, 83), end pos: (54, 84)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_USub_Not, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -51,7 +51,7 @@
+ async def get_all_sms(current_user: dict = Depends(get_current_user)):
+     user_id = current_user.get("user_id")
+ 
+-    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", -1).to_list(200)
++    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", not 1).to_list(200)
+     safe_messages = [convert_doc(m) for m in messages]
+ 
+     return {"sms_messages": safe_messages}</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_4"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_4_1" aria-expanded="false" aria-controls="job_list___sub_collapse_4_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_4_1"><button class="btn btn-outline-success"><span class="job_id">4 : Job ID 43cdf3800be64029b16ab995b326e15c</span></button></div></a><div aria-labelledby="job_list___sub_heading_4_1" data-parent="#job_list___sub_accordion_4" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_4_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=54" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (54, 83), end pos: (54, 84)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_USub, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -51,7 +51,7 @@
+ async def get_all_sms(current_user: dict = Depends(get_current_user)):
+     user_id = current_user.get("user_id")
+ 
+-    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", -1).to_list(200)
++    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", 1).to_list(200)
+     safe_messages = [convert_doc(m) for m in messages]
+ 
+     return {"sms_messages": safe_messages}</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_5"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_5_1" aria-expanded="false" aria-controls="job_list___sub_collapse_5_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_5_1"><button class="btn btn-outline-success"><span class="job_id">5 : Job ID 274ce0a5b37447cd90e30cf56063709f</span></button></div></a><div aria-labelledby="job_list___sub_heading_5_1" data-parent="#job_list___sub_accordion_5" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_5_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=64" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (64, 7), end pos: (64, 10)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -61,7 +61,7 @@
+ @router.post("/sync")
+ async def sync_sms(request: SmsSyncRequest, current_user: dict = Depends(get_current_user)):
+     user_id = current_user.get("user_id")
+-    if not user_id:
++    if  user_id:
+         raise HTTPException(status_code=401, detail="User not authenticated")
+     inserted_count = 0
+     for msg in request.messages:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_6"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_6_1" aria-expanded="false" aria-controls="job_list___sub_collapse_6_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_6_1"><button class="btn btn-outline-success"><span class="job_id">6 : Job ID acac75d3c84149a8ac6972848a2a1f97</span></button></div></a><div aria-labelledby="job_list___sub_heading_6_1" data-parent="#job_list___sub_accordion_6" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_6_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (40, 7), end pos: (40, 32)</button></a></pre><pre>operator: core/AddNot, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -37,7 +37,7 @@
+     return hashlib.sha256(text.encode()).hexdigest()
+ 
+ def convert_doc(doc):
+-    if isinstance(doc, ObjectId):
++    if not isinstance(doc, ObjectId):
+         return str(doc)
+     if isinstance(doc, datetime):
+         return doc.isoformat()</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_7"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_7_1" aria-expanded="false" aria-controls="job_list___sub_collapse_7_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_7_1"><button class="btn btn-outline-success"><span class="job_id">7 : Job ID 96c9e07eb5104898a08ccf84d9892d7a</span></button></div></a><div aria-labelledby="job_list___sub_heading_7_1" data-parent="#job_list___sub_accordion_7" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_7_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=42" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (42, 7), end pos: (42, 32)</button></a></pre><pre>operator: core/AddNot, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -39,7 +39,7 @@
+ def convert_doc(doc):
+     if isinstance(doc, ObjectId):
+         return str(doc)
+-    if isinstance(doc, datetime):
++    if not isinstance(doc, datetime):
+         return doc.isoformat()
+     if isinstance(doc, dict):
+         return {k: convert_doc(v) for k, v in doc.items()}</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_8"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_8_1" aria-expanded="false" aria-controls="job_list___sub_collapse_8_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_8_1"><button class="btn btn-outline-success"><span class="job_id">8 : Job ID 3abf96dd8910495793dcfc11d02db693</span></button></div></a><div aria-labelledby="job_list___sub_heading_8_1" data-parent="#job_list___sub_accordion_8" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_8_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=44" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (44, 7), end pos: (44, 28)</button></a></pre><pre>operator: core/AddNot, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -41,7 +41,7 @@
+         return str(doc)
+     if isinstance(doc, datetime):
+         return doc.isoformat()
+-    if isinstance(doc, dict):
++    if not isinstance(doc, dict):
+         return {k: convert_doc(v) for k, v in doc.items()}
+     if isinstance(doc, list):
+         return [convert_doc(i) for i in doc]</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_9"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_9_1" aria-expanded="false" aria-controls="job_list___sub_collapse_9_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_9_1"><button class="btn btn-outline-success"><span class="job_id">9 : Job ID bfccd55b86f94f15b1272b53946a3b70</span></button></div></a><div aria-labelledby="job_list___sub_heading_9_1" data-parent="#job_list___sub_accordion_9" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_9_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=46" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (46, 7), end pos: (46, 28)</button></a></pre><pre>operator: core/AddNot, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -43,7 +43,7 @@
+         return doc.isoformat()
+     if isinstance(doc, dict):
+         return {k: convert_doc(v) for k, v in doc.items()}
+-    if isinstance(doc, list):
++    if not isinstance(doc, list):
+         return [convert_doc(i) for i in doc]
+     return doc
+ </pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_10"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_10_1" aria-expanded="false" aria-controls="job_list___sub_collapse_10_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_10_1"><button class="btn btn-outline-success"><span class="job_id">10 : Job ID 95da8db982324046b79384110673d5f4</span></button></div></a><div aria-labelledby="job_list___sub_heading_10_1" data-parent="#job_list___sub_accordion_10" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_10_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=64" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (64, 7), end pos: (64, 18)</button></a></pre><pre>operator: core/AddNot, occurrence: 4</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -61,7 +61,7 @@
+ @router.post("/sync")
+ async def sync_sms(request: SmsSyncRequest, current_user: dict = Depends(get_current_user)):
+     user_id = current_user.get("user_id")
+-    if not user_id:
++    if not not user_id:
+         raise HTTPException(status_code=401, detail="User not authenticated")
+     inserted_count = 0
+     for msg in request.messages:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_11"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_11_1" aria-expanded="false" aria-controls="job_list___sub_collapse_11_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_11_1"><button class="btn btn-outline-success"><span class="job_id">11 : Job ID 3e490a2481cd4840bff7c3f18db40548</span></button></div></a><div aria-labelledby="job_list___sub_heading_11_1" data-parent="#job_list___sub_accordion_11" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_11_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=71" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (71, 11), end pos: (71, 19)</button></a></pre><pre>operator: core/AddNot, occurrence: 5</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -68,7 +68,7 @@
+         msg_hash = generate_message_hash(msg.address, msg.body, msg.date_ms)
+ 
+         existing = await sms_messages_col.find_one({"hash": msg_hash, "user_id": user_id})
+-        if existing:
++        if not existing:
+             continue
+ 
+         message_doc = {</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_12"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_12_1" aria-expanded="false" aria-controls="job_list___sub_collapse_12_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_12_1"><button class="btn btn-outline-success"><span class="job_id">12 : Job ID 071ffa9514bc4e0a96c9844cc8e458ef</span></button></div></a><div aria-labelledby="job_list___sub_heading_12_1" data-parent="#job_list___sub_accordion_12" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_12_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=100" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (100, 10), end pos: (100, 14)</button></a></pre><pre>operator: core/AddNot, occurrence: 6</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -97,7 +97,7 @@
+ 
+ 
+ async def retry_failed_sms_predictions():
+-    while True:
++    while not True:
+         cursor = sms_messages_col.find({
+             "$or": [
+                 {"spam_verdict": {"$exists": False}},</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_13"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_13_1" aria-expanded="false" aria-controls="job_list___sub_collapse_13_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_13_1"><button class="btn btn-outline-success"><span class="job_id">13 : Job ID 126c5bcf7213452a8dbda0827ed878f5</span></button></div></a><div aria-labelledby="job_list___sub_heading_13_1" data-parent="#job_list___sub_accordion_13" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_13_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=100" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (100, 10), end pos: (100, 14)</button></a></pre><pre>operator: core/ReplaceTrueWithFalse, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -97,7 +97,7 @@
+ 
+ 
+ async def retry_failed_sms_predictions():
+-    while True:
++    while False:
+         cursor = sms_messages_col.find({
+             "$or": [
+                 {"spam_verdict": {"$exists": False}},</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_14"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_14_1" aria-expanded="false" aria-controls="job_list___sub_collapse_14_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_14_1"><button class="btn btn-outline-success"><span class="job_id">14 : Job ID 0c35939d98424f74b29a2e973e2df073</span></button></div></a><div aria-labelledby="job_list___sub_heading_14_1" data-parent="#job_list___sub_accordion_14" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_14_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=103" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (103, 45), end pos: (103, 50)</button></a></pre><pre>operator: core/ReplaceFalseWithTrue, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -100,7 +100,7 @@
+     while True:
+         cursor = sms_messages_col.find({
+             "$or": [
+-                {"spam_verdict": {"$exists": False}},
++                {"spam_verdict": {"$exists": True}},
+                 {"spam_verdict": None},
+                 {"spam_verdict": "unknown"}
+             ]</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_15"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_15_1" aria-expanded="false" aria-controls="job_list___sub_collapse_15_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_15_1"><button class="btn btn-outline-success"><span class="job_id">15 : Job ID 513da89515d54418b41bf50e9fa071aa</span></button></div></a><div aria-labelledby="job_list___sub_heading_15_1" data-parent="#job_list___sub_accordion_15" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_15_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=72" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (72, 12), end pos: (72, 20)</button></a></pre><pre>operator: core/ReplaceContinueWithBreak, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -69,7 +69,7 @@
+ 
+         existing = await sms_messages_col.find_one({"hash": msg_hash, "user_id": user_id})
+         if existing:
+-            continue
++            break
+ 
+         message_doc = {
+             "user_id": user_id,</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_16"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_16_1" aria-expanded="false" aria-controls="job_list___sub_collapse_16_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_16_1"><button class="btn btn-outline-success"><span class="job_id">16 : Job ID 16d2099ccc2d42a5a3d03aadeaa00e20</span></button></div></a><div aria-labelledby="job_list___sub_heading_16_1" data-parent="#job_list___sub_accordion_16" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_16_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=123" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (123, 19), end pos: (123, 28)</button></a></pre><pre>operator: core/ExceptionReplacer, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -120,7 +120,7 @@
+                         "spam_verdict": prediction.get("final_decision"),
+                     }}
+                 )
+-            except Exception as e:
++            except CosmicRayTestingException as e:
+                 print(f"Failed retry for SMS {sms.get('_id', 'unknown')}: {e}")
+         await asyncio.sleep(60) 
+ </pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_17"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_17_1" aria-expanded="false" aria-controls="job_list___sub_collapse_17_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_17_1"><button class="btn btn-outline-success"><span class="job_id">17 : Job ID 2a05f43696e141fcb387b6d761e274d3</span></button></div></a><div aria-labelledby="job_list___sub_heading_17_1" data-parent="#job_list___sub_accordion_17" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_17_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=54" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (54, 84), end pos: (54, 85)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -51,7 +51,7 @@
+ async def get_all_sms(current_user: dict = Depends(get_current_user)):
+     user_id = current_user.get("user_id")
+ 
+-    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", -1).to_list(200)
++    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", - 2).to_list(200)
+     safe_messages = [convert_doc(m) for m in messages]
+ 
+     return {"sms_messages": safe_messages}</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_18"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_18_1" aria-expanded="false" aria-controls="job_list___sub_collapse_18_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_18_1"><button class="btn btn-outline-success"><span class="job_id">18 : Job ID 206e51501da640bb859a311abb065d80</span></button></div></a><div aria-labelledby="job_list___sub_heading_18_1" data-parent="#job_list___sub_accordion_18" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_18_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=54" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (54, 84), end pos: (54, 85)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -51,7 +51,7 @@
+ async def get_all_sms(current_user: dict = Depends(get_current_user)):
+     user_id = current_user.get("user_id")
+ 
+-    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", -1).to_list(200)
++    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", - 0).to_list(200)
+     safe_messages = [convert_doc(m) for m in messages]
+ 
+     return {"sms_messages": safe_messages}</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_19"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_19_1" aria-expanded="false" aria-controls="job_list___sub_collapse_19_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_19_1"><button class="btn btn-outline-success"><span class="job_id">19 : Job ID 6e453b86321d47d5a291709c0b464226</span></button></div></a><div aria-labelledby="job_list___sub_heading_19_1" data-parent="#job_list___sub_accordion_19" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_19_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=54" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (54, 95), end pos: (54, 98)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -51,7 +51,7 @@
+ async def get_all_sms(current_user: dict = Depends(get_current_user)):
+     user_id = current_user.get("user_id")
+ 
+-    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", -1).to_list(200)
++    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", -1).to_list( 201)
+     safe_messages = [convert_doc(m) for m in messages]
+ 
+     return {"sms_messages": safe_messages}</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_20"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_20_1" aria-expanded="false" aria-controls="job_list___sub_collapse_20_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_20_1"><button class="btn btn-outline-success"><span class="job_id">20 : Job ID 6e8c77d0122d4ac7a3ebb5a3c07e7dd4</span></button></div></a><div aria-labelledby="job_list___sub_heading_20_1" data-parent="#job_list___sub_accordion_20" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_20_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=54" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (54, 95), end pos: (54, 98)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -51,7 +51,7 @@
+ async def get_all_sms(current_user: dict = Depends(get_current_user)):
+     user_id = current_user.get("user_id")
+ 
+-    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", -1).to_list(200)
++    messages = await sms_messages_col.find({"user_id": user_id}).sort("timestamp", -1).to_list( 199)
+     safe_messages = [convert_doc(m) for m in messages]
+ 
+     return {"sms_messages": safe_messages}</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_21"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_21_1" aria-expanded="false" aria-controls="job_list___sub_collapse_21_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_21_1"><button class="btn btn-outline-success"><span class="job_id">21 : Job ID 96f14206218e43caa408343f8793f065</span></button></div></a><div aria-labelledby="job_list___sub_heading_21_1" data-parent="#job_list___sub_accordion_21" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_21_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=65" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (65, 40), end pos: (65, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 4</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -62,7 +62,7 @@
+ async def sync_sms(request: SmsSyncRequest, current_user: dict = Depends(get_current_user)):
+     user_id = current_user.get("user_id")
+     if not user_id:
+-        raise HTTPException(status_code=401, detail="User not authenticated")
++        raise HTTPException(status_code= 402, detail="User not authenticated")
+     inserted_count = 0
+     for msg in request.messages:
+         msg_hash = generate_message_hash(msg.address, msg.body, msg.date_ms)</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_22"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_22_1" aria-expanded="false" aria-controls="job_list___sub_collapse_22_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_22_1"><button class="btn btn-outline-success"><span class="job_id">22 : Job ID ebe0d212d09e459b9f01a7a6ddca51f3</span></button></div></a><div aria-labelledby="job_list___sub_heading_22_1" data-parent="#job_list___sub_accordion_22" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_22_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=65" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (65, 40), end pos: (65, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 5</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -62,7 +62,7 @@
+ async def sync_sms(request: SmsSyncRequest, current_user: dict = Depends(get_current_user)):
+     user_id = current_user.get("user_id")
+     if not user_id:
+-        raise HTTPException(status_code=401, detail="User not authenticated")
++        raise HTTPException(status_code= 400, detail="User not authenticated")
+     inserted_count = 0
+     for msg in request.messages:
+         msg_hash = generate_message_hash(msg.address, msg.body, msg.date_ms)</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_23"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_23_1" aria-expanded="false" aria-controls="job_list___sub_collapse_23_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_23_1"><button class="btn btn-outline-success"><span class="job_id">23 : Job ID e42601213ba24c1883924e204820e4b4</span></button></div></a><div aria-labelledby="job_list___sub_heading_23_1" data-parent="#job_list___sub_accordion_23" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_23_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=66" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (66, 21), end pos: (66, 22)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 6</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -63,7 +63,7 @@
+     user_id = current_user.get("user_id")
+     if not user_id:
+         raise HTTPException(status_code=401, detail="User not authenticated")
+-    inserted_count = 0
++    inserted_count = 1
+     for msg in request.messages:
+         msg_hash = generate_message_hash(msg.address, msg.body, msg.date_ms)
+ </pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_24"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_24_1" aria-expanded="false" aria-controls="job_list___sub_collapse_24_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_24_1"><button class="btn btn-outline-success"><span class="job_id">24 : Job ID 9e12da4513ba4024a994fb9afbff4cd4</span></button></div></a><div aria-labelledby="job_list___sub_heading_24_1" data-parent="#job_list___sub_accordion_24" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_24_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=66" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (66, 21), end pos: (66, 22)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 7</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -63,7 +63,7 @@
+     user_id = current_user.get("user_id")
+     if not user_id:
+         raise HTTPException(status_code=401, detail="User not authenticated")
+-    inserted_count = 0
++    inserted_count = -1
+     for msg in request.messages:
+         msg_hash = generate_message_hash(msg.address, msg.body, msg.date_ms)
+ </pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_25"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_25_1" aria-expanded="false" aria-controls="job_list___sub_collapse_25_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_25_1"><button class="btn btn-outline-success"><span class="job_id">25 : Job ID 7de48666e4f247bebc4874fe895cfd05</span></button></div></a><div aria-labelledby="job_list___sub_heading_25_1" data-parent="#job_list___sub_accordion_25" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_25_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=91" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (91, 26), end pos: (91, 27)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 8</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -88,7 +88,7 @@
+ 
+         inserted = await sms_messages_col.insert_one(message_doc)
+         message_doc["_id"] = inserted.inserted_id
+-        inserted_count += 1
++        inserted_count += 2
+     return {
+         "status": "success",
+         "inserted": inserted_count,</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_26"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_26_1" aria-expanded="false" aria-controls="job_list___sub_collapse_26_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_26_1"><button class="btn btn-outline-success"><span class="job_id">26 : Job ID 9894e466a0af4ef387e9fd3513330c05</span></button></div></a><div aria-labelledby="job_list___sub_heading_26_1" data-parent="#job_list___sub_accordion_26" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_26_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=91" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (91, 26), end pos: (91, 27)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 9</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -88,7 +88,7 @@
+ 
+         inserted = await sms_messages_col.insert_one(message_doc)
+         message_doc["_id"] = inserted.inserted_id
+-        inserted_count += 1
++        inserted_count += 0
+     return {
+         "status": "success",
+         "inserted": inserted_count,</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_27"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_27_1" aria-expanded="false" aria-controls="job_list___sub_collapse_27_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_27_1"><button class="btn btn-outline-success"><span class="job_id">27 : Job ID 7eebe547350b427a9601bf331c4ca590</span></button></div></a><div aria-labelledby="job_list___sub_heading_27_1" data-parent="#job_list___sub_accordion_27" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_27_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=125" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (125, 28), end pos: (125, 30)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 10</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -122,5 +122,5 @@
+                 )
+             except Exception as e:
+                 print(f"Failed retry for SMS {sms.get('_id', 'unknown')}: {e}")
+-        await asyncio.sleep(60) 
++        await asyncio.sleep( 61) 
+ </pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_28"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_28_1" aria-expanded="false" aria-controls="job_list___sub_collapse_28_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_28_1"><button class="btn btn-outline-success"><span class="job_id">28 : Job ID 33b9d3b6fb264e92884c888142f41bce</span></button></div></a><div aria-labelledby="job_list___sub_heading_28_1" data-parent="#job_list___sub_accordion_28" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_28_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=125" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (125, 28), end pos: (125, 30)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 11</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -122,5 +122,5 @@
+                 )
+             except Exception as e:
+                 print(f"Failed retry for SMS {sms.get('_id', 'unknown')}: {e}")
+-        await asyncio.sleep(60) 
++        await asyncio.sleep( 59) 
+ </pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_29"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_29_1" aria-expanded="false" aria-controls="job_list___sub_collapse_29_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_29_1"><button class="btn btn-outline-success"><span class="job_id">29 : Job ID 82f9baf679ca429f92bd0be011cc7617</span></button></div></a><div aria-labelledby="job_list___sub_heading_29_1" data-parent="#job_list___sub_accordion_29" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_29_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=50" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (50, 0), end pos: (51, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -46,8 +46,6 @@
+     if isinstance(doc, list):
+         return [convert_doc(i) for i in doc]
+     return doc
+-
+-@router.get("/all")
+ async def get_all_sms(current_user: dict = Depends(get_current_user)):
+     user_id = current_user.get("user_id")
+ </pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_30"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_30_1" aria-expanded="false" aria-controls="job_list___sub_collapse_30_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_30_1"><button class="btn btn-outline-success"><span class="job_id">30 : Job ID cc8c92b28d63415bb382b81251c0737d</span></button></div></a><div aria-labelledby="job_list___sub_heading_30_1" data-parent="#job_list___sub_accordion_30" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_30_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=61" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (61, 0), end pos: (62, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -55,10 +55,6 @@
+     safe_messages = [convert_doc(m) for m in messages]
+ 
+     return {"sms_messages": safe_messages}
+-
+-
+-
+-@router.post("/sync")
+ async def sync_sms(request: SmsSyncRequest, current_user: dict = Depends(get_current_user)):
+     user_id = current_user.get("user_id")
+     if not user_id:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_31"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_31_1" aria-expanded="false" aria-controls="job_list___sub_collapse_31_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_31_1"><button class="btn btn-outline-success"><span class="job_id">31 : Job ID c914085e760c406dba1e9496426cdd62</span></button></div></a><div aria-labelledby="job_list___sub_heading_31_1" data-parent="#job_list___sub_accordion_31" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_31_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=67" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (67, 15), end pos: (67, 31)</button></a></pre><pre>operator: core/ZeroIterationForLoop, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -64,7 +64,7 @@
+     if not user_id:
+         raise HTTPException(status_code=401, detail="User not authenticated")
+     inserted_count = 0
+-    for msg in request.messages:
++    for msg in []:
+         msg_hash = generate_message_hash(msg.address, msg.body, msg.date_ms)
+ 
+         existing = await sms_messages_col.find_one({"hash": msg_hash, "user_id": user_id})</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_32"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_32_1" aria-expanded="false" aria-controls="job_list___sub_collapse_32_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_32_1"><button class="btn btn-outline-success"><span class="job_id">32 : Job ID 0972763d87864d8ea13883ffb1d65a41</span></button></div></a><div aria-labelledby="job_list___sub_heading_32_1" data-parent="#job_list___sub_accordion_32" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_32_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/sms.py&amp;line=109" class="text-secondary"><button class="btn btn-outline-dark">routes/sms.py, start pos: (109, 25), end pos: (109, 31)</button></a></pre><pre>operator: core/ZeroIterationForLoop, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/sms.py
++++ broutes/sms.py
+@@ -106,7 +106,7 @@
+             ]
+         })
+ 
+-        async for sms in cursor:
++        async for sms in []:
+             try:
+                 req = SpamRequest(sender=sms["address"], subject="", text=sms["body"])
+                 prediction = await get_spam_prediction(req)</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div></div></div></div></div></div><script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script><script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script><script type="text/javascript">$('div.job_list___sub_multi_collapse').on('shown.bs.collapse',  function () {    correct_behavior_functional_buttons();  });$('div.job_list___sub_multi_collapse').on('hidden.bs.collapse',  function () {    correct_behavior_functional_buttons();  });function correct_behavior_functional_buttons() {    var expand = false;    var collapse = false;    $('a.job_list___sub_multi_heading').each(function(index) {      if ($(this).attr('aria-expanded') == 'false') {        expand = true;        return false;      };    });    $('a.job_list___sub_multi_heading').each(function(index) {      if ($(this).attr('aria-expanded') == 'true') {        collapse = true;        return false;      };    });    if (expand) {      $('div#job_item_expand_all').css('display', 'inline-block');    } else {      $('div#job_item_expand_all').css('display', 'none');    };    if (collapse) {      $('div#job_item_collapse_all').css('display', 'inline-block');    } else {      $('div#job_item_collapse_all').css('display', 'none');    };  };correct_behavior_functional_buttons();</script></body></html>

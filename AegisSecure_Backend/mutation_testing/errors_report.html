@@ -1,0 +1,210 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /><link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" /><title>Cosmic Ray Report</title></head><body><div class="container"><h1><p class="text-dark">Cosmic Ray Report</p></h1></div><div class="container"><div class="mb-1" id="summary_info___accordion"><div class="card"><a data-toggle="collapse" data-target="#summary_info___collapse_1" aria-expanded="true" aria-controls="summary_info___collapse_1" href="#"><div class="card-header" id="summary_info___heading_1"><button class="btn btn-outline-dark"><h4 class="m-0">Summary info</h4></button></div></a><div aria-labelledby="summary_info___heading_1" data-parent="#summary_info___accordion" class="collapse show" id="summary_info___collapse_1"><div class="card-body"><p>Date time: 26/11/2025 11:00:16</p><p>Total jobs: 19</p><p>Complete: 19 (100.00%)</p><p>Surviving mutants: 0 (0.00%)</p></div></div></div></div><div class="mb-1" id="job_list___accordion"><div class="card"><a data-toggle="collapse" data-target="#job_list___collapse_1" aria-expanded="false" aria-controls="job_list___collapse_1" href="#"><div class="card-header" id="job_list___heading_1"><button class="btn btn-outline-dark"><h4 class="m-0">Job list</h4></button></div></a><div aria-labelledby="job_list___heading_1" data-parent="#job_list___accordion" class="collapse" id="job_list___collapse_1"><div class="card-body"><div class="text-right mb-1"><div class="mx-1" id="job_item_expand_all"><a href="#" onclick="$('div.job_list___sub_multi_collapse').collapse('show');"><button class="btn btn-outline-dark"><span>Expand All</span></button></a></div><div class="mx-1" id="job_item_collapse_all"><a href="#" onclick="$('div.job_list___sub_multi_collapse').collapse('hide');"><button class="btn btn-outline-dark"><span>Collapse All</span></button></a></div></div><div class="mb-1" id="job_list___sub_accordion_1"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_1_1" aria-expanded="false" aria-controls="job_list___sub_collapse_1_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_1_1"><button class="btn btn-outline-success"><span class="job_id">1 : Job ID bd384f4e02954faf94d9323608de55ff</span></button></div></a><div aria-labelledby="job_list___sub_heading_1_1" data-parent="#job_list___sub_accordion_1" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_1_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=170" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (170, 7), end pos: (170, 14)</button></a></pre><pre>operator: core/AddNot, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -167,7 +167,7 @@
+         "status_code": status_code
+     }
+     
+-    if details:
++    if not details:
+         content["details"] = details
+     
+     return JSONResponse(status_code=status_code, content=content)</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_2"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_2_1" aria-expanded="false" aria-controls="job_list___sub_collapse_2_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_2_1"><button class="btn btn-outline-success"><span class="job_id">2 : Job ID 671db75dc35843bb9664cae7c5a28064</span></button></div></a><div aria-labelledby="job_list___sub_heading_2_1" data-parent="#job_list___sub_accordion_2" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_2_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=186" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (186, 7), end pos: (186, 38)</button></a></pre><pre>operator: core/AddNot, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -183,7 +183,7 @@
+     Returns:
+         JSONResponse with error details
+     """
+-    if isinstance(exc, AegisException):
++    if not isinstance(exc, AegisException):
+         return create_error_response(
+             message=exc.message,
+             status_code=exc.status_code,</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_3"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_3_1" aria-expanded="false" aria-controls="job_list___sub_collapse_3_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_3_1"><button class="btn btn-outline-success"><span class="job_id">3 : Job ID ac108e5901574086b75db26258e65a63</span></button></div></a><div aria-labelledby="job_list___sub_heading_3_1" data-parent="#job_list___sub_accordion_3" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_3_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=165" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (165, 17), end pos: (165, 21)</button></a></pre><pre>operator: core/ReplaceTrueWithFalse, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -162,7 +162,7 @@
+         JSONResponse with error details
+     """
+     content = {
+-        "error": True,
++        "error": False,
+         "message": message,
+         "status_code": status_code
+     }</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_4"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_4_1" aria-expanded="false" aria-controls="job_list___sub_collapse_4_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_4_1"><button class="btn btn-outline-success"><span class="job_id">4 : Job ID ae15a5462d6e4b8a9db6a4582e8070b2</span></button></div></a><div aria-labelledby="job_list___sub_heading_4_1" data-parent="#job_list___sub_accordion_4" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_4_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=20" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (20, 31), end pos: (20, 33)</button></a></pre><pre>operator: core/ReplaceOrWithAnd, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -17,7 +17,7 @@
+     ):
+         self.message = message
+         self.status_code = status_code
+-        self.details = details or {}
++        self.details = details and {}
+         super().__init__(self.message)
+ 
+ </pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_5"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_5_1" aria-expanded="false" aria-controls="job_list___sub_collapse_5_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_5_1"><button class="btn btn-outline-success"><span class="job_id">5 : Job ID 84e6ead4bcbe4e728c20e1041eaae9b4</span></button></div></a><div aria-labelledby="job_list___sub_heading_5_1" data-parent="#job_list___sub_accordion_5" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_5_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=99" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (99, 26), end pos: (99, 28)</button></a></pre><pre>operator: core/ReplaceOrWithAnd, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -96,7 +96,7 @@
+         message: str = "External API request failed",
+         details: Optional[Dict] = None
+     ):
+-        details = details or {}
++        details = details and {}
+         details["service"] = service
+         super().__init__(
+             message=message,</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_6"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_6_1" aria-expanded="false" aria-controls="job_list___sub_collapse_6_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_6_1"><button class="btn btn-outline-success"><span class="job_id">6 : Job ID ba8c7e3fdb2c4e0cb5d1c29797a426f7</span></button></div></a><div aria-labelledby="job_list___sub_heading_6_1" data-parent="#job_list___sub_accordion_6" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_6_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (117, 26), end pos: (117, 28)</button></a></pre><pre>operator: core/ReplaceOrWithAnd, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -114,7 +114,7 @@
+         retry_after: int = 60,
+         details: Optional[Dict] = None
+     ):
+-        details = details or {}
++        details = details and {}
+         details["retry_after"] = retry_after
+         super().__init__(
+             message=message,</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_7"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_7_1" aria-expanded="false" aria-controls="job_list___sub_collapse_7_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_7_1"><button class="btn btn-outline-success"><span class="job_id">7 : Job ID 7f69d95598694189876a047d776c1837</span></button></div></a><div aria-labelledby="job_list___sub_heading_7_1" data-parent="#job_list___sub_accordion_7" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_7_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=114" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (114, 27), end pos: (114, 29)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -111,7 +111,7 @@
+     def __init__(
+         self,
+         message: str = "Rate limit exceeded",
+-        retry_after: int = 60,
++        retry_after: int = 61,
+         details: Optional[Dict] = None
+     ):
+         details = details or {}</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_8"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_8_1" aria-expanded="false" aria-controls="job_list___sub_collapse_8_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_8_1"><button class="btn btn-outline-success"><span class="job_id">8 : Job ID f5805316495743e8a9a6983ab9972f40</span></button></div></a><div aria-labelledby="job_list___sub_heading_8_1" data-parent="#job_list___sub_accordion_8" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_8_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=114" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (114, 27), end pos: (114, 29)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -111,7 +111,7 @@
+     def __init__(
+         self,
+         message: str = "Rate limit exceeded",
+-        retry_after: int = 60,
++        retry_after: int = 59,
+         details: Optional[Dict] = None
+     ):
+         details = details or {}</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_9"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_9_1" aria-expanded="false" aria-controls="job_list___sub_collapse_9_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_9_1"><button class="btn btn-outline-success"><span class="job_id">9 : Job ID 701f2765509641b38f015f404e098570</span></button></div></a><div aria-labelledby="job_list___sub_heading_9_1" data-parent="#job_list___sub_accordion_9" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_9_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=264" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (264, 47), end pos: (264, 49)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -261,7 +261,7 @@
+         )
+     
+     @staticmethod
+-    def rate_limit_exceeded(retry_after: int = 60):
++    def rate_limit_exceeded(retry_after: int = 61):
+         return create_error_response(
+             message="Too many requests. Please try again later.",
+             status_code=status.HTTP_429_TOO_MANY_REQUESTS,</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_10"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_10_1" aria-expanded="false" aria-controls="job_list___sub_collapse_10_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_10_1"><button class="btn btn-outline-success"><span class="job_id">10 : Job ID a29c5f1d1ba747a28c85cd2edbc3cfed</span></button></div></a><div aria-labelledby="job_list___sub_heading_10_1" data-parent="#job_list___sub_accordion_10" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_10_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=264" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (264, 47), end pos: (264, 49)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -261,7 +261,7 @@
+         )
+     
+     @staticmethod
+-    def rate_limit_exceeded(retry_after: int = 60):
++    def rate_limit_exceeded(retry_after: int = 59):
+         return create_error_response(
+             message="Too many requests. Please try again later.",
+             status_code=status.HTTP_429_TOO_MANY_REQUESTS,</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_11"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_11_1" aria-expanded="false" aria-controls="job_list___sub_collapse_11_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_11_1"><button class="btn btn-outline-success"><span class="job_id">11 : Job ID 787a63f4a99042e39cfb8e321a995b49</span></button></div></a><div aria-labelledby="job_list___sub_heading_11_1" data-parent="#job_list___sub_accordion_11" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_11_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=212" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (212, 4), end pos: (213, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -208,8 +208,6 @@
+ # Error response templates
+ class ErrorResponses:
+     """Predefined error response templates."""
+-    
+-    @staticmethod
+     def invalid_credentials():
+         return create_error_response(
+             message="Invalid email or password",</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_12"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_12_1" aria-expanded="false" aria-controls="job_list___sub_collapse_12_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_12_1"><button class="btn btn-outline-success"><span class="job_id">12 : Job ID a66ecf19bb1c40dbbb854b76b89ae98b</span></button></div></a><div aria-labelledby="job_list___sub_heading_12_1" data-parent="#job_list___sub_accordion_12" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_12_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=219" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (219, 4), end pos: (220, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -215,8 +215,6 @@
+             message="Invalid email or password",
+             status_code=status.HTTP_401_UNAUTHORIZED
+         )
+-    
+-    @staticmethod
+     def user_not_found():
+         return create_error_response(
+             message="User not found",</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_13"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_13_1" aria-expanded="false" aria-controls="job_list___sub_collapse_13_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_13_1"><button class="btn btn-outline-success"><span class="job_id">13 : Job ID 4534b304ed934c47aed56ba99ea3f982</span></button></div></a><div aria-labelledby="job_list___sub_heading_13_1" data-parent="#job_list___sub_accordion_13" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_13_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=226" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (226, 4), end pos: (227, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -222,8 +222,6 @@
+             message="User not found",
+             status_code=status.HTTP_404_NOT_FOUND
+         )
+-    
+-    @staticmethod
+     def email_already_exists():
+         return create_error_response(
+             message="Email already registered",</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_14"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_14_1" aria-expanded="false" aria-controls="job_list___sub_collapse_14_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_14_1"><button class="btn btn-outline-success"><span class="job_id">14 : Job ID 515f5bbe40bd412cb4d98e2ffd2f67fd</span></button></div></a><div aria-labelledby="job_list___sub_heading_14_1" data-parent="#job_list___sub_accordion_14" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_14_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=233" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (233, 4), end pos: (234, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -229,8 +229,6 @@
+             message="Email already registered",
+             status_code=status.HTTP_409_CONFLICT
+         )
+-    
+-    @staticmethod
+     def invalid_token():
+         return create_error_response(
+             message="Invalid or expired token",</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_15"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_15_1" aria-expanded="false" aria-controls="job_list___sub_collapse_15_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_15_1"><button class="btn btn-outline-success"><span class="job_id">15 : Job ID 5eff7b58094d48e1ada3163f77b1bbe2</span></button></div></a><div aria-labelledby="job_list___sub_heading_15_1" data-parent="#job_list___sub_accordion_15" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_15_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=240" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (240, 4), end pos: (241, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 4</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -236,8 +236,6 @@
+             message="Invalid or expired token",
+             status_code=status.HTTP_401_UNAUTHORIZED
+         )
+-    
+-    @staticmethod
+     def weak_password():
+         return create_error_response(
+             message="Password does not meet security requirements",</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_16"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_16_1" aria-expanded="false" aria-controls="job_list___sub_collapse_16_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_16_1"><button class="btn btn-outline-success"><span class="job_id">16 : Job ID e4be338ee07d41a09c5fb46f5891091b</span></button></div></a><div aria-labelledby="job_list___sub_heading_16_1" data-parent="#job_list___sub_accordion_16" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_16_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=256" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (256, 4), end pos: (257, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 5</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -252,8 +252,6 @@
+                 ]
+             }
+         )
+-    
+-    @staticmethod
+     def otp_invalid():
+         return create_error_response(
+             message="Invalid or expired OTP",</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_17"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_17_1" aria-expanded="false" aria-controls="job_list___sub_collapse_17_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_17_1"><button class="btn btn-outline-success"><span class="job_id">17 : Job ID 393f46e6e67d476dabdb3564d23f42d6</span></button></div></a><div aria-labelledby="job_list___sub_heading_17_1" data-parent="#job_list___sub_accordion_17" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_17_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=263" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (263, 4), end pos: (264, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 6</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -259,8 +259,6 @@
+             message="Invalid or expired OTP",
+             status_code=status.HTTP_400_BAD_REQUEST
+         )
+-    
+-    @staticmethod
+     def rate_limit_exceeded(retry_after: int = 60):
+         return create_error_response(
+             message="Too many requests. Please try again later.",</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_18"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_18_1" aria-expanded="false" aria-controls="job_list___sub_collapse_18_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_18_1"><button class="btn btn-outline-success"><span class="job_id">18 : Job ID 199b924c01e34dee9e66684ef63ec7b8</span></button></div></a><div aria-labelledby="job_list___sub_heading_18_1" data-parent="#job_list___sub_accordion_18" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_18_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=271" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (271, 4), end pos: (272, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 7</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -267,8 +267,6 @@
+             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+             details={"retry_after": retry_after}
+         )
+-    
+-    @staticmethod
+     def database_error():
+         return create_error_response(
+             message="Database operation failed. Please try again.",</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_19"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_19_1" aria-expanded="false" aria-controls="job_list___sub_collapse_19_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_19_1"><button class="btn btn-outline-success"><span class="job_id">19 : Job ID b256b96b96884284b75a6fd2fc654e0f</span></button></div></a><div aria-labelledby="job_list___sub_heading_19_1" data-parent="#job_list___sub_accordion_19" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_19_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=errors.py&amp;line=278" class="text-secondary"><button class="btn btn-outline-dark">errors.py, start pos: (278, 4), end pos: (279, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 8</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aerrors.py
++++ berrors.py
+@@ -274,8 +274,6 @@
+             message="Database operation failed. Please try again.",
+             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+         )
+-    
+-    @staticmethod
+     def external_api_error(service: str):
+         return create_error_response(
+             message=f"Failed to communicate with {service}",</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div></div></div></div></div></div><script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script><script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script><script type="text/javascript">$('div.job_list___sub_multi_collapse').on('shown.bs.collapse',  function () {    correct_behavior_functional_buttons();  });$('div.job_list___sub_multi_collapse').on('hidden.bs.collapse',  function () {    correct_behavior_functional_buttons();  });function correct_behavior_functional_buttons() {    var expand = false;    var collapse = false;    $('a.job_list___sub_multi_heading').each(function(index) {      if ($(this).attr('aria-expanded') == 'false') {        expand = true;        return false;      };    });    $('a.job_list___sub_multi_heading').each(function(index) {      if ($(this).attr('aria-expanded') == 'true') {        collapse = true;        return false;      };    });    if (expand) {      $('div#job_item_expand_all').css('display', 'inline-block');    } else {      $('div#job_item_expand_all').css('display', 'none');    };    if (collapse) {      $('div#job_item_collapse_all').css('display', 'inline-block');    } else {      $('div#job_item_collapse_all').css('display', 'none');    };  };correct_behavior_functional_buttons();</script></body></html>

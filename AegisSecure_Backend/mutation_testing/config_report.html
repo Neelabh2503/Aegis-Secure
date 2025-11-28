@@ -1,0 +1,914 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /><link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" /><title>Cosmic Ray Report</title></head><body><div class="container"><h1><p class="text-dark">Cosmic Ray Report</p></h1></div><div class="container"><div class="mb-1" id="summary_info___accordion"><div class="card"><a data-toggle="collapse" data-target="#summary_info___collapse_1" aria-expanded="true" aria-controls="summary_info___collapse_1" href="#"><div class="card-header" id="summary_info___heading_1"><button class="btn btn-outline-dark"><h4 class="m-0">Summary info</h4></button></div></a><div aria-labelledby="summary_info___heading_1" data-parent="#summary_info___accordion" class="collapse show" id="summary_info___collapse_1"><div class="card-body"><p>Date time: 25/11/2025 15:40:13</p><p>Total jobs: 83</p><p>Complete: 83 (100.00%)</p><p>Surviving mutants: 0 (0.00%)</p></div></div></div></div><div class="mb-1" id="job_list___accordion"><div class="card"><a data-toggle="collapse" data-target="#job_list___collapse_1" aria-expanded="false" aria-controls="job_list___collapse_1" href="#"><div class="card-header" id="job_list___heading_1"><button class="btn btn-outline-dark"><h4 class="m-0">Job list</h4></button></div></a><div aria-labelledby="job_list___heading_1" data-parent="#job_list___accordion" class="collapse" id="job_list___collapse_1"><div class="card-body"><div class="text-right mb-1"><div class="mx-1" id="job_item_expand_all"><a href="#" onclick="$('div.job_list___sub_multi_collapse').collapse('show');"><button class="btn btn-outline-dark"><span>Expand All</span></button></a></div><div class="mx-1" id="job_item_collapse_all"><a href="#" onclick="$('div.job_list___sub_multi_collapse').collapse('hide');"><button class="btn btn-outline-dark"><span>Collapse All</span></button></a></div></div><div class="mb-1" id="job_list___sub_accordion_1"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_1_1" aria-expanded="false" aria-controls="job_list___sub_collapse_1_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_1_1"><button class="btn btn-outline-success"><span class="job_id">1 : Job ID f64dfc4281f248a1be264efdbe77deb7</span></button></div></a><div aria-labelledby="job_list___sub_heading_1_1" data-parent="#job_list___sub_accordion_1" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_1_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=107" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (107, 18), end pos: (107, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Add, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -104,7 +104,7 @@
+     @classmethod
+     def print_config_summary(cls):
+         """Print non-sensitive configuration for debugging."""
+-        print("=" * 60)
++        print("=" + 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+         print("=" * 60)
+         print(f"Debug Mode: {cls.DEBUG}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_2"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_2_1" aria-expanded="false" aria-controls="job_list___sub_collapse_2_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_2_1"><button class="btn btn-outline-success"><span class="job_id">2 : Job ID 547d9d4afb4742cbb3cf51f46180ec3a</span></button></div></a><div aria-labelledby="job_list___sub_heading_2_1" data-parent="#job_list___sub_accordion_2" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_2_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=109" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (109, 18), end pos: (109, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Add, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -106,7 +106,7 @@
+         """Print non-sensitive configuration for debugging."""
+         print("=" * 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+-        print("=" * 60)
++        print("=" + 60)
+         print(f"Debug Mode: {cls.DEBUG}")
+         print(f"JWT Algorithm: {cls.JWT_ALGORITHM}")
+         print(f"JWT Access Token Expiry: {cls.JWT_ACCESS_TOKEN_EXPIRE_HOURS}h")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_3"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_3_1" aria-expanded="false" aria-controls="job_list___sub_collapse_3_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_3_1"><button class="btn btn-outline-success"><span class="job_id">3 : Job ID 6aef7f38c4bc4125b911214827c32e26</span></button></div></a><div aria-labelledby="job_list___sub_heading_3_1" data-parent="#job_list___sub_accordion_3" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_3_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (117, 18), end pos: (117, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Add, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -114,7 +114,7 @@
+         print(f"Rate Limiting: {cls.RATE_LIMIT_ENABLED}")
+         print(f"Log Level: {cls.LOG_LEVEL}")
+         print(f"CORS Origins: {cls.CORS_ORIGINS}")
+-        print("=" * 60)
++        print("=" + 60)
+ 
+ 
+ # Singleton settings instance</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_4"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_4_1" aria-expanded="false" aria-controls="job_list___sub_collapse_4_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_4_1"><button class="btn btn-outline-success"><span class="job_id">4 : Job ID d7af8763b2aa4ff5b3a1d7514f05db59</span></button></div></a><div aria-labelledby="job_list___sub_heading_4_1" data-parent="#job_list___sub_accordion_4" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_4_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=107" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (107, 18), end pos: (107, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Sub, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -104,7 +104,7 @@
+     @classmethod
+     def print_config_summary(cls):
+         """Print non-sensitive configuration for debugging."""
+-        print("=" * 60)
++        print("=" - 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+         print("=" * 60)
+         print(f"Debug Mode: {cls.DEBUG}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_5"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_5_1" aria-expanded="false" aria-controls="job_list___sub_collapse_5_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_5_1"><button class="btn btn-outline-success"><span class="job_id">5 : Job ID 5aa4c275d7b243eb9b1d1cc013659a55</span></button></div></a><div aria-labelledby="job_list___sub_heading_5_1" data-parent="#job_list___sub_accordion_5" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_5_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=109" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (109, 18), end pos: (109, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Sub, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -106,7 +106,7 @@
+         """Print non-sensitive configuration for debugging."""
+         print("=" * 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+-        print("=" * 60)
++        print("=" - 60)
+         print(f"Debug Mode: {cls.DEBUG}")
+         print(f"JWT Algorithm: {cls.JWT_ALGORITHM}")
+         print(f"JWT Access Token Expiry: {cls.JWT_ACCESS_TOKEN_EXPIRE_HOURS}h")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_6"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_6_1" aria-expanded="false" aria-controls="job_list___sub_collapse_6_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_6_1"><button class="btn btn-outline-success"><span class="job_id">6 : Job ID 8b08324dc1b249f18c2e9ff40073545b</span></button></div></a><div aria-labelledby="job_list___sub_heading_6_1" data-parent="#job_list___sub_accordion_6" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_6_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (117, 18), end pos: (117, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Sub, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -114,7 +114,7 @@
+         print(f"Rate Limiting: {cls.RATE_LIMIT_ENABLED}")
+         print(f"Log Level: {cls.LOG_LEVEL}")
+         print(f"CORS Origins: {cls.CORS_ORIGINS}")
+-        print("=" * 60)
++        print("=" - 60)
+ 
+ 
+ # Singleton settings instance</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_7"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_7_1" aria-expanded="false" aria-controls="job_list___sub_collapse_7_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_7_1"><button class="btn btn-outline-success"><span class="job_id">7 : Job ID 513192bee39e419193d03c23ae928741</span></button></div></a><div aria-labelledby="job_list___sub_heading_7_1" data-parent="#job_list___sub_accordion_7" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_7_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=107" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (107, 18), end pos: (107, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Div, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -104,7 +104,7 @@
+     @classmethod
+     def print_config_summary(cls):
+         """Print non-sensitive configuration for debugging."""
+-        print("=" * 60)
++        print("=" / 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+         print("=" * 60)
+         print(f"Debug Mode: {cls.DEBUG}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_8"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_8_1" aria-expanded="false" aria-controls="job_list___sub_collapse_8_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_8_1"><button class="btn btn-outline-success"><span class="job_id">8 : Job ID 96360c638e394df5b44758f53bb54d1f</span></button></div></a><div aria-labelledby="job_list___sub_heading_8_1" data-parent="#job_list___sub_accordion_8" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_8_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=109" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (109, 18), end pos: (109, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Div, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -106,7 +106,7 @@
+         """Print non-sensitive configuration for debugging."""
+         print("=" * 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+-        print("=" * 60)
++        print("=" / 60)
+         print(f"Debug Mode: {cls.DEBUG}")
+         print(f"JWT Algorithm: {cls.JWT_ALGORITHM}")
+         print(f"JWT Access Token Expiry: {cls.JWT_ACCESS_TOKEN_EXPIRE_HOURS}h")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_9"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_9_1" aria-expanded="false" aria-controls="job_list___sub_collapse_9_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_9_1"><button class="btn btn-outline-success"><span class="job_id">9 : Job ID c7055d8b64c547d08b5d836441aacb00</span></button></div></a><div aria-labelledby="job_list___sub_heading_9_1" data-parent="#job_list___sub_accordion_9" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_9_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (117, 18), end pos: (117, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Div, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -114,7 +114,7 @@
+         print(f"Rate Limiting: {cls.RATE_LIMIT_ENABLED}")
+         print(f"Log Level: {cls.LOG_LEVEL}")
+         print(f"CORS Origins: {cls.CORS_ORIGINS}")
+-        print("=" * 60)
++        print("=" / 60)
+ 
+ 
+ # Singleton settings instance</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_10"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_10_1" aria-expanded="false" aria-controls="job_list___sub_collapse_10_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_10_1"><button class="btn btn-outline-success"><span class="job_id">10 : Job ID d7a41aa419b341bfa2c792ab8ffd5166</span></button></div></a><div aria-labelledby="job_list___sub_heading_10_1" data-parent="#job_list___sub_accordion_10" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_10_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=107" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (107, 18), end pos: (107, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_FloorDiv, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -104,7 +104,7 @@
+     @classmethod
+     def print_config_summary(cls):
+         """Print non-sensitive configuration for debugging."""
+-        print("=" * 60)
++        print("=" // 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+         print("=" * 60)
+         print(f"Debug Mode: {cls.DEBUG}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_11"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_11_1" aria-expanded="false" aria-controls="job_list___sub_collapse_11_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_11_1"><button class="btn btn-outline-success"><span class="job_id">11 : Job ID 595a7fa178164827b52a4859eacae3ff</span></button></div></a><div aria-labelledby="job_list___sub_heading_11_1" data-parent="#job_list___sub_accordion_11" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_11_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=109" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (109, 18), end pos: (109, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_FloorDiv, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -106,7 +106,7 @@
+         """Print non-sensitive configuration for debugging."""
+         print("=" * 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+-        print("=" * 60)
++        print("=" // 60)
+         print(f"Debug Mode: {cls.DEBUG}")
+         print(f"JWT Algorithm: {cls.JWT_ALGORITHM}")
+         print(f"JWT Access Token Expiry: {cls.JWT_ACCESS_TOKEN_EXPIRE_HOURS}h")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_12"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_12_1" aria-expanded="false" aria-controls="job_list___sub_collapse_12_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_12_1"><button class="btn btn-outline-success"><span class="job_id">12 : Job ID 168fad1f312d4485aabaff56b882d129</span></button></div></a><div aria-labelledby="job_list___sub_heading_12_1" data-parent="#job_list___sub_accordion_12" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_12_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (117, 18), end pos: (117, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_FloorDiv, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -114,7 +114,7 @@
+         print(f"Rate Limiting: {cls.RATE_LIMIT_ENABLED}")
+         print(f"Log Level: {cls.LOG_LEVEL}")
+         print(f"CORS Origins: {cls.CORS_ORIGINS}")
+-        print("=" * 60)
++        print("=" // 60)
+ 
+ 
+ # Singleton settings instance</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_13"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_13_1" aria-expanded="false" aria-controls="job_list___sub_collapse_13_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_13_1"><button class="btn btn-outline-success"><span class="job_id">13 : Job ID 98bb669e1e5d491bac7a79bd23e2e29f</span></button></div></a><div aria-labelledby="job_list___sub_heading_13_1" data-parent="#job_list___sub_accordion_13" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_13_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=107" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (107, 18), end pos: (107, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Mod, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -104,7 +104,7 @@
+     @classmethod
+     def print_config_summary(cls):
+         """Print non-sensitive configuration for debugging."""
+-        print("=" * 60)
++        print("=" % 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+         print("=" * 60)
+         print(f"Debug Mode: {cls.DEBUG}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_14"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_14_1" aria-expanded="false" aria-controls="job_list___sub_collapse_14_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_14_1"><button class="btn btn-outline-success"><span class="job_id">14 : Job ID 178ebd155423479ea242c0d96786044c</span></button></div></a><div aria-labelledby="job_list___sub_heading_14_1" data-parent="#job_list___sub_accordion_14" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_14_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=109" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (109, 18), end pos: (109, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Mod, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -106,7 +106,7 @@
+         """Print non-sensitive configuration for debugging."""
+         print("=" * 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+-        print("=" * 60)
++        print("=" % 60)
+         print(f"Debug Mode: {cls.DEBUG}")
+         print(f"JWT Algorithm: {cls.JWT_ALGORITHM}")
+         print(f"JWT Access Token Expiry: {cls.JWT_ACCESS_TOKEN_EXPIRE_HOURS}h")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_15"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_15_1" aria-expanded="false" aria-controls="job_list___sub_collapse_15_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_15_1"><button class="btn btn-outline-success"><span class="job_id">15 : Job ID f021197977f244f08e2f12e05b231bdd</span></button></div></a><div aria-labelledby="job_list___sub_heading_15_1" data-parent="#job_list___sub_accordion_15" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_15_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (117, 18), end pos: (117, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Mod, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -114,7 +114,7 @@
+         print(f"Rate Limiting: {cls.RATE_LIMIT_ENABLED}")
+         print(f"Log Level: {cls.LOG_LEVEL}")
+         print(f"CORS Origins: {cls.CORS_ORIGINS}")
+-        print("=" * 60)
++        print("=" % 60)
+ 
+ 
+ # Singleton settings instance</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_16"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_16_1" aria-expanded="false" aria-controls="job_list___sub_collapse_16_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_16_1"><button class="btn btn-outline-success"><span class="job_id">16 : Job ID cfdebd514d2f42dd99359e60a1c5185b</span></button></div></a><div aria-labelledby="job_list___sub_heading_16_1" data-parent="#job_list___sub_accordion_16" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_16_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=107" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (107, 18), end pos: (107, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Pow, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -104,7 +104,7 @@
+     @classmethod
+     def print_config_summary(cls):
+         """Print non-sensitive configuration for debugging."""
+-        print("=" * 60)
++        print("=" ** 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+         print("=" * 60)
+         print(f"Debug Mode: {cls.DEBUG}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_17"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_17_1" aria-expanded="false" aria-controls="job_list___sub_collapse_17_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_17_1"><button class="btn btn-outline-success"><span class="job_id">17 : Job ID 1f4da10609e0484d9b28f498941dc6f1</span></button></div></a><div aria-labelledby="job_list___sub_heading_17_1" data-parent="#job_list___sub_accordion_17" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_17_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=109" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (109, 18), end pos: (109, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Pow, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -106,7 +106,7 @@
+         """Print non-sensitive configuration for debugging."""
+         print("=" * 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+-        print("=" * 60)
++        print("=" ** 60)
+         print(f"Debug Mode: {cls.DEBUG}")
+         print(f"JWT Algorithm: {cls.JWT_ALGORITHM}")
+         print(f"JWT Access Token Expiry: {cls.JWT_ACCESS_TOKEN_EXPIRE_HOURS}h")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_18"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_18_1" aria-expanded="false" aria-controls="job_list___sub_collapse_18_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_18_1"><button class="btn btn-outline-success"><span class="job_id">18 : Job ID fd6b27c0ac574aada3bd5159d5890d31</span></button></div></a><div aria-labelledby="job_list___sub_heading_18_1" data-parent="#job_list___sub_accordion_18" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_18_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (117, 18), end pos: (117, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_Pow, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -114,7 +114,7 @@
+         print(f"Rate Limiting: {cls.RATE_LIMIT_ENABLED}")
+         print(f"Log Level: {cls.LOG_LEVEL}")
+         print(f"CORS Origins: {cls.CORS_ORIGINS}")
+-        print("=" * 60)
++        print("=" ** 60)
+ 
+ 
+ # Singleton settings instance</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_19"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_19_1" aria-expanded="false" aria-controls="job_list___sub_collapse_19_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_19_1"><button class="btn btn-outline-success"><span class="job_id">19 : Job ID 8be4da38b2a448ca9ab92592105a955c</span></button></div></a><div aria-labelledby="job_list___sub_heading_19_1" data-parent="#job_list___sub_accordion_19" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_19_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=107" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (107, 18), end pos: (107, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_RShift, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -104,7 +104,7 @@
+     @classmethod
+     def print_config_summary(cls):
+         """Print non-sensitive configuration for debugging."""
+-        print("=" * 60)
++        print("=" &gt;&gt; 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+         print("=" * 60)
+         print(f"Debug Mode: {cls.DEBUG}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_20"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_20_1" aria-expanded="false" aria-controls="job_list___sub_collapse_20_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_20_1"><button class="btn btn-outline-success"><span class="job_id">20 : Job ID 19d628c70d4f4d27b5ca0dcd7f24d8c2</span></button></div></a><div aria-labelledby="job_list___sub_heading_20_1" data-parent="#job_list___sub_accordion_20" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_20_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=109" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (109, 18), end pos: (109, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_RShift, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -106,7 +106,7 @@
+         """Print non-sensitive configuration for debugging."""
+         print("=" * 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+-        print("=" * 60)
++        print("=" &gt;&gt; 60)
+         print(f"Debug Mode: {cls.DEBUG}")
+         print(f"JWT Algorithm: {cls.JWT_ALGORITHM}")
+         print(f"JWT Access Token Expiry: {cls.JWT_ACCESS_TOKEN_EXPIRE_HOURS}h")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_21"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_21_1" aria-expanded="false" aria-controls="job_list___sub_collapse_21_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_21_1"><button class="btn btn-outline-success"><span class="job_id">21 : Job ID 334aa4a35f7a4c46aabbae8cfa1fa93a</span></button></div></a><div aria-labelledby="job_list___sub_heading_21_1" data-parent="#job_list___sub_accordion_21" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_21_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (117, 18), end pos: (117, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_RShift, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -114,7 +114,7 @@
+         print(f"Rate Limiting: {cls.RATE_LIMIT_ENABLED}")
+         print(f"Log Level: {cls.LOG_LEVEL}")
+         print(f"CORS Origins: {cls.CORS_ORIGINS}")
+-        print("=" * 60)
++        print("=" &gt;&gt; 60)
+ 
+ 
+ # Singleton settings instance</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_22"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_22_1" aria-expanded="false" aria-controls="job_list___sub_collapse_22_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_22_1"><button class="btn btn-outline-success"><span class="job_id">22 : Job ID 30ccd461e1414d228c7aad91b055e057</span></button></div></a><div aria-labelledby="job_list___sub_heading_22_1" data-parent="#job_list___sub_accordion_22" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_22_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=107" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (107, 18), end pos: (107, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_LShift, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -104,7 +104,7 @@
+     @classmethod
+     def print_config_summary(cls):
+         """Print non-sensitive configuration for debugging."""
+-        print("=" * 60)
++        print("=" &lt;&lt; 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+         print("=" * 60)
+         print(f"Debug Mode: {cls.DEBUG}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_23"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_23_1" aria-expanded="false" aria-controls="job_list___sub_collapse_23_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_23_1"><button class="btn btn-outline-success"><span class="job_id">23 : Job ID 06f8a774d8134340b38134678fba7fa0</span></button></div></a><div aria-labelledby="job_list___sub_heading_23_1" data-parent="#job_list___sub_accordion_23" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_23_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=109" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (109, 18), end pos: (109, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_LShift, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -106,7 +106,7 @@
+         """Print non-sensitive configuration for debugging."""
+         print("=" * 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+-        print("=" * 60)
++        print("=" &lt;&lt; 60)
+         print(f"Debug Mode: {cls.DEBUG}")
+         print(f"JWT Algorithm: {cls.JWT_ALGORITHM}")
+         print(f"JWT Access Token Expiry: {cls.JWT_ACCESS_TOKEN_EXPIRE_HOURS}h")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_24"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_24_1" aria-expanded="false" aria-controls="job_list___sub_collapse_24_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_24_1"><button class="btn btn-outline-success"><span class="job_id">24 : Job ID 3f6340335a8d41b1b221221689a338d5</span></button></div></a><div aria-labelledby="job_list___sub_heading_24_1" data-parent="#job_list___sub_accordion_24" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_24_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (117, 18), end pos: (117, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_LShift, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -114,7 +114,7 @@
+         print(f"Rate Limiting: {cls.RATE_LIMIT_ENABLED}")
+         print(f"Log Level: {cls.LOG_LEVEL}")
+         print(f"CORS Origins: {cls.CORS_ORIGINS}")
+-        print("=" * 60)
++        print("=" &lt;&lt; 60)
+ 
+ 
+ # Singleton settings instance</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_25"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_25_1" aria-expanded="false" aria-controls="job_list___sub_collapse_25_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_25_1"><button class="btn btn-outline-success"><span class="job_id">25 : Job ID f3055aad7f964e1ca0bf83f0b64637bc</span></button></div></a><div aria-labelledby="job_list___sub_heading_25_1" data-parent="#job_list___sub_accordion_25" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_25_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=107" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (107, 18), end pos: (107, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_BitOr, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -104,7 +104,7 @@
+     @classmethod
+     def print_config_summary(cls):
+         """Print non-sensitive configuration for debugging."""
+-        print("=" * 60)
++        print("=" | 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+         print("=" * 60)
+         print(f"Debug Mode: {cls.DEBUG}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_26"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_26_1" aria-expanded="false" aria-controls="job_list___sub_collapse_26_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_26_1"><button class="btn btn-outline-success"><span class="job_id">26 : Job ID 27bce2c6ad174e338acd4335bf7869c0</span></button></div></a><div aria-labelledby="job_list___sub_heading_26_1" data-parent="#job_list___sub_accordion_26" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_26_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=109" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (109, 18), end pos: (109, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_BitOr, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -106,7 +106,7 @@
+         """Print non-sensitive configuration for debugging."""
+         print("=" * 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+-        print("=" * 60)
++        print("=" | 60)
+         print(f"Debug Mode: {cls.DEBUG}")
+         print(f"JWT Algorithm: {cls.JWT_ALGORITHM}")
+         print(f"JWT Access Token Expiry: {cls.JWT_ACCESS_TOKEN_EXPIRE_HOURS}h")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_27"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_27_1" aria-expanded="false" aria-controls="job_list___sub_collapse_27_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_27_1"><button class="btn btn-outline-success"><span class="job_id">27 : Job ID 0245370a6c8f48cd8e4d0c00ba09e9d8</span></button></div></a><div aria-labelledby="job_list___sub_heading_27_1" data-parent="#job_list___sub_accordion_27" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_27_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (117, 18), end pos: (117, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_BitOr, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -114,7 +114,7 @@
+         print(f"Rate Limiting: {cls.RATE_LIMIT_ENABLED}")
+         print(f"Log Level: {cls.LOG_LEVEL}")
+         print(f"CORS Origins: {cls.CORS_ORIGINS}")
+-        print("=" * 60)
++        print("=" | 60)
+ 
+ 
+ # Singleton settings instance</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_28"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_28_1" aria-expanded="false" aria-controls="job_list___sub_collapse_28_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_28_1"><button class="btn btn-outline-success"><span class="job_id">28 : Job ID 79f5807963c346d1b650a930d53bbcdd</span></button></div></a><div aria-labelledby="job_list___sub_heading_28_1" data-parent="#job_list___sub_accordion_28" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_28_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=107" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (107, 18), end pos: (107, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_BitAnd, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -104,7 +104,7 @@
+     @classmethod
+     def print_config_summary(cls):
+         """Print non-sensitive configuration for debugging."""
+-        print("=" * 60)
++        print("=" &amp; 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+         print("=" * 60)
+         print(f"Debug Mode: {cls.DEBUG}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_29"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_29_1" aria-expanded="false" aria-controls="job_list___sub_collapse_29_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_29_1"><button class="btn btn-outline-success"><span class="job_id">29 : Job ID e4135d38de964fca90d2d1b20c69566d</span></button></div></a><div aria-labelledby="job_list___sub_heading_29_1" data-parent="#job_list___sub_accordion_29" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_29_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=109" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (109, 18), end pos: (109, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_BitAnd, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -106,7 +106,7 @@
+         """Print non-sensitive configuration for debugging."""
+         print("=" * 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+-        print("=" * 60)
++        print("=" &amp; 60)
+         print(f"Debug Mode: {cls.DEBUG}")
+         print(f"JWT Algorithm: {cls.JWT_ALGORITHM}")
+         print(f"JWT Access Token Expiry: {cls.JWT_ACCESS_TOKEN_EXPIRE_HOURS}h")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_30"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_30_1" aria-expanded="false" aria-controls="job_list___sub_collapse_30_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_30_1"><button class="btn btn-outline-success"><span class="job_id">30 : Job ID 32664dda3b6f47a5947f22770f941f22</span></button></div></a><div aria-labelledby="job_list___sub_heading_30_1" data-parent="#job_list___sub_accordion_30" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_30_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (117, 18), end pos: (117, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_BitAnd, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -114,7 +114,7 @@
+         print(f"Rate Limiting: {cls.RATE_LIMIT_ENABLED}")
+         print(f"Log Level: {cls.LOG_LEVEL}")
+         print(f"CORS Origins: {cls.CORS_ORIGINS}")
+-        print("=" * 60)
++        print("=" &amp; 60)
+ 
+ 
+ # Singleton settings instance</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_31"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_31_1" aria-expanded="false" aria-controls="job_list___sub_collapse_31_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_31_1"><button class="btn btn-outline-success"><span class="job_id">31 : Job ID 4bd5118d85c24b8cbc3f635128b81e93</span></button></div></a><div aria-labelledby="job_list___sub_heading_31_1" data-parent="#job_list___sub_accordion_31" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_31_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=107" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (107, 18), end pos: (107, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_BitXor, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -104,7 +104,7 @@
+     @classmethod
+     def print_config_summary(cls):
+         """Print non-sensitive configuration for debugging."""
+-        print("=" * 60)
++        print("=" ^ 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+         print("=" * 60)
+         print(f"Debug Mode: {cls.DEBUG}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_32"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_32_1" aria-expanded="false" aria-controls="job_list___sub_collapse_32_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_32_1"><button class="btn btn-outline-success"><span class="job_id">32 : Job ID 46cb9afa6d0d4fb1bc506b9b467f6aa7</span></button></div></a><div aria-labelledby="job_list___sub_heading_32_1" data-parent="#job_list___sub_accordion_32" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_32_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=109" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (109, 18), end pos: (109, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_BitXor, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -106,7 +106,7 @@
+         """Print non-sensitive configuration for debugging."""
+         print("=" * 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+-        print("=" * 60)
++        print("=" ^ 60)
+         print(f"Debug Mode: {cls.DEBUG}")
+         print(f"JWT Algorithm: {cls.JWT_ALGORITHM}")
+         print(f"JWT Access Token Expiry: {cls.JWT_ACCESS_TOKEN_EXPIRE_HOURS}h")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_33"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_33_1" aria-expanded="false" aria-controls="job_list___sub_collapse_33_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_33_1"><button class="btn btn-outline-success"><span class="job_id">33 : Job ID 82aef4e40b3b4755baceb008bdcc254f</span></button></div></a><div aria-labelledby="job_list___sub_heading_33_1" data-parent="#job_list___sub_accordion_33" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_33_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (117, 18), end pos: (117, 19)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Mul_BitXor, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -114,7 +114,7 @@
+         print(f"Rate Limiting: {cls.RATE_LIMIT_ENABLED}")
+         print(f"Log Level: {cls.LOG_LEVEL}")
+         print(f"CORS Origins: {cls.CORS_ORIGINS}")
+-        print("=" * 60)
++        print("=" ^ 60)
+ 
+ 
+ # Singleton settings instance</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_34"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_34_1" aria-expanded="false" aria-controls="job_list___sub_collapse_34_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_34_1"><button class="btn btn-outline-success"><span class="job_id">34 : Job ID ae4e2f0a183e4dc89cfa80a21fb115ed</span></button></div></a><div aria-labelledby="job_list___sub_heading_34_1" data-parent="#job_list___sub_accordion_34" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_34_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=17" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (17, 54), end pos: (17, 56)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_NotEq, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -14,7 +14,7 @@
+     # Application
+     APP_NAME: str = "AegisSecure Backend"
+     APP_VERSION: str = "1.0.0"
+-    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
++    DEBUG: bool = os.getenv("DEBUG", "False").lower() != "true"
+     
+     # Security - JWT
+     JWT_SECRET: str = os.getenv("JWT_SECRET", "")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_35"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_35_1" aria-expanded="false" aria-controls="job_list___sub_collapse_35_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_35_1"><button class="btn btn-outline-success"><span class="job_id">35 : Job ID 45712c651e26452b9f359f27be63d52e</span></button></div></a><div aria-labelledby="job_list___sub_heading_35_1" data-parent="#job_list___sub_accordion_35" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_35_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=17" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (17, 54), end pos: (17, 56)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_Lt, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -14,7 +14,7 @@
+     # Application
+     APP_NAME: str = "AegisSecure Backend"
+     APP_VERSION: str = "1.0.0"
+-    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
++    DEBUG: bool = os.getenv("DEBUG", "False").lower() &lt; "true"
+     
+     # Security - JWT
+     JWT_SECRET: str = os.getenv("JWT_SECRET", "")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_36"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_36_1" aria-expanded="false" aria-controls="job_list___sub_collapse_36_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_36_1"><button class="btn btn-outline-success"><span class="job_id">36 : Job ID 6ae0122da4e94df590b672c0a35c2c85</span></button></div></a><div aria-labelledby="job_list___sub_heading_36_1" data-parent="#job_list___sub_accordion_36" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_36_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=17" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (17, 54), end pos: (17, 56)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_LtE, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -14,7 +14,7 @@
+     # Application
+     APP_NAME: str = "AegisSecure Backend"
+     APP_VERSION: str = "1.0.0"
+-    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
++    DEBUG: bool = os.getenv("DEBUG", "False").lower() &lt;= "true"
+     
+     # Security - JWT
+     JWT_SECRET: str = os.getenv("JWT_SECRET", "")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_37"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_37_1" aria-expanded="false" aria-controls="job_list___sub_collapse_37_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_37_1"><button class="btn btn-outline-success"><span class="job_id">37 : Job ID a9813b8e75c7459ea7d4b5b08184be66</span></button></div></a><div aria-labelledby="job_list___sub_heading_37_1" data-parent="#job_list___sub_accordion_37" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_37_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=17" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (17, 54), end pos: (17, 56)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_Gt, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -14,7 +14,7 @@
+     # Application
+     APP_NAME: str = "AegisSecure Backend"
+     APP_VERSION: str = "1.0.0"
+-    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
++    DEBUG: bool = os.getenv("DEBUG", "False").lower() &gt; "true"
+     
+     # Security - JWT
+     JWT_SECRET: str = os.getenv("JWT_SECRET", "")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_38"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_38_1" aria-expanded="false" aria-controls="job_list___sub_collapse_38_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_38_1"><button class="btn btn-outline-success"><span class="job_id">38 : Job ID 2c7140005a9747169595d22d4f162ead</span></button></div></a><div aria-labelledby="job_list___sub_heading_38_1" data-parent="#job_list___sub_accordion_38" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_38_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=17" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (17, 54), end pos: (17, 56)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_GtE, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -14,7 +14,7 @@
+     # Application
+     APP_NAME: str = "AegisSecure Backend"
+     APP_VERSION: str = "1.0.0"
+-    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
++    DEBUG: bool = os.getenv("DEBUG", "False").lower() &gt;= "true"
+     
+     # Security - JWT
+     JWT_SECRET: str = os.getenv("JWT_SECRET", "")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_39"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_39_1" aria-expanded="false" aria-controls="job_list___sub_collapse_39_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_39_1"><button class="btn btn-outline-success"><span class="job_id">39 : Job ID 2578ea2b25e541f9be8299d4cff7f630</span></button></div></a><div aria-labelledby="job_list___sub_heading_39_1" data-parent="#job_list___sub_accordion_39" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_39_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=17" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (17, 54), end pos: (17, 56)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_Is, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -14,7 +14,7 @@
+     # Application
+     APP_NAME: str = "AegisSecure Backend"
+     APP_VERSION: str = "1.0.0"
+-    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
++    DEBUG: bool = os.getenv("DEBUG", "False").lower() is "true"
+     
+     # Security - JWT
+     JWT_SECRET: str = os.getenv("JWT_SECRET", "")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_40"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_40_1" aria-expanded="false" aria-controls="job_list___sub_collapse_40_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_40_1"><button class="btn btn-outline-success"><span class="job_id">40 : Job ID e39438363b3b45079f266e3ab483d993</span></button></div></a><div aria-labelledby="job_list___sub_heading_40_1" data-parent="#job_list___sub_accordion_40" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_40_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=17" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (17, 54), end pos: (17, 56)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_IsNot, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -14,7 +14,7 @@
+     # Application
+     APP_NAME: str = "AegisSecure Backend"
+     APP_VERSION: str = "1.0.0"
+-    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
++    DEBUG: bool = os.getenv("DEBUG", "False").lower() is not "true"
+     
+     # Security - JWT
+     JWT_SECRET: str = os.getenv("JWT_SECRET", "")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_41"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_41_1" aria-expanded="false" aria-controls="job_list___sub_collapse_41_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_41_1"><button class="btn btn-outline-success"><span class="job_id">41 : Job ID c920f8c0d61b4dbd8ea7ea1bb1689fd9</span></button></div></a><div aria-labelledby="job_list___sub_heading_41_1" data-parent="#job_list___sub_accordion_41" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_41_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=87" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (87, 53), end pos: (87, 54)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Lt_Eq, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -84,7 +84,7 @@
+         """
+         errors = []
+         
+-        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 32:
++        if not cls.JWT_SECRET or len(cls.JWT_SECRET) == 32:
+             errors.append("JWT_SECRET must be set and at least 32 characters long")
+         
+         if not cls.MONGO_URI:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_42"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_42_1" aria-expanded="false" aria-controls="job_list___sub_collapse_42_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_42_1"><button class="btn btn-outline-success"><span class="job_id">42 : Job ID b1c11e543bc5401f976725d17ac7a269</span></button></div></a><div aria-labelledby="job_list___sub_heading_42_1" data-parent="#job_list___sub_accordion_42" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_42_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=87" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (87, 53), end pos: (87, 54)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Lt_NotEq, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -84,7 +84,7 @@
+         """
+         errors = []
+         
+-        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 32:
++        if not cls.JWT_SECRET or len(cls.JWT_SECRET) != 32:
+             errors.append("JWT_SECRET must be set and at least 32 characters long")
+         
+         if not cls.MONGO_URI:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_43"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_43_1" aria-expanded="false" aria-controls="job_list___sub_collapse_43_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_43_1"><button class="btn btn-outline-success"><span class="job_id">43 : Job ID 23a82f1bf8f94659a90c01db17b0b6f7</span></button></div></a><div aria-labelledby="job_list___sub_heading_43_1" data-parent="#job_list___sub_accordion_43" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_43_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=87" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (87, 53), end pos: (87, 54)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Lt_LtE, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -84,7 +84,7 @@
+         """
+         errors = []
+         
+-        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 32:
++        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt;= 32:
+             errors.append("JWT_SECRET must be set and at least 32 characters long")
+         
+         if not cls.MONGO_URI:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_44"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_44_1" aria-expanded="false" aria-controls="job_list___sub_collapse_44_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_44_1"><button class="btn btn-outline-success"><span class="job_id">44 : Job ID 0cd0ba54d3674a05af00b3f23478cfef</span></button></div></a><div aria-labelledby="job_list___sub_heading_44_1" data-parent="#job_list___sub_accordion_44" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_44_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=87" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (87, 53), end pos: (87, 54)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Lt_Gt, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -84,7 +84,7 @@
+         """
+         errors = []
+         
+-        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 32:
++        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &gt; 32:
+             errors.append("JWT_SECRET must be set and at least 32 characters long")
+         
+         if not cls.MONGO_URI:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_45"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_45_1" aria-expanded="false" aria-controls="job_list___sub_collapse_45_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_45_1"><button class="btn btn-outline-success"><span class="job_id">45 : Job ID 768ff939436e4578902c2e9cfe621817</span></button></div></a><div aria-labelledby="job_list___sub_heading_45_1" data-parent="#job_list___sub_accordion_45" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_45_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=87" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (87, 53), end pos: (87, 54)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Lt_GtE, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -84,7 +84,7 @@
+         """
+         errors = []
+         
+-        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 32:
++        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &gt;= 32:
+             errors.append("JWT_SECRET must be set and at least 32 characters long")
+         
+         if not cls.MONGO_URI:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_46"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_46_1" aria-expanded="false" aria-controls="job_list___sub_collapse_46_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_46_1"><button class="btn btn-outline-success"><span class="job_id">46 : Job ID 852397a93e2d4d0b9586ddb0e8a277be</span></button></div></a><div aria-labelledby="job_list___sub_heading_46_1" data-parent="#job_list___sub_accordion_46" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_46_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=87" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (87, 11), end pos: (87, 14)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -84,7 +84,7 @@
+         """
+         errors = []
+         
+-        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 32:
++        if  cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 32:
+             errors.append("JWT_SECRET must be set and at least 32 characters long")
+         
+         if not cls.MONGO_URI:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_47"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_47_1" aria-expanded="false" aria-controls="job_list___sub_collapse_47_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_47_1"><button class="btn btn-outline-success"><span class="job_id">47 : Job ID 9d0fcfd6ff9c4bab9003942da8a4c28c</span></button></div></a><div aria-labelledby="job_list___sub_heading_47_1" data-parent="#job_list___sub_accordion_47" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_47_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=90" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (90, 11), end pos: (90, 14)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -87,7 +87,7 @@
+         if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 32:
+             errors.append("JWT_SECRET must be set and at least 32 characters long")
+         
+-        if not cls.MONGO_URI:
++        if  cls.MONGO_URI:
+             errors.append("MONGO_URI must be set")
+         
+         if not cls.GOOGLE_CLIENT_ID or not cls.GOOGLE_CLIENT_SECRET:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_48"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_48_1" aria-expanded="false" aria-controls="job_list___sub_collapse_48_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_48_1"><button class="btn btn-outline-success"><span class="job_id">48 : Job ID 3547a8d473274887b7582b0ae1b387af</span></button></div></a><div aria-labelledby="job_list___sub_heading_48_1" data-parent="#job_list___sub_accordion_48" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_48_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=93" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (93, 11), end pos: (93, 14)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -90,7 +90,7 @@
+         if not cls.MONGO_URI:
+             errors.append("MONGO_URI must be set")
+         
+-        if not cls.GOOGLE_CLIENT_ID or not cls.GOOGLE_CLIENT_SECRET:
++        if  cls.GOOGLE_CLIENT_ID or not cls.GOOGLE_CLIENT_SECRET:
+             errors.append("Google OAuth credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET) must be set")
+         
+         if not cls.GOOGLE_REDIRECT_URI:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_49"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_49_1" aria-expanded="false" aria-controls="job_list___sub_collapse_49_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_49_1"><button class="btn btn-outline-success"><span class="job_id">49 : Job ID 1da74eb1a5fa429d9a20fd430ede8db1</span></button></div></a><div aria-labelledby="job_list___sub_heading_49_1" data-parent="#job_list___sub_accordion_49" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_49_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=93" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (93, 39), end pos: (93, 42)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -90,7 +90,7 @@
+         if not cls.MONGO_URI:
+             errors.append("MONGO_URI must be set")
+         
+-        if not cls.GOOGLE_CLIENT_ID or not cls.GOOGLE_CLIENT_SECRET:
++        if not cls.GOOGLE_CLIENT_ID or  cls.GOOGLE_CLIENT_SECRET:
+             errors.append("Google OAuth credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET) must be set")
+         
+         if not cls.GOOGLE_REDIRECT_URI:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_50"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_50_1" aria-expanded="false" aria-controls="job_list___sub_collapse_50_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_50_1"><button class="btn btn-outline-success"><span class="job_id">50 : Job ID e25172cd19a345498d7825276e14b5b3</span></button></div></a><div aria-labelledby="job_list___sub_heading_50_1" data-parent="#job_list___sub_accordion_50" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_50_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=96" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (96, 11), end pos: (96, 14)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 4</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -93,7 +93,7 @@
+         if not cls.GOOGLE_CLIENT_ID or not cls.GOOGLE_CLIENT_SECRET:
+             errors.append("Google OAuth credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET) must be set")
+         
+-        if not cls.GOOGLE_REDIRECT_URI:
++        if  cls.GOOGLE_REDIRECT_URI:
+             errors.append("GOOGLE_REDIRECT_URI must be set")
+         
+         if not cls.SMTP_EMAIL:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_51"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_51_1" aria-expanded="false" aria-controls="job_list___sub_collapse_51_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_51_1"><button class="btn btn-outline-success"><span class="job_id">51 : Job ID fea0e25f8962417d82ece4a6ec3ad88f</span></button></div></a><div aria-labelledby="job_list___sub_heading_51_1" data-parent="#job_list___sub_accordion_51" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_51_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=99" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (99, 11), end pos: (99, 14)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 5</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -96,7 +96,7 @@
+         if not cls.GOOGLE_REDIRECT_URI:
+             errors.append("GOOGLE_REDIRECT_URI must be set")
+         
+-        if not cls.SMTP_EMAIL:
++        if  cls.SMTP_EMAIL:
+             errors.append("SMTP_EMAIL must be set for email functionality")
+         
+         return errors</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_52"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_52_1" aria-expanded="false" aria-controls="job_list___sub_collapse_52_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_52_1"><button class="btn btn-outline-success"><span class="job_id">52 : Job ID cc4bea341c6c4e3aaec8b87fbd050ac3</span></button></div></a><div aria-labelledby="job_list___sub_heading_52_1" data-parent="#job_list___sub_accordion_52" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_52_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=87" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (87, 11), end pos: (87, 57)</button></a></pre><pre>operator: core/AddNot, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -84,7 +84,7 @@
+         """
+         errors = []
+         
+-        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 32:
++        if not not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 32:
+             errors.append("JWT_SECRET must be set and at least 32 characters long")
+         
+         if not cls.MONGO_URI:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_53"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_53_1" aria-expanded="false" aria-controls="job_list___sub_collapse_53_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_53_1"><button class="btn btn-outline-success"><span class="job_id">53 : Job ID d1f431058c8d4e3f94870b04777cb3d8</span></button></div></a><div aria-labelledby="job_list___sub_heading_53_1" data-parent="#job_list___sub_accordion_53" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_53_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=90" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (90, 11), end pos: (90, 28)</button></a></pre><pre>operator: core/AddNot, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -87,7 +87,7 @@
+         if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 32:
+             errors.append("JWT_SECRET must be set and at least 32 characters long")
+         
+-        if not cls.MONGO_URI:
++        if not not cls.MONGO_URI:
+             errors.append("MONGO_URI must be set")
+         
+         if not cls.GOOGLE_CLIENT_ID or not cls.GOOGLE_CLIENT_SECRET:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_54"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_54_1" aria-expanded="false" aria-controls="job_list___sub_collapse_54_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_54_1"><button class="btn btn-outline-success"><span class="job_id">54 : Job ID 651a2c24aab349009efa750d525d530a</span></button></div></a><div aria-labelledby="job_list___sub_heading_54_1" data-parent="#job_list___sub_accordion_54" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_54_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=93" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (93, 11), end pos: (93, 67)</button></a></pre><pre>operator: core/AddNot, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -90,7 +90,7 @@
+         if not cls.MONGO_URI:
+             errors.append("MONGO_URI must be set")
+         
+-        if not cls.GOOGLE_CLIENT_ID or not cls.GOOGLE_CLIENT_SECRET:
++        if not not cls.GOOGLE_CLIENT_ID or not cls.GOOGLE_CLIENT_SECRET:
+             errors.append("Google OAuth credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET) must be set")
+         
+         if not cls.GOOGLE_REDIRECT_URI:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_55"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_55_1" aria-expanded="false" aria-controls="job_list___sub_collapse_55_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_55_1"><button class="btn btn-outline-success"><span class="job_id">55 : Job ID eb7a0caf58714d8c893b22ac11407d0f</span></button></div></a><div aria-labelledby="job_list___sub_heading_55_1" data-parent="#job_list___sub_accordion_55" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_55_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=96" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (96, 11), end pos: (96, 38)</button></a></pre><pre>operator: core/AddNot, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -93,7 +93,7 @@
+         if not cls.GOOGLE_CLIENT_ID or not cls.GOOGLE_CLIENT_SECRET:
+             errors.append("Google OAuth credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET) must be set")
+         
+-        if not cls.GOOGLE_REDIRECT_URI:
++        if not not cls.GOOGLE_REDIRECT_URI:
+             errors.append("GOOGLE_REDIRECT_URI must be set")
+         
+         if not cls.SMTP_EMAIL:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_56"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_56_1" aria-expanded="false" aria-controls="job_list___sub_collapse_56_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_56_1"><button class="btn btn-outline-success"><span class="job_id">56 : Job ID b99f3f2c9ccf4e77b7faa4080f1d7779</span></button></div></a><div aria-labelledby="job_list___sub_heading_56_1" data-parent="#job_list___sub_accordion_56" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_56_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=99" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (99, 11), end pos: (99, 29)</button></a></pre><pre>operator: core/AddNot, occurrence: 4</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -96,7 +96,7 @@
+         if not cls.GOOGLE_REDIRECT_URI:
+             errors.append("GOOGLE_REDIRECT_URI must be set")
+         
+-        if not cls.SMTP_EMAIL:
++        if not not cls.SMTP_EMAIL:
+             errors.append("SMTP_EMAIL must be set for email functionality")
+         
+         return errors</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_57"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_57_1" aria-expanded="false" aria-controls="job_list___sub_collapse_57_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_57_1"><button class="btn btn-outline-success"><span class="job_id">57 : Job ID e790458a573c46539677b8db7c2c0f4b</span></button></div></a><div aria-labelledby="job_list___sub_heading_57_1" data-parent="#job_list___sub_accordion_57" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_57_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=46" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (46, 39), end pos: (46, 43)</button></a></pre><pre>operator: core/ReplaceTrueWithFalse, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -43,7 +43,7 @@
+     
+     # Security - Password
+     PASSWORD_MIN_LENGTH: int = 8
+-    PASSWORD_REQUIRE_UPPERCASE: bool = True
++    PASSWORD_REQUIRE_UPPERCASE: bool = False
+     PASSWORD_REQUIRE_LOWERCASE: bool = True
+     PASSWORD_REQUIRE_DIGIT: bool = True
+     PASSWORD_REQUIRE_SPECIAL: bool = True</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_58"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_58_1" aria-expanded="false" aria-controls="job_list___sub_collapse_58_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_58_1"><button class="btn btn-outline-success"><span class="job_id">58 : Job ID 50263a39be9e46dcb4a3d6c93e948fe2</span></button></div></a><div aria-labelledby="job_list___sub_heading_58_1" data-parent="#job_list___sub_accordion_58" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_58_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=47" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (47, 39), end pos: (47, 43)</button></a></pre><pre>operator: core/ReplaceTrueWithFalse, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -44,7 +44,7 @@
+     # Security - Password
+     PASSWORD_MIN_LENGTH: int = 8
+     PASSWORD_REQUIRE_UPPERCASE: bool = True
+-    PASSWORD_REQUIRE_LOWERCASE: bool = True
++    PASSWORD_REQUIRE_LOWERCASE: bool = False
+     PASSWORD_REQUIRE_DIGIT: bool = True
+     PASSWORD_REQUIRE_SPECIAL: bool = True
+     </pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_59"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_59_1" aria-expanded="false" aria-controls="job_list___sub_collapse_59_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_59_1"><button class="btn btn-outline-success"><span class="job_id">59 : Job ID 83112190a3bf4085ac80c575359fac93</span></button></div></a><div aria-labelledby="job_list___sub_heading_59_1" data-parent="#job_list___sub_accordion_59" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_59_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=48" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (48, 35), end pos: (48, 39)</button></a></pre><pre>operator: core/ReplaceTrueWithFalse, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -45,7 +45,7 @@
+     PASSWORD_MIN_LENGTH: int = 8
+     PASSWORD_REQUIRE_UPPERCASE: bool = True
+     PASSWORD_REQUIRE_LOWERCASE: bool = True
+-    PASSWORD_REQUIRE_DIGIT: bool = True
++    PASSWORD_REQUIRE_DIGIT: bool = False
+     PASSWORD_REQUIRE_SPECIAL: bool = True
+     
+     # Rate Limiting</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_60"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_60_1" aria-expanded="false" aria-controls="job_list___sub_collapse_60_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_60_1"><button class="btn btn-outline-success"><span class="job_id">60 : Job ID 8c008a17b8354cb593dfb1feeecf596c</span></button></div></a><div aria-labelledby="job_list___sub_heading_60_1" data-parent="#job_list___sub_accordion_60" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_60_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=49" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (49, 37), end pos: (49, 41)</button></a></pre><pre>operator: core/ReplaceTrueWithFalse, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -46,7 +46,7 @@
+     PASSWORD_REQUIRE_UPPERCASE: bool = True
+     PASSWORD_REQUIRE_LOWERCASE: bool = True
+     PASSWORD_REQUIRE_DIGIT: bool = True
+-    PASSWORD_REQUIRE_SPECIAL: bool = True
++    PASSWORD_REQUIRE_SPECIAL: bool = False
+     
+     # Rate Limiting
+     RATE_LIMIT_ENABLED: bool = True</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_61"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_61_1" aria-expanded="false" aria-controls="job_list___sub_collapse_61_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_61_1"><button class="btn btn-outline-success"><span class="job_id">61 : Job ID 47452d121fa84c18a104b4ea26f4555b</span></button></div></a><div aria-labelledby="job_list___sub_heading_61_1" data-parent="#job_list___sub_accordion_61" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_61_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=52" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (52, 31), end pos: (52, 35)</button></a></pre><pre>operator: core/ReplaceTrueWithFalse, occurrence: 4</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -49,7 +49,7 @@
+     PASSWORD_REQUIRE_SPECIAL: bool = True
+     
+     # Rate Limiting
+-    RATE_LIMIT_ENABLED: bool = True
++    RATE_LIMIT_ENABLED: bool = False
+     RATE_LIMIT_PER_MINUTE: int = int(os.getenv("RATE_LIMIT_PER_MINUTE", "60"))
+     RATE_LIMIT_LOGIN_PER_HOUR: int = int(os.getenv("RATE_LIMIT_LOGIN_PER_HOUR", "5"))
+     </pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_62"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_62_1" aria-expanded="false" aria-controls="job_list___sub_collapse_62_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_62_1"><button class="btn btn-outline-success"><span class="job_id">62 : Job ID 96ec2abcdc814ca5bd97b866d4e1ce8a</span></button></div></a><div aria-labelledby="job_list___sub_heading_62_1" data-parent="#job_list___sub_accordion_62" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_62_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=87" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (87, 30), end pos: (87, 32)</button></a></pre><pre>operator: core/ReplaceOrWithAnd, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -84,7 +84,7 @@
+         """
+         errors = []
+         
+-        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 32:
++        if not cls.JWT_SECRET and len(cls.JWT_SECRET) &lt; 32:
+             errors.append("JWT_SECRET must be set and at least 32 characters long")
+         
+         if not cls.MONGO_URI:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_63"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_63_1" aria-expanded="false" aria-controls="job_list___sub_collapse_63_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_63_1"><button class="btn btn-outline-success"><span class="job_id">63 : Job ID b23b6c586a9b4d5097be8b88f75baff6</span></button></div></a><div aria-labelledby="job_list___sub_heading_63_1" data-parent="#job_list___sub_accordion_63" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_63_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=93" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (93, 36), end pos: (93, 38)</button></a></pre><pre>operator: core/ReplaceOrWithAnd, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -90,7 +90,7 @@
+         if not cls.MONGO_URI:
+             errors.append("MONGO_URI must be set")
+         
+-        if not cls.GOOGLE_CLIENT_ID or not cls.GOOGLE_CLIENT_SECRET:
++        if not cls.GOOGLE_CLIENT_ID and not cls.GOOGLE_CLIENT_SECRET:
+             errors.append("Google OAuth credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET) must be set")
+         
+         if not cls.GOOGLE_REDIRECT_URI:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_64"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_64_1" aria-expanded="false" aria-controls="job_list___sub_collapse_64_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_64_1"><button class="btn btn-outline-success"><span class="job_id">64 : Job ID 6158af3a603d48da98bad1e8f6a24bf5</span></button></div></a><div aria-labelledby="job_list___sub_heading_64_1" data-parent="#job_list___sub_accordion_64" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_64_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=41" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (41, 22), end pos: (41, 23)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -38,7 +38,7 @@
+     
+     # OTP Configuration
+     OTP_EXPIRE_MINUTES: int = int(os.getenv("OTP_EXPIRE_MINUTES", "10"))
+-    OTP_LENGTH: int = 6
++    OTP_LENGTH: int = 7
+     OTP_MAX_ATTEMPTS: int = 5
+     
+     # Security - Password</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_65"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_65_1" aria-expanded="false" aria-controls="job_list___sub_collapse_65_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_65_1"><button class="btn btn-outline-success"><span class="job_id">65 : Job ID 6101eecad84b49e7a49fcf411b354c1b</span></button></div></a><div aria-labelledby="job_list___sub_heading_65_1" data-parent="#job_list___sub_accordion_65" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_65_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=41" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (41, 22), end pos: (41, 23)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -38,7 +38,7 @@
+     
+     # OTP Configuration
+     OTP_EXPIRE_MINUTES: int = int(os.getenv("OTP_EXPIRE_MINUTES", "10"))
+-    OTP_LENGTH: int = 6
++    OTP_LENGTH: int = 5
+     OTP_MAX_ATTEMPTS: int = 5
+     
+     # Security - Password</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_66"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_66_1" aria-expanded="false" aria-controls="job_list___sub_collapse_66_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_66_1"><button class="btn btn-outline-success"><span class="job_id">66 : Job ID 83249a10740c4575959774f7f947dd0b</span></button></div></a><div aria-labelledby="job_list___sub_heading_66_1" data-parent="#job_list___sub_accordion_66" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_66_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=42" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (42, 28), end pos: (42, 29)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -39,7 +39,7 @@
+     # OTP Configuration
+     OTP_EXPIRE_MINUTES: int = int(os.getenv("OTP_EXPIRE_MINUTES", "10"))
+     OTP_LENGTH: int = 6
+-    OTP_MAX_ATTEMPTS: int = 5
++    OTP_MAX_ATTEMPTS: int = 6
+     
+     # Security - Password
+     PASSWORD_MIN_LENGTH: int = 8</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_67"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_67_1" aria-expanded="false" aria-controls="job_list___sub_collapse_67_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_67_1"><button class="btn btn-outline-success"><span class="job_id">67 : Job ID 49fcce2a66824f0085d7f3d12131f8ef</span></button></div></a><div aria-labelledby="job_list___sub_heading_67_1" data-parent="#job_list___sub_accordion_67" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_67_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=42" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (42, 28), end pos: (42, 29)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -39,7 +39,7 @@
+     # OTP Configuration
+     OTP_EXPIRE_MINUTES: int = int(os.getenv("OTP_EXPIRE_MINUTES", "10"))
+     OTP_LENGTH: int = 6
+-    OTP_MAX_ATTEMPTS: int = 5
++    OTP_MAX_ATTEMPTS: int = 4
+     
+     # Security - Password
+     PASSWORD_MIN_LENGTH: int = 8</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_68"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_68_1" aria-expanded="false" aria-controls="job_list___sub_collapse_68_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_68_1"><button class="btn btn-outline-success"><span class="job_id">68 : Job ID 8ee987155f40497d932bcf03c0ce86ca</span></button></div></a><div aria-labelledby="job_list___sub_heading_68_1" data-parent="#job_list___sub_accordion_68" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_68_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=45" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (45, 31), end pos: (45, 32)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 4</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -42,7 +42,7 @@
+     OTP_MAX_ATTEMPTS: int = 5
+     
+     # Security - Password
+-    PASSWORD_MIN_LENGTH: int = 8
++    PASSWORD_MIN_LENGTH: int = 9
+     PASSWORD_REQUIRE_UPPERCASE: bool = True
+     PASSWORD_REQUIRE_LOWERCASE: bool = True
+     PASSWORD_REQUIRE_DIGIT: bool = True</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_69"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_69_1" aria-expanded="false" aria-controls="job_list___sub_collapse_69_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_69_1"><button class="btn btn-outline-success"><span class="job_id">69 : Job ID 6f039a50292646f6858ecc6bd7c8a69f</span></button></div></a><div aria-labelledby="job_list___sub_heading_69_1" data-parent="#job_list___sub_accordion_69" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_69_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=45" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (45, 31), end pos: (45, 32)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 5</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -42,7 +42,7 @@
+     OTP_MAX_ATTEMPTS: int = 5
+     
+     # Security - Password
+-    PASSWORD_MIN_LENGTH: int = 8
++    PASSWORD_MIN_LENGTH: int = 7
+     PASSWORD_REQUIRE_UPPERCASE: bool = True
+     PASSWORD_REQUIRE_LOWERCASE: bool = True
+     PASSWORD_REQUIRE_DIGIT: bool = True</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_70"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_70_1" aria-expanded="false" aria-controls="job_list___sub_collapse_70_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_70_1"><button class="btn btn-outline-success"><span class="job_id">70 : Job ID 64c3977afcf84bc49392c81be639622b</span></button></div></a><div aria-labelledby="job_list___sub_heading_70_1" data-parent="#job_list___sub_accordion_70" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_70_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=72" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (72, 29), end pos: (72, 31)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 6</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -69,7 +69,7 @@
+     WS_MAX_CONNECTIONS: int = int(os.getenv("WS_MAX_CONNECTIONS", "1000"))
+     
+     # Pagination
+-    DEFAULT_PAGE_SIZE: int = 50
++    DEFAULT_PAGE_SIZE: int = 51
+     MAX_PAGE_SIZE: int = 200
+     
+     # Cache (if using Redis in future)</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_71"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_71_1" aria-expanded="false" aria-controls="job_list___sub_collapse_71_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_71_1"><button class="btn btn-outline-success"><span class="job_id">71 : Job ID 16e4b827c297486a9ec4f5e3d1e7465a</span></button></div></a><div aria-labelledby="job_list___sub_heading_71_1" data-parent="#job_list___sub_accordion_71" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_71_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=72" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (72, 29), end pos: (72, 31)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 7</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -69,7 +69,7 @@
+     WS_MAX_CONNECTIONS: int = int(os.getenv("WS_MAX_CONNECTIONS", "1000"))
+     
+     # Pagination
+-    DEFAULT_PAGE_SIZE: int = 50
++    DEFAULT_PAGE_SIZE: int = 49
+     MAX_PAGE_SIZE: int = 200
+     
+     # Cache (if using Redis in future)</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_72"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_72_1" aria-expanded="false" aria-controls="job_list___sub_collapse_72_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_72_1"><button class="btn btn-outline-success"><span class="job_id">72 : Job ID d693cff8b659465a95cec7130ff8d153</span></button></div></a><div aria-labelledby="job_list___sub_heading_72_1" data-parent="#job_list___sub_accordion_72" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_72_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=73" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (73, 25), end pos: (73, 28)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 8</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -70,7 +70,7 @@
+     
+     # Pagination
+     DEFAULT_PAGE_SIZE: int = 50
+-    MAX_PAGE_SIZE: int = 200
++    MAX_PAGE_SIZE: int = 201
+     
+     # Cache (if using Redis in future)
+     REDIS_URL: Optional[str] = os.getenv("REDIS_URL", None)</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_73"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_73_1" aria-expanded="false" aria-controls="job_list___sub_collapse_73_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_73_1"><button class="btn btn-outline-success"><span class="job_id">73 : Job ID 729b654de54d4562ba4c13f206505fb9</span></button></div></a><div aria-labelledby="job_list___sub_heading_73_1" data-parent="#job_list___sub_accordion_73" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_73_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=73" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (73, 25), end pos: (73, 28)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 9</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -70,7 +70,7 @@
+     
+     # Pagination
+     DEFAULT_PAGE_SIZE: int = 50
+-    MAX_PAGE_SIZE: int = 200
++    MAX_PAGE_SIZE: int = 199
+     
+     # Cache (if using Redis in future)
+     REDIS_URL: Optional[str] = os.getenv("REDIS_URL", None)</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_74"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_74_1" aria-expanded="false" aria-controls="job_list___sub_collapse_74_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_74_1"><button class="btn btn-outline-success"><span class="job_id">74 : Job ID 8bad0c25d9444fcdb8825f47ecf91056</span></button></div></a><div aria-labelledby="job_list___sub_heading_74_1" data-parent="#job_list___sub_accordion_74" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_74_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=87" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (87, 55), end pos: (87, 57)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 10</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -84,7 +84,7 @@
+         """
+         errors = []
+         
+-        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 32:
++        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 33:
+             errors.append("JWT_SECRET must be set and at least 32 characters long")
+         
+         if not cls.MONGO_URI:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_75"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_75_1" aria-expanded="false" aria-controls="job_list___sub_collapse_75_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_75_1"><button class="btn btn-outline-success"><span class="job_id">75 : Job ID 46e0474e089e43c39e99d4c13ba5b61e</span></button></div></a><div aria-labelledby="job_list___sub_heading_75_1" data-parent="#job_list___sub_accordion_75" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_75_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=87" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (87, 55), end pos: (87, 57)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 11</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -84,7 +84,7 @@
+         """
+         errors = []
+         
+-        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 32:
++        if not cls.JWT_SECRET or len(cls.JWT_SECRET) &lt; 31:
+             errors.append("JWT_SECRET must be set and at least 32 characters long")
+         
+         if not cls.MONGO_URI:</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_76"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_76_1" aria-expanded="false" aria-controls="job_list___sub_collapse_76_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_76_1"><button class="btn btn-outline-success"><span class="job_id">76 : Job ID ae1e42c96afc468d82afb7340721500c</span></button></div></a><div aria-labelledby="job_list___sub_heading_76_1" data-parent="#job_list___sub_accordion_76" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_76_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=107" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (107, 20), end pos: (107, 22)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 12</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -104,7 +104,7 @@
+     @classmethod
+     def print_config_summary(cls):
+         """Print non-sensitive configuration for debugging."""
+-        print("=" * 60)
++        print("=" * 61)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+         print("=" * 60)
+         print(f"Debug Mode: {cls.DEBUG}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_77"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_77_1" aria-expanded="false" aria-controls="job_list___sub_collapse_77_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_77_1"><button class="btn btn-outline-success"><span class="job_id">77 : Job ID 67c008d68d694141999b4632cdb292d0</span></button></div></a><div aria-labelledby="job_list___sub_heading_77_1" data-parent="#job_list___sub_accordion_77" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_77_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=107" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (107, 20), end pos: (107, 22)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 13</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -104,7 +104,7 @@
+     @classmethod
+     def print_config_summary(cls):
+         """Print non-sensitive configuration for debugging."""
+-        print("=" * 60)
++        print("=" * 59)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+         print("=" * 60)
+         print(f"Debug Mode: {cls.DEBUG}")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_78"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_78_1" aria-expanded="false" aria-controls="job_list___sub_collapse_78_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_78_1"><button class="btn btn-outline-success"><span class="job_id">78 : Job ID 8ac8bf21ea88483799265a88727fde13</span></button></div></a><div aria-labelledby="job_list___sub_heading_78_1" data-parent="#job_list___sub_accordion_78" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_78_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=109" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (109, 20), end pos: (109, 22)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 14</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -106,7 +106,7 @@
+         """Print non-sensitive configuration for debugging."""
+         print("=" * 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+-        print("=" * 60)
++        print("=" * 61)
+         print(f"Debug Mode: {cls.DEBUG}")
+         print(f"JWT Algorithm: {cls.JWT_ALGORITHM}")
+         print(f"JWT Access Token Expiry: {cls.JWT_ACCESS_TOKEN_EXPIRE_HOURS}h")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_79"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_79_1" aria-expanded="false" aria-controls="job_list___sub_collapse_79_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_79_1"><button class="btn btn-outline-success"><span class="job_id">79 : Job ID 702b76f9d46548efa4e5a3351164d64e</span></button></div></a><div aria-labelledby="job_list___sub_heading_79_1" data-parent="#job_list___sub_accordion_79" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_79_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=109" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (109, 20), end pos: (109, 22)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 15</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -106,7 +106,7 @@
+         """Print non-sensitive configuration for debugging."""
+         print("=" * 60)
+         print(f"🔧 {cls.APP_NAME} v{cls.APP_VERSION}")
+-        print("=" * 60)
++        print("=" * 59)
+         print(f"Debug Mode: {cls.DEBUG}")
+         print(f"JWT Algorithm: {cls.JWT_ALGORITHM}")
+         print(f"JWT Access Token Expiry: {cls.JWT_ACCESS_TOKEN_EXPIRE_HOURS}h")</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_80"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_80_1" aria-expanded="false" aria-controls="job_list___sub_collapse_80_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_80_1"><button class="btn btn-outline-success"><span class="job_id">80 : Job ID f28135fb38cd46fd9d29254584c7de08</span></button></div></a><div aria-labelledby="job_list___sub_heading_80_1" data-parent="#job_list___sub_accordion_80" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_80_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (117, 20), end pos: (117, 22)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 16</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -114,7 +114,7 @@
+         print(f"Rate Limiting: {cls.RATE_LIMIT_ENABLED}")
+         print(f"Log Level: {cls.LOG_LEVEL}")
+         print(f"CORS Origins: {cls.CORS_ORIGINS}")
+-        print("=" * 60)
++        print("=" * 61)
+ 
+ 
+ # Singleton settings instance</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_81"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_81_1" aria-expanded="false" aria-controls="job_list___sub_collapse_81_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_81_1"><button class="btn btn-outline-success"><span class="job_id">81 : Job ID c8071f303c30418ba336666fcfd7f531</span></button></div></a><div aria-labelledby="job_list___sub_heading_81_1" data-parent="#job_list___sub_accordion_81" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_81_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (117, 20), end pos: (117, 22)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 17</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -114,7 +114,7 @@
+         print(f"Rate Limiting: {cls.RATE_LIMIT_ENABLED}")
+         print(f"Log Level: {cls.LOG_LEVEL}")
+         print(f"CORS Origins: {cls.CORS_ORIGINS}")
+-        print("=" * 60)
++        print("=" * 59)
+ 
+ 
+ # Singleton settings instance</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_82"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_82_1" aria-expanded="false" aria-controls="job_list___sub_collapse_82_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_82_1"><button class="btn btn-outline-success"><span class="job_id">82 : Job ID 9ce2f98464b5442daec8a98b39941b9a</span></button></div></a><div aria-labelledby="job_list___sub_heading_82_1" data-parent="#job_list___sub_accordion_82" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_82_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=79" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (79, 4), end pos: (80, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -75,8 +75,6 @@
+     # Cache (if using Redis in future)
+     REDIS_URL: Optional[str] = os.getenv("REDIS_URL", None)
+     CACHE_TTL_SECONDS: int = int(os.getenv("CACHE_TTL_SECONDS", "300"))
+-    
+-    @classmethod
+     def validate(cls) -&gt; List[str]:
+         """
+         Validate that all required environment variables are set.</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_83"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_83_1" aria-expanded="false" aria-controls="job_list___sub_collapse_83_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_83_1"><button class="btn btn-outline-success"><span class="job_id">83 : Job ID a99908a7604b40f79fb116d709df98ad</span></button></div></a><div aria-labelledby="job_list___sub_heading_83_1" data-parent="#job_list___sub_accordion_83" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_83_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=config.py&amp;line=104" class="text-secondary"><button class="btn btn-outline-dark">config.py, start pos: (104, 4), end pos: (105, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aconfig.py
++++ bconfig.py
+@@ -100,8 +100,6 @@
+             errors.append("SMTP_EMAIL must be set for email functionality")
+         
+         return errors
+-    
+-    @classmethod
+     def print_config_summary(cls):
+         """Print non-sensitive configuration for debugging."""
+         print("=" * 60)</pre></div><div class="alert alert-secondary"><pre class="diff">timeout</pre></div></div></div></div></div></div></div></div></div></div><script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script><script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script><script type="text/javascript">$('div.job_list___sub_multi_collapse').on('shown.bs.collapse',  function () {    correct_behavior_functional_buttons();  });$('div.job_list___sub_multi_collapse').on('hidden.bs.collapse',  function () {    correct_behavior_functional_buttons();  });function correct_behavior_functional_buttons() {    var expand = false;    var collapse = false;    $('a.job_list___sub_multi_heading').each(function(index) {      if ($(this).attr('aria-expanded') == 'false') {        expand = true;        return false;      };    });    $('a.job_list___sub_multi_heading').each(function(index) {      if ($(this).attr('aria-expanded') == 'true') {        collapse = true;        return false;      };    });    if (expand) {      $('div#job_item_expand_all').css('display', 'inline-block');    } else {      $('div#job_item_expand_all').css('display', 'none');    };    if (collapse) {      $('div#job_item_collapse_all').css('display', 'inline-block');    } else {      $('div#job_item_collapse_all').css('display', 'none');    };  };correct_behavior_functional_buttons();</script></body></html>
