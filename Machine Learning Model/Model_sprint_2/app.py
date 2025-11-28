@@ -4,9 +4,15 @@ import json
 import time
 import sys
 import asyncio
-from typing import List, Dict, Optional
-from urllib.parse import urlparse
 import socket
+import random
+import logging
+import warnings
+import unicodedata
+from typing import List, Dict, Optional, Any
+from urllib.parse import urlparse
+
+# Third-party imports
 import httpx
 import uvicorn
 import joblib
@@ -16,22 +22,45 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from groq import AsyncGroq
+from groq import AsyncGroq, RateLimitError, APIError
 from dotenv import load_dotenv
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
+from playwright.async_api import async_playwright
 
+# Local imports
 import config
 from models import get_ml_models, get_dl_models, FinetunedBERT
 from feature_extraction import process_row
 
 load_dotenv()
 sys.path.append(os.path.join(config.BASE_DIR, 'Message_model'))
-from predict import PhishingPredictor
+
+# Attempt to import the local semantic model
+try:
+    from predict import PhishingPredictor
+except ImportError:
+    PhishingPredictor = None
+
+# --- CONFIGURATION & LOGGING ---
+
+# Configure Structured Logging (Standard Python Logging)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+logger = logging.getLogger("PhishingAPI")
+
+MAX_INPUT_CHARS = 4000
+MAX_CONCURRENT_REQUESTS = 5
+# CRITICAL FIX: Reduced from 1000 to 15 to prevent self-DoS and API bans
+MAX_URLS_TO_ANALYZE = 15
+LLM_MAX_RETRIES = 3
 
 app = FastAPI(
-    title="Phishing Detection API",
-    description="Advanced phishing detection system using multiple ML/DL models and Groq",
-    version="1.0.0"
+    title="Phishing Detection API (Robust Ensemble)",
+    description="Multilingual phishing detection using Weighted Ensemble (ML/DL) + LLM Semantic Analysis + Live Scraping",
+    version="2.6.0"
 )
 
 app.add_middleware(
@@ -42,10 +71,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+request_semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+
+# --- DATA MODELS ---
+
 class MessageInput(BaseModel):
     sender: Optional[str] = ""
     subject: Optional[str] = ""
-    text: str
+    text: Optional[str] = ""
     metadata: Optional[Dict] = {}
 
 class PredictionResponse(BaseModel):
@@ -55,291 +88,459 @@ class PredictionResponse(BaseModel):
     final_decision: str
     suggestion: str
 
+# --- UTILITIES ---
+
+class SmartAPIKeyRotator:
+    def __init__(self):
+        keys_str = os.environ.get('GROQ_API_KEYS', '')
+        self.keys = [k.strip() for k in keys_str.split(',') if k.strip()]
+        if not self.keys:
+            single_key = os.environ.get('GROQ_API_KEY')
+            if single_key:
+                self.keys = [single_key]
+        
+        if not self.keys:
+            logger.critical("CRITICAL: No GROQ_API_KEYS found in environment variables!")
+        else:
+            logger.info(f"API Key Rotator initialized with {len(self.keys)} keys.")
+            
+        self.clients = [AsyncGroq(api_key=k) for k in self.keys]
+        self.num_keys = len(self.clients)
+        self.current_index = 0
+
+    def get_client_and_rotate(self):
+        if not self.clients:
+            return None
+        client = self.clients[self.current_index]
+        self.current_index = (self.current_index + 1) % self.num_keys
+        return client
+
+# Global Model Placeholders
 ml_models = {}
 dl_models = {}
 bert_model = None
 semantic_model = None
-groq_async_client = None
+key_rotator: Optional[SmartAPIKeyRotator] = None
+# Simple in-memory cache for IP lookups
+ip_cache = {}
 
-MODEL_BOUNDARIES = {
-    'logistic': 0.5,
-    'svm': 0.5,
-    'xgboost': 0.5,
-    'attention_blstm': 0.5,
-    'rcnn': 0.5,
-    'bert': 0.5,
-    'semantic': 0.5
-}
+def clean_and_parse_json(text: str) -> Dict:
+    """
+    Robustly extracts JSON from text, handling markdown blocks and conversational filler.
+    Fixes Error 400 issues.
+    """
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    # Remove Markdown Code Blocks
+    text = re.sub(r"```json\s*", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"```", "", text)
+
+    # Attempt to find the first '{' and last '}'
+    try:
+        start = text.find('{')
+        end = text.rfind('}')
+        if start != -1 and end != -1:
+            json_str = text[start:end+1]
+            return json.loads(json_str)
+    except Exception:
+        pass
+    
+    logger.error(f"Failed to parse JSON from LLM response: {text[:100]}...")
+    return {}
+
+class EnsembleScorer:
+    WEIGHTS = {
+        'ml': 0.30,
+        'dl': 0.20,
+        'bert': 0.20,
+        'semantic': 0.10,
+        'network': 0.20
+    }
+    
+    @staticmethod
+    def calculate_technical_score(predictions: Dict, network_data: List[Dict], urls: List[str]) -> Dict:
+        score_accum = 0.0
+        weight_accum = 0.0
+        details = []
+        
+        # ML Scores
+        ml_scores = [p['raw_score'] for k, p in predictions.items() if k in ['logistic', 'svm', 'xgboost']]
+        if ml_scores:
+            avg_ml = np.mean(ml_scores)
+            score_accum += avg_ml * EnsembleScorer.WEIGHTS['ml'] * 100
+            weight_accum += EnsembleScorer.WEIGHTS['ml']
+            details.append(f"ML Consensus: {avg_ml:.2f}")
+
+        # DL Scores
+        dl_scores = [p['raw_score'] for k, p in predictions.items() if k in ['attention_blstm', 'rcnn']]
+        if dl_scores:
+            avg_dl = np.mean(dl_scores)
+            score_accum += avg_dl * EnsembleScorer.WEIGHTS['dl'] * 100
+            weight_accum += EnsembleScorer.WEIGHTS['dl']
+            details.append(f"DL Consensus: {avg_dl:.2f}")
+
+        # BERT Score
+        if 'bert' in predictions:
+            bert_s = predictions['bert']['raw_score']
+            score_accum += bert_s * EnsembleScorer.WEIGHTS['bert'] * 100
+            weight_accum += EnsembleScorer.WEIGHTS['bert']
+            details.append(f"BERT Score: {bert_s:.2f}")
+
+        # Semantic Score
+        if 'semantic' in predictions:
+            sem_s = predictions['semantic']['raw_score']
+            score_accum += sem_s * EnsembleScorer.WEIGHTS['semantic'] * 100
+            weight_accum += EnsembleScorer.WEIGHTS['semantic']
+
+        # Network Risk Logic
+        net_risk = 0.0
+        net_reasons = []
+        for net_info in network_data:
+            if net_info.get('proxy') or net_info.get('hosting'):
+                net_risk += 40
+                net_reasons.append("Hosted/Proxy IP")
+            
+            org = str(net_info.get('org', '')).lower()
+            isp = str(net_info.get('isp', '')).lower()
+            suspicious_hosts = ['hostinger', 'namecheap', 'digitalocean', 'hetzner', 'ovh', 'flokinet']
+            if any(x in org or x in isp for x in suspicious_hosts):
+                net_risk += 20
+                net_reasons.append(f"Cheap Cloud Provider ({org[:15]}...)")
+        
+        net_risk = min(net_risk, 100)
+        score_accum += net_risk * EnsembleScorer.WEIGHTS['network']
+        weight_accum += EnsembleScorer.WEIGHTS['network']
+        
+        if net_reasons:
+            details.append(f"Network Penalties: {', '.join(list(set(net_reasons)))}")
+
+        if weight_accum == 0:
+            final_score = 50.0
+        else:
+            final_score = score_accum / weight_accum
+
+        return {
+            "score": min(max(final_score, 0), 100),
+            "details": "; ".join(details),
+            "network_risk": net_risk
+        }
 
 def load_models():
-    global ml_models, dl_models, bert_model, semantic_model, groq_async_client
-    
-    print("Loading models...")
+    global ml_models, dl_models, bert_model, semantic_model, key_rotator
+    logger.info("Initializing System & Loading Models...")
     
     models_dir = config.MODELS_DIR
+    
+    # Load ML Models
     for model_name in ['logistic', 'svm', 'xgboost']:
-        model_path = os.path.join(models_dir, f'{model_name}.joblib')
-        if os.path.exists(model_path):
-            ml_models[model_name] = joblib.load(model_path)
-            print(f"✓ Loaded {model_name} model")
-        else:
-            print(f"⚠ Warning: {model_name} model not found at {model_path}")
-    
+        try:
+            path = os.path.join(models_dir, f'{model_name}.joblib')
+            if os.path.exists(path):
+                ml_models[model_name] = joblib.load(path)
+                logger.info(f"Loaded ML: {model_name}")
+        except Exception: pass
+
+    # Load DL Models
     for model_name in ['attention_blstm', 'rcnn']:
-        model_path = os.path.join(models_dir, f'{model_name}.pt')
-        if os.path.exists(model_path):
-            model_template = get_dl_models(input_dim=len(config.NUMERICAL_FEATURES))
-            dl_models[model_name] = model_template[model_name]
-            dl_models[model_name].load_state_dict(torch.load(model_path, map_location='cpu'))
-            dl_models[model_name].eval()
-            print(f"✓ Loaded {model_name} model")
-        else:
-            print(f"⚠ Warning: {model_name} model not found at {model_path}")
-    
+        try:
+            path = os.path.join(models_dir, f'{model_name}.pt')
+            if os.path.exists(path):
+                template = get_dl_models(input_dim=len(config.NUMERICAL_FEATURES))
+                model = template[model_name]
+                model.load_state_dict(torch.load(path, map_location='cpu'))
+                model.eval()
+                dl_models[model_name] = model
+                logger.info(f"Loaded DL: {model_name}")
+        except Exception: pass
+
+    # Load BERT
     bert_path = os.path.join(config.BASE_DIR, 'finetuned_bert')
     if os.path.exists(bert_path):
         try:
             bert_model = FinetunedBERT(bert_path)
-            print("✓ Loaded BERT model")
-        except Exception as e:
-            print(f"⚠ Warning: Could not load BERT model: {e}")
-    
-    semantic_model_path = os.path.join(config.BASE_DIR, 'Message_model', 'final_semantic_model')
-    if os.path.exists(semantic_model_path) and os.listdir(semantic_model_path):
+            logger.info("Loaded BERT")
+        except Exception: pass
+
+    # Load Semantic
+    sem_path = os.path.join(config.BASE_DIR, 'Message_model', 'final_semantic_model')
+    if os.path.exists(sem_path) and PhishingPredictor:
         try:
-            semantic_model = PhishingPredictor(model_path=semantic_model_path)
-            print("✓ Loaded semantic model")
-        except Exception as e:
-            print(f"⚠ Warning: Could not load semantic model: {e}")
-    else:
-        checkpoint_path = os.path.join(config.BASE_DIR, 'Message_model', 'training_checkpoints', 'checkpoint-30')
-        if os.path.exists(checkpoint_path):
-            try:
-                semantic_model = PhishingPredictor(model_path=checkpoint_path)
-                print("✓ Loaded semantic model from checkpoint")
-            except Exception as e:
-                print(f"⚠ Warning: Could not load semantic model from checkpoint: {e}")
+            semantic_model = PhishingPredictor(model_path=sem_path)
+            logger.info("Loaded Semantic Model")
+        except Exception: pass
+        
+    key_rotator = SmartAPIKeyRotator()
+
+# --- FIXED & ROBUST URL EXTRACTION ---
+
+def extract_visible_text_and_links(html_body: str) -> tuple:
+    if not html_body: 
+        return "", []
+
+    extracted_urls = set()
     
-    groq_api_key = os.environ.get('GROQ_API_KEY')
-    if groq_api_key:
-        groq_async_client = AsyncGroq(api_key=groq_api_key)
-        print("✓ Initialized Groq API Client")
-    else:
-        print("⚠ Warning: GROQ_API_KEY not set. Set it as environment variable.")
-        print("   Example: export GROQ_API_KEY='your-api-key-here'")
-
-def extract_visible_text(html_body: str) -> str:
-    soup = BeautifulSoup(html_body, 'html.parser')
-
-    for tag in soup(["script", "style", "nav", "header", "footer", "link", "meta"]):
-        tag.decompose()
-
-    text = soup.get_text(separator=' ', strip=True)
-    text = re.sub(r'\s+', ' ', text).strip()
+    # --- 1. Regex Extraction (Run on RAW input first) ---
+    url_pattern = r'(?:https?://|ftp://|www\.)[\w\-\.]+\.[a-zA-Z]{2,}(?:/[\w\-\._~:/?#[\]@!$&\'()*+,;=]*)?'
     
-    return text
+    try:
+        raw_matches = re.findall(url_pattern, html_body)
+        for url in raw_matches:
+            cleaned_url = url.rstrip('.,;:"\')>]')
+            extracted_urls.add(cleaned_url)
+    except Exception as e:
+        logger.warning(f"Regex extraction warning: {e}")
 
-def parse_message(text: str) -> tuple:
-    url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+|(?:www\.)?[a-zA-Z0-9-]+\.[a-z]{2,12}\b(?:/[^\s]*)?'
-    urls = re.findall(url_pattern, text)
-    cleaned_text = re.sub(url_pattern, '', text)
-    cleaned_text = ' '.join(cleaned_text.lower().split())
-    cleaned_text = re.sub(r'[^a-z0-9\s.,!?-]', '', cleaned_text)
-    cleaned_text = re.sub(r'([.,!?])+', r'\1', cleaned_text)
-    cleaned_text = ' '.join(cleaned_text.split())
-    return urls, cleaned_text
+    # --- 2. HTML Attribute Extraction ---
+    try:
+        warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
+        soup = BeautifulSoup(html_body, 'html.parser')
+
+        url_tags = {
+            'a': 'href', 'link': 'href', 'img': 'src', 'iframe': 'src',
+            'form': 'action', 'source': 'src', 'script': 'src', 'area': 'href', 'embed': 'src'
+        }
+
+        for tag_name, attr_name in url_tags.items():
+            for tag in soup.find_all(tag_name):
+                url = tag.get(attr_name)
+                if url:
+                    url = url.strip()
+                    if url.startswith('//'):
+                        url = 'https:' + url
+                    if re.match(url_pattern, url):
+                        extracted_urls.add(url)
+
+        # --- 3. Text Extraction ---
+        for tag in soup(["script", "style", "nav", "header", "footer", "meta", "noscript", "svg"]):
+            tag.decompose()
+
+        text = soup.get_text(separator=' ', strip=True)
+        text = unicodedata.normalize('NFKC', text)
+        text = "".join(ch for ch in text if unicodedata.category(ch)[0] != "C" or ch == "\n")
+        
+        return text.strip(), list(extracted_urls)
+
+    except Exception as e:
+        logger.error(f"Parser Error: {e}")
+        return html_body, list(extracted_urls)
 
 async def extract_url_features(urls: List[str]) -> pd.DataFrame:
-    if not urls:
-        return pd.DataFrame()
-    
+    if not urls: return pd.DataFrame()
     df = pd.DataFrame({'url': urls})
-    whois_cache = {}
-    ssl_cache = {}
+    whois_cache, ssl_cache = {}, {}
     
-    tasks = []
-    for _, row in df.iterrows():
-        tasks.append(asyncio.to_thread(process_row, row, whois_cache, ssl_cache))
+    # Concurrency limiter inside feature extraction if needed
+    tasks = [asyncio.to_thread(process_row, row, whois_cache, ssl_cache) for _, row in df.iterrows()]
     
-    feature_list = await asyncio.gather(*tasks)
-    features_df = pd.DataFrame(feature_list)
-    result_df = pd.concat([df, features_df], axis=1)
-    return result_df
+    # Use gather with return_exceptions=True to prevent one bad URL crashing the batch
+    feature_list_raw = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    # Filter out exceptions
+    feature_list = []
+    for f in feature_list_raw:
+        if isinstance(f, Exception):
+            logger.error(f"Feature extraction error: {f}")
+            # Return empty feature set/defaults on error to keep DF alignment
+            feature_list.append({}) 
+        else:
+            feature_list.append(f)
 
-def custom_boundary(raw_score: float, boundary: float) -> float:
-    return (raw_score - boundary) * 100
+    return pd.concat([df, pd.DataFrame(feature_list)], axis=1)
 
 def get_model_predictions(features_df: pd.DataFrame, message_text: str) -> Dict:
     predictions = {}
-    
-    numerical_features = config.NUMERICAL_FEATURES
-    categorical_features = config.CATEGORICAL_FEATURES
+    num_feats = config.NUMERICAL_FEATURES
+    cat_feats = config.CATEGORICAL_FEATURES
     
     if not features_df.empty:
         try:
-            X = features_df[numerical_features + categorical_features]
-
-            X.loc[:, numerical_features] = X.loc[:, numerical_features].fillna(-1)
-            X.loc[:, categorical_features] = X.loc[:, categorical_features].fillna('N/A')
-
-            for model_name, model in ml_models.items():
-                try:
-                    all_probas = model.predict_proba(X)[:, 1]  
-                    raw_score = np.max(all_probas)      
-                    
-                    scaled_score = custom_boundary(raw_score, MODEL_BOUNDARIES[model_name])
-                    predictions[model_name] = {
-                        'raw_score': float(raw_score),
-                        'scaled_score': float(scaled_score)
-                    }
-                except Exception as e:
-                    print(f"Error with {model_name} (Prediction Step): {e}") 
+            X = features_df[num_feats + cat_feats].copy()
+            X[num_feats] = X[num_feats].fillna(-1)
+            X[cat_feats] = X[cat_feats].fillna('N/A')
             
-            X_numerical = X[numerical_features].values 
-            
-            for model_name, model in dl_models.items():
+            # ML Prediction
+            for name, model in ml_models.items():
                 try:
-                    X_tensor = torch.tensor(X_numerical, dtype=torch.float32)
-                    with torch.no_grad():
-                        all_scores = model(X_tensor)
-                        raw_score = torch.max(all_scores).item()
-                        
-                    scaled_score = custom_boundary(raw_score, MODEL_BOUNDARIES[model_name])
-                    predictions[model_name] = {
-                        'raw_score': float(raw_score),
-                        'scaled_score': float(scaled_score)
-                    }
-                except Exception as e:
-                    print(f"Error with {model_name}: {e}")
-        
-        except KeyError as e:
-            print(f"Error: Missing columns in features_df. {e}")
-            print(f"Available columns: {features_df.columns.tolist()}")
-
-        if bert_model:
-            try:
-                urls = features_df['url'].tolist()
-                raw_scores = bert_model.predict_proba(urls)
-                avg_raw_score = np.mean([score[1] for score in raw_scores])
-                scaled_score = custom_boundary(avg_raw_score, MODEL_BOUNDARIES['bert'])
-                predictions['bert'] = {
-                    'raw_score': float(avg_raw_score),
-                    'scaled_score': float(scaled_score)
-                }
-            except Exception as e:
-                print(f"Error with BERT: {e}")
-    
+                    probas = model.predict_proba(X)[:, 1]
+                    predictions[name] = {'raw_score': float(np.max(probas))}
+                except: predictions[name] = {'raw_score': 0.5}
+            
+            # DL Prediction
+            if dl_models:
+                X_num = torch.tensor(X[num_feats].values.astype(np.float32))
+                with torch.no_grad():
+                    for name, model in dl_models.items():
+                        try:
+                            out = model(X_num)
+                            predictions[name] = {'raw_score': float(torch.max(out).item())}
+                        except: predictions[name] = {'raw_score': 0.5}
+            
+            # BERT Prediction
+            if bert_model:
+                try:
+                    scores = bert_model.predict_proba(features_df['url'].tolist())
+                    predictions['bert'] = {'raw_score': float(np.mean([s[1] for s in scores]))}
+                except: pass
+        except Exception as e:
+            logger.error(f"Feature Pipeline Error: {e}")
+            
+    # Semantic Prediction
     if semantic_model and message_text:
         try:
-            result = semantic_model.predict(message_text)
-            raw_score = result['phishing_probability']
-            scaled_score = custom_boundary(raw_score, MODEL_BOUNDARIES['semantic'])
-            predictions['semantic'] = {
-                'raw_score': float(raw_score),
-                'scaled_score': float(scaled_score),
-                'confidence': result['confidence']
-            }
-        except Exception as e:
-            print(f"Error with semantic model: {e}")
-    
+            res = semantic_model.predict(message_text)
+            predictions['semantic'] = {'raw_score': float(res['phishing_probability'])}
+        except: pass
+        
     return predictions
 
-async def get_network_features_for_gemini(urls: List[str]) -> str:
-    if not urls:
-        return "No URLs to analyze for network features."
+async def get_network_data_raw(urls: List[str]) -> List[Dict]:
+    """
+    Fetches network data with caching and concurrency limits to avoid API bans.
+    """
+    data = []
+    unique_hosts = set()
     
-    results = []
-    async with httpx.AsyncClient() as client:
-        for i, url_str in enumerate(urls[:3]): 
+    # Filter to unique hosts to avoid redundant calls
+    for url_str in urls:
+        try:
+            parsed = urlparse(url_str if url_str.startswith(('http', 'https')) else f"http://{url_str}")
+            if parsed.hostname:
+                unique_hosts.add(parsed.hostname)
+        except: pass
+    
+    # Limit to top 5 unique hosts to save API quota
+    target_hosts = list(unique_hosts)[:5]
+
+    async with httpx.AsyncClient(timeout=3.0) as client:
+        for host in target_hosts:
+            # Check Cache
+            if host in ip_cache:
+                data.append(ip_cache[host])
+                continue
+
             try:
-                hostname = urlparse(url_str).hostname
-                if not hostname:
-                    results.append(f"\nURL {i+1} ({url_str}): Invalid URL, no hostname.")
-                    continue
+                ip = await asyncio.to_thread(socket.gethostbyname, host)
+                resp = await client.get(f"http://ip-api.com/json/{ip}?fields=status,message,country,isp,org,as,proxy,hosting")
+                if resp.status_code == 200:
+                    geo = resp.json()
+                    if geo.get('status') == 'success':
+                        geo['ip'] = ip
+                        geo['host'] = host
+                        data.append(geo)
+                        ip_cache[host] = geo # Cache result
+            except Exception:
+                pass
+            
+            # Polite delay to respect rate limits
+            await asyncio.sleep(0.2)
+            
+    return data
+
+async def scrape_landing_page(url: str) -> str:
+    if not url: return ""
+    try:
+        async with async_playwright() as p:
+            # Launch chromium in headless mode
+            browser = await p.chromium.launch(headless=True)
+            
+            # Create context with realistic User-Agent
+            context = await browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+            )
+            
+            page = await context.new_page()
+            
+            try:
+                target_url = url if url.startswith(('http', 'https')) else f"http://{url}"
+                # Wait for DOM to load, timeout after 10s to keep API fast
+                await page.goto(target_url, timeout=10000, wait_until="domcontentloaded")
                 
-                try:
-                    ip_address = await asyncio.to_thread(socket.gethostbyname, hostname)
-                except socket.gaierror:
-                    results.append(f"\nURL {i+1} ({hostname}): Could not resolve domain to IP.")
-                    continue
+                # Extract content
+                content = await page.content()
                 
-                try:
-                    geo_url = f"http://ip-api.com/json/{ip_address}?fields=status,message,country,city,isp,org,as"
-                    response = await client.get(geo_url, timeout=3.0)
-                    response.raise_for_status()
-                    data = response.json()
-                    
-                    if data.get('status') == 'success':
-                        geo_info = (
-                            f"   • IP Address: {ip_address}\n"
-                            f"   • Location: {data.get('city', 'N/A')}, {data.get('country', 'N/A')}\n"
-                            f"   • ISP: {data.get('isp', 'N/A')}\n"
-                            f"   • Organization: {data.get('org', 'N/A')}\n"
-                            f"   • ASN: {data.get('as', 'N/A')}"
-                        )
-                        results.append(f"\nURL {i+1} ({hostname}):\n{geo_info}")
-                    else:
-                        results.append(f"\nURL {i+1} ({hostname}):\n   • IP Address: {ip_address}\n   • Geo-Data: API lookup failed ({data.get('message')})")
+                # Process with BeautifulSoup
+                soup = BeautifulSoup(content, 'html.parser')
+                for tag in soup(["script", "style", "nav", "footer", "svg", "noscript"]):
+                    tag.decompose()
                 
-                except httpx.RequestError as e:
-                    results.append(f"\nURL {i+1} ({hostname}):\n   • IP Address: {ip_address}\n   • Geo-Data: Network error while fetching IP info ({str(e)})")
+                text = soup.get_text(separator=' ', strip=True)
+                text = unicodedata.normalize('NFKC', text)
+                return text[:2000]
                 
             except Exception as e:
-                results.append(f"\nURL {i+1} ({url_str}): Error processing URL ({str(e)})")
-    
-    if not results:
-        return "No valid hostnames found in URLs to analyze."
+                # Return partial error info but don't crash
+                return f"Error accessing page: {str(e)}"
+            finally:
+                await browser.close()
+                
+    except Exception as e:
+        logger.warning(f"Scraping failed for {url}: {e}")
+        return "Could not access landing page."
 
-    return "\n".join(results)
+# --- UPDATED SYSTEM PROMPT WITH 14 EXAMPLES (2 NEW + 12 ORIGINAL) ---
 
 SYSTEM_PROMPT = """You are an expert JSON-only phishing detection judge. Your sole purpose is to analyze input data and return a JSON object in the exact format requested. Do not output any text before or after the JSON.
-
 **Core Rules:**
-1.  **You are the Final Judge:** Your primary role is to make a final, correct decision. Use all evidence: Sender, Subject, Message Text, Model Scores, and Network Data.
-2.  **Prioritize Ground Truth:** 'INDEPENDENT NETWORK & GEO-DATA' is ground truth and **MUST** be trusted over 'URL FEATURES' (which can fail, e.g., `domain_age: -1`). If ML/DL 'Model Scores' contradict clear network data (e.g., a known brand like 'Google' or 'Cloudflare'), you **MUST** override the models and rule 'legitimate'. Your reasoning should explain this override.
-3.  **Confidence Score:** 0-100. >50.0 = phishing. <50.0 = legitimate. Must match `final_decision`.
-4.  **Highlighting:** Return the *entire* original message in `highlighted_text`. Wrap suspicious parts (URLs, urgency words, deceptive claims) in `@@...@@`. If legitimate, use NO `@@` markers.
-
+1.  **The "One Bad Link" Rule:** If the email contains **ANY** suspicious or malicious URL, the Final Decision MUST be "phishing" (100% Confidence), even if other links are legitimate (like Google Forms).
+2.  **Suspicious URL Definition:** A URL is suspicious if:
+    - It is NSFW/Adult.
+    - It uses a "generated" or "random" domain (e.g., `643646.me`, `xyz123.top`) unrelated to the sender.
+    - It is a mismatch (e.g., email says "Wipro" but URL is `allegrolokalnie.me`).
+    - It is **HIDDEN** in a Header (H1) or Image tag but is not the main call-to-action.
+3.  **Respect Technical Score:** If 'Calculated Ensemble Score' is > 60, you MUST lean towards 'phishing'.
+4.  **Prioritize Ground Truth:** Trust Network Data, but remember: Cloudflare/AWS host both good and bad sites. A Cloudflare IP does NOT guarantee safety if the domain name itself (`643646.me`) looks fraudulent.
+5.  **Highlighting:** Return the *entire* message. Wrap suspicious parts in `@@...@@`.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-**FEW-SHOT EXAMPLES:**
-
-**Example 1: Clear Phishing (Typosquat)**
+**14 FEW-SHOT EXAMPLES:**
+**Example 1: Mixed Links (Phishing - Hidden Header)**
+Sender: hr@wipro.com
+Message: "Apply here: [docs.google.com](Legit)" (Hidden in H1: `suspicious-site.net`)
+Correct Decision: {{
+    "confidence": 99.0,
+    "reasoning": "Phishing. Although the Google Form link is valid, the email contains a hidden URL ('suspicious-site.net') in the header. This is a common evasion tactic.",
+    "highlighted_text": "Apply here: [docs.google.com] @@(Hidden Header URL Detected)@@",
+    "final_decision": "phishing",
+    "suggestion": "Do not click. A hidden malicious link was detected."
+}}
+**Example 2: Random Domain (Phishing)**
+Sender: support@amazon.com
+Message: "Verify account: [amazon-verify.643646.me]"
+Correct Decision: {{
+    "confidence": 95.0,
+    "reasoning": "Phishing. The domain '643646.me' is a random/generated alphanumeric domain unrelated to Amazon.",
+    "highlighted_text": "Verify account: @@[amazon-verify.643646.me]@@",
+    "final_decision": "phishing",
+    "suggestion": "This is a fake Amazon link."
+}}
+**Example 3: Clear Phishing (Typosquat)**
 Sender: no-reply@paypa1-secure.xyz
 Subject: URGENT! Your Account is Suspended!
-Message: "URGENT! Your account has suspicious activity. Click: http://paypa1-secure.xyz/verify to login and verify."
-URL Features: domain_age: 5
-Network Data: IP: 123.45.67.89, Location: Russia, ISP: Shady-Host
-Model Scores: All positive
+Message: "URGENT! Your account has suspicious activity. Click: [http://paypa1-secure.xyz/verify](http://paypa1-secure.xyz/verify) to login and verify."
 Correct Decision: {{
     "confidence": 98.0,
     "reasoning": "Phishing. Typosquatted domain 'paypa1', new age, suspicious ISP, and urgency tactics.",
-    "highlighted_text": "@@URGENT!@@ Your account has suspicious activity. Click: @@http://paypa1-secure.xyz/verify@@ to login and verify.",
+    "highlighted_text": "@@URGENT!@@ Your account has suspicious activity. Click: @@[http://paypa1-secure.xyz/verify](http://paypa1-secure.xyz/verify)@@ to login and verify.",
     "final_decision": "phishing",
     "suggestion": "Do NOT click. This is a clear attempt to steal your credentials. Delete immediately."
 }}
-
-**Example 2: Legitimate (False Positive Case)**
+**Example 4: Legitimate (False Positive Case)**
 Sender: notifications@codeforces.com
 Subject: Codeforces Round 184 Reminder
-Message: "Hi, join Codeforces Round 184. ... Unsubscribe: https://codeforces.com/unsubscribe/..."
-URL Features: domain_age: -1 (This is a lookup failure!)
-Network Data: URL (codeforces.com): IP: 104.22.6.109, Location: San Francisco, USA, ISP: Cloudflare, Inc.
-Model Scores: Mixed
+Message: "Hi, join Codeforces Round 184. ... Unsubscribe: [https://codeforces.com/unsubscribe/](https://codeforces.com/unsubscribe/)..."
 Correct Decision: {{
     "confidence": 10.0,
     "reasoning": "Legitimate. Override models. `domain_age: -1` is a lookup failure. Network data confirms 'codeforces.com' is real (Cloudflare).",
-    "highlighted_text": "Hi, join Codeforces Round 184. ... Unsubscribe: https://codeforces.com/unsubscribe/...",
+    "highlighted_text": "Hi, join Codeforces Round 184. ... Unsubscribe: [https://codeforces.com/unsubscribe/](https://codeforces.com/unsubscribe/)...",
     "final_decision": "legitimate",
     "suggestion": "This message is safe. It is a legitimate notification from Codeforces."
 }}
-
-**Example 3: Legitimate (Formal Text)**
+**Example 5: Legitimate (Formal Text)**
 Sender: investor.relations@tatamotors.com
 Subject: TATA MOTORS GENERAL GUIDANCE NOTE
 Message: "TATA MOTORS PASSENGER VEHICLES LIMITED... GENERAL GUIDANCE NOTE... [TRUNCATED]"
-URL Features: domain_age: 8414
-Network Data: URL (cars.tatamotors.com): IP: 23.209.113.12, Location: Boardman, USA, ISP: Akamai
-Model Scores: All negative
 Correct Decision: {{
     "confidence": 5.0,
     "reasoning": "Legitimate. Formal corporate text. Network data confirms 'tatamotors.com' on Akamai. Models are correct.",
@@ -347,14 +548,10 @@ Correct Decision: {{
     "final_decision": "legitimate",
     "suggestion": "This message is a legitimate corporate communication and appears safe."
 }}
-
-**Example 4: No URL Phishing (Scam)**
+**Example 6: No URL Phishing (Scam)**
 Sender: it-support@yourcompany.org
 Subject: Employee Appreciation Reward
 Message: "To thank you for your hard work, please reply with your personal email address and mobile phone number to receive your $500 gift card."
-URL Features: No URLs detected
-Network Data: No URLs detected
-Model Scores: semantic: positive
 Correct Decision: {{
     "confidence": 85.0,
     "reasoning": "Phishing. No URL. This is a data harvesting scam. The sender is suspicious and is requesting sensitive personal information.",
@@ -362,14 +559,10 @@ Correct Decision: {{
     "final_decision": "phishing",
     "suggestion": "Do not reply. This is a scam to steal your personal information. Report this email to your IT department."
 }}
-
-**Example 5: Legitimate Transaction (No URL)**
+**Example 7: Legitimate Transaction (No URL)**
 Sender: VM-SBIUPI
 Subject: N/A
 Message: "Dear UPI user A/C X1243 debited by 16.0 on date 16Nov25 trf to Kuldevi Caterers Refno 532032534589 If not u? call-1800111109 for other services-18001234-SBI"
-URL Features: No URLs detected
-Network Data: No URLs detected
-Model Scores: semantic: negative
 Correct Decision: {{
     "confidence": 10.0,
     "reasoning": "Legitimate. This is a standard, informational banking transaction alert (UPI debit). It contains no URLs and the phone numbers appear to be standard toll-free support lines.",
@@ -377,59 +570,43 @@ Correct Decision: {{
     "final_decision": "legitimate",
     "suggestion": "This message is a legitimate transaction alert and appears safe. No action is needed unless you do not recognize this transaction."
 }}
-
-**Example 6: Clear Phishing (Prize Scam)**
+**Example 8: Clear Phishing (Prize Scam)**
 Sender: meta-rewards@hacker-round.com
 Subject: hooray you have won a prize!!!
-Message: "You have won Rs 5000 for the meta hacker round 2 , for getting into top 2500 click here to claim you prize : https:// www.dghjdgf.com/paypal.co.uk/cycgi-bin/webscrcmd=_home-customer&nav=1/loading.php"
-URL Features: domain_age: 1, count_dot: 4, count_special_chars: 12
-Network Data: URL (dghjdgf.com): IP: 1.2.3.4, Location: Unknown, ISP: Random-Host-Provider
-Model Scores: All positive
+Message: "You have won Rs 5000 for the meta hacker round 2 , for getting into top 2500 click here to claim you prize : https:// [www.dghjdgf.com/paypal.co.uk/cycgi-bin/webscrcmd=_home-customer&nav=1/loading.php](https://www.dghjdgf.com/paypal.co.uk/cycgi-bin/webscrcmd=_home-customer&nav=1/loading.php)"
 Correct Decision: {{
     "confidence": 99.0,
     "reasoning": "Phishing. This is a classic prize scam. The URL is highly suspicious, using a random domain ('dghjdgf.com') to impersonate PayPal. The lure of money and call to action are clear phishing tactics.",
-    "highlighted_text": "@@You have won Rs 5000 for the meta hacker round 2@@ , for getting into top 2500 @@click here to claim you prize : https:// www.dghjdgf.com/paypal.co.uk/cycgi-bin/webscrcmd=_home-customer&nav=1/loading.php@@",
+    "highlighted_text": "@@You have won Rs 5000 for the meta hacker round 2@@ , for getting into top 2500 @@click here to claim you prize : https:// [www.dghjdgf.com/paypal.co.uk/cycgi-bin/webscrcmd=_home-customer&nav=1/loading.php](https://www.dghjdgf.com/paypal.co.uk/cycgi-bin/webscrcmd=_home-customer&nav=1/loading.php)@@",
     "final_decision": "phishing",
     "suggestion": "Do NOT click this link. This is a scam to steal your information. Delete this email immediately."
 }}
-
-**Example 7: Legitimate University Event (Internal)**
+**Example 9: Legitimate University Event (Internal)**
 Sender: AI Club <ai_club@dau.ac.in>
 Subject: Invitation to iPrompt ’25 & AI Triathlon — 15th November at iFest’25
-Message: "Dear Students, The AI Club, DA-IICT, is delighted to invite you... Register: https://ifest25.vercel.app ... Participants’ WhatsApp Group: https://chat.whatsapp.com/EeJ1XeNxcgM7w7gVBjKjox ... Warm regards, AI Club, DA-IICT"
-URL Features: domain_age: -1 (vercel.app), domain_age: 7500 (whatsapp.com)
-Network Data: URL (ifest25.vercel.app): IP: 76.76.21.21, Location: USA, ISP: Vercel Inc. URL (chat.whatsapp.com): IP: 157.240.22.60, Location: USA, ISP: Meta Platforms, Inc.
-Model Scores: Mixed (semantic: negative, some URL models might flag vercel.app)
+Message: "Dear Students, The AI Club, DA-IICT, is delighted to invite you... Register: [https://ifest25.vercel.app](https://ifest25.vercel.app)    ... Participants' WhatsApp Group: [https://chat.whatsapp.com/EeJ1XeNxcgM7w7gVBjKjox](https://chat.whatsapp.com/EeJ1XeNxcgM7w7gVBjKjox)    ... Warm regards, AI Club, DA-IICT"
 Correct Decision: {{
     "confidence": 5.0,
     "reasoning": "Legitimate. This is an internal university announcement from a trusted sender domain (@dau.ac.in). The links to Vercel (common for student projects) and WhatsApp are legitimate and verified by network data.",
-    "highlighted_text": "Dear Students, The AI Club, DA-IICT, is delighted to invite you... Register: https://ifest25.vercel.app ... Participants’ WhatsApp Group: https://chat.whatsapp.com/EeJ1XeNxcgM7w7gVBjKjox ... Warm regards, AI Club, DA-IICT",
+    "highlighted_text": "Dear Students, The AI Club, DA-IICT, is delighted to invite you... Register: [https://ifest25.vercel.app](https://ifest25.vercel.app)    ... Participants' WhatsApp Group: [https://chat.whatsapp.com/EeJ1XeNxcgM7w7gVBjKjox](https://chat.whatsapp.com/EeJ1XeNxcgM7w7gVBjKjox)    ... Warm regards, AI Club, DA-IICT",
     "final_decision": "legitimate",
     "suggestion": "This email is a safe internal announcement about a university event."
 }}
-
-**Example 8: Legitimate Corporate Policy Update**
+**Example 10: Legitimate Corporate Policy Update**
 Sender: YouTube <no-reply@youtube.com>
-Subject: Annual reminder about YouTube’s Terms of Service, Community Guidelines and Privacy Policy
-Message: "This email is an annual reminder that your use of YouTube is subject to the Terms of Service, Community Guidelines and Google’s Privacy Policy... © 2025 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA, 94043"
-URL Features: domain_age: 10000+ (youtube.com, google.com)
-Network Data: URL (youtube.com): IP: 142.250.196.222, Location: USA, ISP: Google LLC
-Model Scores: All negative
+Subject: Annual reminder about YouTube's Terms of Service, Community Guidelines and Privacy Policy
+Message: "This email is an annual reminder that your use of YouTube is subject to the Terms of Service, Community Guidelines and Google's Privacy Policy... © 2025 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA, 94043"
 Correct Decision: {{
     "confidence": 1.0,
     "reasoning": "Legitimate. This is a standard, text-heavy legal/policy notification from a trusted sender (@youtube.com). Network data confirms the domain belongs to Google. There is no suspicious call to action.",
-    "highlighted_text": "This email is an annual reminder that your use of YouTube is subject to the Terms of Service, Community Guidelines and Google’s Privacy Policy... © 2025 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA, 94043",
+    "highlighted_text": "This email is an annual reminder that your use of YouTube is subject to the Terms of Service, Community Guidelines and Google's Privacy Policy... © 2025 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA, 94043",
     "final_decision": "legitimate",
     "suggestion": "This is a standard policy update from YouTube. It is safe."
 }}
-
-**Example 9: Legitimate Service Notification (Google)**
+**Example 11: Legitimate Service Notification (Google)**
 Sender: 2022 01224 (Classroom) <no-reply@classroom.google.com>
 Subject: Due tomorrow: "Lab 09"
 Message: "Aaditya_CT303 Due tomorrow Lab 09 Follow these instructions... View assignment Google LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA"
-URL Features: domain_age: 10000+ (classroom.google.com)
-Network Data: URL (classroom.google.com): IP: 142.250.196.206, Location: USA, ISP: Google LLC
-Model Scores: All negative
 Correct Decision: {{
     "confidence": 2.0,
     "reasoning": "Legitimate. This is an automated notification from Google Classroom. The sender (@classroom.google.com) and network data confirm it's a real Google service. The 'urgency' (Due tomorrow) is part of the service's function.",
@@ -437,29 +614,21 @@ Correct Decision: {{
     "final_decision": "legitimate",
     "suggestion": "This is a safe and legitimate assignment reminder from Google Classroom."
 }}
-
-**Example 10: Legitimate Internal Announcement (No URL)**
+**Example 12: Legitimate Internal Announcement (No URL)**
 Sender: iFest DAU <ifest@dau.ac.in>
 Subject: Instruction for i.Fest' 25
-Message: "Hello everyone, As we all know, i.Fest’ 25 begins today! Here are some important guidelines... Entry will be permitted only with a valid Student ID card... Best Regards, Team i.Fest"
-URL Features: No URLs detected
-Network Data: No URLs detected
-Model Scores: semantic: negative
+Message: "Hello everyone, As we all know, i.Fest' 25 begins today! Here are some important guidelines... Entry will be permitted only with a valid Student ID card... Best Regards, Team i.Fest"
 Correct Decision: {{
     "confidence": 5.0,
     "reasoning": "Legitimate. This is a text-only informational email from a trusted internal university domain (@dau.ac.in). It contains instructions, not suspicious links or requests.",
-    "highlighted_text": "Hello everyone, As we all know, i.Fest’ 25 begins today! Here are some important guidelines... Entry will be permitted only with a valid Student ID card... Best Regards, Team i.Fest",
+    "highlighted_text": "Hello everyone, As we all know, i.Fest' 25 begins today! Here are some important guidelines... Entry will be permitted only with a valid Student ID card... Best Regards, Team i.Fest",
     "final_decision": "legitimate",
     "suggestion": "This is a safe internal announcement for university students."
 }}
-
-**Example 11: Legitimate Marketing (Clickbait Subject)**
+**Example 13: Legitimate Marketing (Clickbait Subject)**
 Sender: Jia from Unstop <noreply@dare2compete.news>
 Subject: [Congrats] Intern with Panasonic - Earn a stipend of ₹35,000!
 Message: "Hi Akshat, here are some top opportunities curated just for you! ... Software Engineering Internship Panasonic... Explore more Internships... © 2025 Unstop. All rights reserved."
-URL Features: domain_age: 3000+ (dare2compete.news)
-Network Data: URL (dare2compete.news): IP: 104.26.10.168, Location: USA, ISP: Cloudflare, Inc.
-Model Scores: Mixed (Subject line '[Congrats]' might trigger semantic model)
 Correct Decision: {{
     "confidence": 15.0,
     "reasoning": "Legitimate. Although the subject line '[Congrats]' is clickbait, the sender domain ('dare2compete.news') is established and network data (Cloudflare) checks out. The content is a standard job/internship digest from a known platform.",
@@ -467,26 +636,20 @@ Correct Decision: {{
     "final_decision": "legitimate",
     "suggestion": "This is a legitimate promotional email from Unstop. It is safe."
 }}
-
-**Example 12: Legitimate Marketing (SaaS)**
+**Example 14: Legitimate Marketing (SaaS)**
 Sender: Numerade <ace@email.numerade.com>
 Subject: Your All-In-One Finals Prep Toolkit
-Message: "Finals can be overwhelming. Numerade’s textbook solutions give you instant access to step-by-step explanations... Find Your Textbook Answers ... © 2025, Numerade, All rights reserved."
-URL Features: domain_age: 2000+ (email.numerade.com)
-Network Data: URL (email.numerade.com): IP: 149.72.215.153, Location: USA, ISP: SendGrid, Inc.
-Model Scores: All negative
+Message: "Finals can be overwhelming. Numerade's textbook solutions give you instant access to step-by-step explanations... Find Your Textbook Answers ... © 2025, Numerade, All rights reserved."
 Correct Decision: {{
     "confidence": 8.0,
     "reasoning": "Legitimate. This is a standard marketing email from a known company (Numerade) sent via a reputable email service (SendGrid), as confirmed by network data. It has clear unsubscribe links and branding.",
-    "highlighted_text": "Finals can be overwhelming. Numerade’s textbook solutions give you instant access to step-by-step explanations... Find Your Textbook Answers ... © 2025, Numerade, All rights reserved.",
+    "highlighted_text": "Finals can be overwhelming. Numerade's textbook solutions give you instant access to step-by-step explanations... Find Your Textbook Answers ... © 2025, Numerade, All rights reserved.",
     "final_decision": "legitimate",
     "suggestion": "This is a safe marketing email from Numerade."
 }}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 **YOUR ANALYSIS TASK:**
 Analyze the message data provided by the user (in the 'user' message) following all rules. Respond ONLY with the JSON object.
-
 **OUTPUT FORMAT (JSON ONLY):**
 {{
     "confidence": <float (0-100, directional score where >50 is phishing)>,
@@ -496,276 +659,220 @@ Analyze the message data provided by the user (in the 'user' message) following 
     "suggestion": "<specific, actionable advice for the user on how to handle this message>"
 }}"""
 
-async def get_groq_final_decision(urls: List[str], features_df: pd.DataFrame, 
-                                  message_text: str, predictions: Dict, 
-                                  original_text: str,
-                                  sender: Optional[str] = "",
-                                  subject: Optional[str] = "") -> Dict:
+# --- UPDATED FUNCTION TO HANDLE RAW HTML SCANNING & CLEAN TEXT DISPLAY ---
+async def get_groq_decision(ensemble_result: Dict, network_data: List[Dict], landing_page_text: str, cleaned_text: str, original_raw_html: str, readable_display_text: str, sender: str, subject: str):
+    # 1. Format Network Data
+    net_str = "No Network Data"
+    if network_data:
+        net_str = "\n".join([
+            f"- Host: {d.get('host')} | IP: {d.get('ip')} | Org: {d.get('org')} | ISP: {d.get('isp')} | Hosting/Proxy: {d.get('hosting') or d.get('proxy')}"
+            for d in network_data
+        ])
     
-    if not groq_async_client:
-        avg_scaled_score = np.mean([p['scaled_score'] for p in predictions.values()]) if predictions else 0
-        confidence = min(100, max(0, 50 + avg_scaled_score))
-        final_decision = "phishing" if confidence > 50 else "legitimate"
-        
-        return {
-            "confidence": round(confidence, 2),
-            "reasoning": f"Groq API not available. Using average model scores. (Avg Scaled Score: {avg_scaled_score:.2f})",
-            "highlighted_text": original_text,
-            "final_decision": final_decision,
-            "suggestion": "Do not interact with this message. Delete it immediately and report it to your IT department." if final_decision == "phishing" else "This message appears safe, but remain cautious with any links or attachments."
-        }
-    
-    url_features_summary = "No URLs detected in message"
-    if not features_df.empty:
-        feature_summary_parts = []
-        for idx, row in features_df.iterrows():
-            url = row.get('url', 'Unknown')
-            feature_summary_parts.append(f"\nURL {idx+1}: {url}")
-            feature_summary_parts.append(f"   • Length: {row.get('url_length', 'N/A')} chars")
-            feature_summary_parts.append(f"   • Dots in URL: {row.get('count_dot', 'N/A')}")
-            feature_summary_parts.append(f"   • Special characters: {row.get('count_special_chars', 'N/A')}")
-            feature_summary_parts.append(f"   • Domain age: {row.get('domain_age_days', 'N/A')} days")
-            feature_summary_parts.append(f"   • SSL certificate valid: {row.get('cert_has_valid_hostname', 'N/A')}")
-            feature_summary_parts.append(f"   • Uses HTTPS: {row.get('https', 'N/A')}")
-        url_features_summary = "\n".join(feature_summary_parts)
-
-    network_features_summary = await get_network_features_for_gemini(urls)
-    
-    model_predictions_summary = []
-    for model_name, pred_data in predictions.items():
-        scaled = pred_data['scaled_score']
-        raw = pred_data['raw_score']
-        model_predictions_summary.append(
-            f"   • {model_name.upper()}: scaled_score={scaled:.2f} (raw={raw:.3f})"
-        )
-    model_scores_text = "\n".join(model_predictions_summary)
-    
-    MAX_TEXT_LEN = 3000
-    if len(original_text) > MAX_TEXT_LEN:
-        truncated_original_text = original_text[:MAX_TEXT_LEN] + "\n... [TRUNCATED]"
-    else:
-        truncated_original_text = original_text
-
-    if len(message_text) > MAX_TEXT_LEN:
-        truncated_message_text = message_text[:MAX_TEXT_LEN] + "\n... [TRUNCATED]"
-    else:
-        truncated_message_text = message_text
-
-    user_prompt = f"""MESSAGE DATA:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Sender: {sender if sender else 'N/A'}
-Subject: {subject if subject else 'N/A'}
-
-Original Message (Parsed from HTML):
-{truncated_original_text}
-
-Cleaned Text (for models):
-{truncated_message_text}
-
-URLs Found: {', '.join(urls) if urls else 'None'}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-URL FEATURES (from ML models):
-{url_features_summary}
-
-INDEPENDENT NETWORK & GEO-DATA (for Gemini analysis only):
-{network_features_summary}
-
-MODEL PREDICTIONS:
-(Positive scaled scores → phishing, Negative → legitimate. Range: -50 to +50)
-{model_scores_text}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Please analyze this data and provide your JSON response."""
-    
+    # --- FORENSIC URL SCAN (Scanning Raw HTML) ---
+    forensic_report = []
     try:
-        max_retries = 3
-        retry_delay = 2
+        soup = BeautifulSoup(original_raw_html, 'html.parser')
         
-        for attempt in range(max_retries):
-            try:
-                chat_completion = await groq_async_client.chat.completions.create(
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": SYSTEM_PROMPT,
-                        },
-                        {
-                            "role": "user",
-                            "content": user_prompt,
-                        }
-                    ],
-                    model="meta-llama/llama-4-scout-17b-16e-instruct",
-                    temperature=0.2,
-                    max_tokens=4096, 
-                    top_p=0.85,
-                    response_format={"type": "json_object"},
-                )
-                
-                response_text = chat_completion.choices[0].message.content
-                break
+        # A. Scan Forms
+        for form in soup.find_all('form'):
+            action = form.get('action')
+            if action: forensic_report.append(f"CRITICAL: Found URL in <form action>: {action}")
 
-            except Exception as retry_error:
-                print(f"Groq API attempt {attempt + 1} failed: {retry_error}")
-                if attempt < max_retries - 1:
-                    print(f"Retrying in {retry_delay}s...")
-                    await asyncio.sleep(retry_delay) 
-                    retry_delay *= 2
-                else:
-                    raise retry_error
-
-        result = json.loads(response_text)
-        
-        required_fields = ['confidence', 'reasoning', 'highlighted_text', 'final_decision', 'suggestion']
-        if not all(field in result for field in required_fields):
-            raise ValueError(f"Missing required fields. Got: {list(result.keys())}")
-        
-        result['confidence'] = float(result['confidence'])
-        if not 0 <= result['confidence'] <= 100:
-            result['confidence'] = max(0, min(100, result['confidence']))
-        
-        if result['final_decision'].lower() not in ['phishing', 'legitimate']:
-            result['final_decision'] = 'phishing' if result['confidence'] > 50 else 'legitimate'
-        else:
-            result['final_decision'] = result['final_decision'].lower()
-        
-        if result['final_decision'] == 'phishing' and result['confidence'] < 50:
-            print(f"Warning: Groq decision 'phishing' mismatches confidence {result['confidence']}. Adjusting confidence.")
-            result['confidence'] = 51.0
-        elif result['final_decision'] == 'legitimate' and result['confidence'] > 50:
-            print(f"Warning: Groq decision 'legitimate' mismatches confidence {result['confidence']}. Adjusting confidence.")
-            result['confidence'] = 49.0
+        # B. Scan Images
+        for img in soup.find_all('img'):
+            src = img.get('src')
+            if src: forensic_report.append(f"Found URL in <img src>: {src}")
             
-        if not result['highlighted_text'].strip() or '...' in result['highlighted_text'] or 'TRUNCATED' in result['highlighted_text']:
-            print("Warning: Groq returned empty or truncated 'highlighted_text'. Falling back to original_text.")
-            result['highlighted_text'] = original_text
-        
-        if not result.get('suggestion', '').strip():
-            if result['final_decision'] == 'phishing':
-                result['suggestion'] = "Do not interact with this message. Delete it immediately and report it as phishing."
-            else:
-                result['suggestion'] = "This message appears safe, but always verify sender identity before taking any action."
-        
-        return result
-    
-    except json.JSONDecodeError as e:
-        print(f"JSON parsing error: {e}")
-        print(f"Response text that failed parsing: {response_text[:500]}")
-        
-        avg_scaled_score = np.mean([p['scaled_score'] for p in predictions.values()]) if predictions else 0
-        confidence = min(100, max(0, 50 + avg_scaled_score))
-        final_decision = "phishing" if confidence > 50 else "legitimate"
-        
-        return {
-            "confidence": round(confidence, 2),
-            "reasoning": f"Groq response parsing failed. Fallback: Based on model average (directional score: {confidence:.2f}), message appears {'suspicious' if final_decision == 'phishing' else 'legitimate'}.",
-            "highlighted_text": original_text,
-            "final_decision": final_decision,
-            "suggestion": "Do not interact with this message. Delete it immediately and be cautious." if final_decision == 'phishing' else "Exercise caution. Verify the sender before taking any action."
-        }
-    
+        # C. Scan Links
+        for a in soup.find_all('a'):
+            href = a.get('href')
+            if href: forensic_report.append(f"Found URL in <a href>: {href}")
+            
+        # D. Scan Raw Text (Catches the H1 Case)
+        url_pattern = r'(?:https?://|ftp://|www\.)[\w\-\.]+\.[a-zA-Z]{2,}(?:/[\w\-\._~:/?#[\]@!$&\'()*+,;=]*)?'
+        all_text_urls = set(re.findall(url_pattern, original_raw_html))
+        if all_text_urls:
+            forensic_report.append(f"All URLs detected in raw text: {', '.join(all_text_urls)}")
+
     except Exception as e:
-        print(f"Error with Groq API: {e}")
-        
-        avg_scaled_score = np.mean([p['scaled_score'] for p in predictions.values()]) if predictions else 0
-        confidence = min(100, max(0, 50 + avg_scaled_score))
-        final_decision = "phishing" if confidence > 50 else "legitimate"
-        
-        return {
-            "confidence": round(confidence, 2),
-            "reasoning": f"Groq API error: {str(e)}. Fallback decision based on {len(predictions)} model predictions (average directional score: {confidence:.2f}).",
-            "highlighted_text": original_text,
-            "final_decision": final_decision,
-            "suggestion": "Treat this message with caution. Delete it if suspicious, or verify the sender through official channels before taking action." if final_decision == 'phishing' else "This message appears safe based on models, but always verify sender identity before clicking links or providing information."
-        }
+        logger.warning(f"Forensic Scan Error: {e}")
+        forensic_report.append("Forensic scan failed to parse HTML structure.")
+
+    forensic_str = "\n".join(forensic_report) if forensic_report else "No URLs found in forensic scan."
+
+    # --- PROMPT CONSTRUCTION ---
+    # NOTE: We pass 'readable_display_text' as the Message Content so LLM highlights CLEAN text, not HTML.
+    prompt = f"""
+    **ANALYSIS CONTEXT**
+    Sender: {sender}
+    Subject: {subject}
+    
+    **FORENSIC URL SCAN (INTERNAL HTML ANALYSIS)**
+    The system scanned the raw HTML and found these URLs (hidden in tags):
+    {forensic_str}
+    
+    **TECHNICAL INDICATORS**
+    Calculated Ensemble Score: {ensemble_result['score']:.2f} / 100
+    Key Factors: {ensemble_result['details']}
+    
+    **NETWORK GROUND TRUTH**
+    {net_str}
+    
+    **LANDING PAGE PREVIEW (Scraped Text)**
+    "{landing_page_text}"
+    
+    **MESSAGE CONTENT (READABLE VERSION)**
+    "{readable_display_text[:MAX_INPUT_CHARS]}"
+    
+    **TASK:**
+    Analyze the "FORENSIC URL SCAN" findings.
+    - If ANY URL in the forensic scan is NSFW/Adult or malicious, flag as PHISHING.
+    - If a URL looks like a generated subdomain (e.g. `643646.me`) or is unrelated to the sender, FLAG AS PHISHING immediately.
+    - IMPORTANT: For the 'highlighted_text' field in your JSON response, use the **MESSAGE CONTENT (READABLE VERSION)** provided above. Do NOT output raw HTML tags. Just mark suspicious parts in the readable text with @@...@@.
+    """
+    
+    attempts = 0
+    while attempts < LLM_MAX_RETRIES:
+        try:
+            client = key_rotator.get_client_and_rotate()
+            if not client: raise Exception("No Keys")
+            
+            completion = await client.chat.completions.create(
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": prompt}
+                ],
+                model="llama-3.3-70b-versatile",
+                temperature=0.1,
+                max_tokens=4096,
+                response_format={"type": "json_object"}
+            )
+            
+            raw_content = completion.choices[0].message.content
+            parsed_json = clean_and_parse_json(raw_content)
+            if parsed_json:
+                return parsed_json
+            else:
+                raise ValueError("Empty or Invalid JSON from LLM")
+
+        except RateLimitError as e:
+            wait_time = 2 ** (attempts + 1) + random.uniform(0, 1)
+            if hasattr(e, 'headers') and 'retry-after' in e.headers:
+                try:
+                    wait_time = float(e.headers['retry-after']) + 1
+                except: pass
+            
+            logger.warning(f"LLM Rate Limit (429). Retrying in {wait_time:.2f}s...")
+            await asyncio.sleep(wait_time)
+            attempts += 1
+
+        except Exception as e:
+            logger.warning(f"LLM Attempt {attempts+1} failed: {e}")
+            attempts += 1
+            await asyncio.sleep(1)
+            
+    is_phishing = ensemble_result['score'] > 50
+    return {
+        "confidence": ensemble_result['score'],
+        "reasoning": f"LLM Unavailable after retries. Decision based purely on Technical Score ({ensemble_result['score']:.2f}).",
+        "highlighted_text": readable_display_text, # Fallback to readable text
+        "final_decision": "phishing" if is_phishing else "legitimate",
+        "suggestion": "Exercise caution. Automated analysis detected risks." if is_phishing else "Appears safe."
+    }
 
 @app.on_event("startup")
-async def startup_event():
+async def startup():
+    logger.info("Starting Robust Phishing API v2.6.0")
     load_models()
-    print("\n" + "="*60)
-    print("Phishing Detection API is ready!")
-    print("="*60)
-    print("API Documentation: http://localhost:8000/docs")
-    print("="*60 + "\n")
+    logger.info("Ensemble Scorer & Models Ready")
 
-@app.get("/")
-async def root():
-    return {
-        "message": "Phishing Detection API",
-        "version": "1.0.0",
-        "endpoints": {
-            "predict": "/predict (POST)",
-            "health": "/health (GET)",
-            "docs": "/docs (GET)"
-        }
-    }
-
-@app.get("/health")
-async def health_check():
-    models_loaded = {
-        "ml_models": list(ml_models.keys()),
-        "dl_models": list(dl_models.keys()),
-        "bert_model": bert_model is not None,
-        "semantic_model": semantic_model is not None,
-        "groq_client": groq_async_client is not None
-    }
-    
-    return {
-        "status": "healthy",
-        "models_loaded": models_loaded
-    }
+# --- PREDICT ENDPOINT ---
 
 @app.post("/predict", response_model=PredictionResponse)
-async def predict(message_input: MessageInput):
-    try:
-        html_body = message_input.text
-        sender = message_input.sender
-        subject = message_input.subject
-        
-        original_text = extract_visible_text(html_body)
-        
-        if not original_text or not original_text.strip():
-            raise HTTPException(status_code=400, detail="Message text (after HTML parsing) cannot be empty")
-        
-        urls, cleaned_text = parse_message(original_text)
-        
-        features_df = pd.DataFrame()
-        if urls:
-            features_df = await extract_url_features(urls)
-        
-        predictions = {}
-        if not features_df.empty or (cleaned_text and semantic_model):
-            predictions = await asyncio.to_thread(get_model_predictions, features_df, cleaned_text)
-        
-        if not predictions:
-            if not urls and not cleaned_text:
-                detail = "Message text is empty after cleaning."
-            elif not urls and not semantic_model:
-                detail = "No URLs provided and semantic model is not loaded."
-            elif not any([ml_models, dl_models, bert_model, semantic_model]):
-                    detail = "No models available for prediction. Please ensure models are trained and loaded."
-            else:
-                detail = "Could not generate predictions. Models may be missing or feature extraction failed."
-            
-            raise HTTPException(
-                status_code=500, 
-                detail=detail
-            )
-        
-        final_result = await get_groq_final_decision(
-            urls, features_df, cleaned_text, predictions, original_text,
-            sender, subject
+async def predict(input_data: MessageInput):
+    if not input_data.text or not input_data.text.strip():
+        return PredictionResponse(
+            confidence=0.0, reasoning="Empty input.", highlighted_text="",
+            final_decision="legitimate", suggestion="None"
         )
         
-        return PredictionResponse(**final_result)
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        import traceback
-        print(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    async with request_semaphore:
+        try:
+            start_time = time.time()
+            
+            # 1. Unified Extraction
+            # 'extracted_text' = Clean, readable text (No HTML tags)
+            # 'all_urls' = List of URLs found
+            extracted_text, all_urls = extract_visible_text_and_links(input_data.text)
+            
+            # 2. Clean Text for Models (Lowercased, no URLs)
+            url_pattern_for_cleaning = r'(?:https?://|ftp://|www\.)[\w\-\.]+\.[a-zA-Z]{2,}(?:/[\w\-\._~:/?#[\]@!$&\'()*+,;=]*)?'
+            cleaned_text_for_models = re.sub(url_pattern_for_cleaning, '', extracted_text)
+            cleaned_text_for_models = ' '.join(cleaned_text_for_models.lower().split())
+
+            # LIMIT URLs to avoid 429s / DoS
+            all_urls = all_urls[:MAX_URLS_TO_ANALYZE]
+
+            if all_urls:
+                logger.info(f"🔍 Analyzing {len(all_urls)} URLs.")
+            else:
+                logger.info("ℹ️ No URLs detected.")
+
+            # 3. Feature Extraction & Scraping
+            features_df = pd.DataFrame()
+            network_data_raw = []
+            landing_page_text = ""
+            
+            if all_urls:
+                results = await asyncio.gather(
+                    extract_url_features(all_urls),
+                    get_network_data_raw(all_urls),
+                    scrape_landing_page(all_urls[0]) if all_urls else asyncio.to_thread(lambda: "")
+                )
+                features_df, network_data_raw, landing_page_text = results
+                if landing_page_text:
+                    logger.info(f"Scraped {len(landing_page_text)} chars from landing page.")
+            
+            # 4. Model Predictions
+            predictions = await asyncio.to_thread(get_model_predictions, features_df, cleaned_text_for_models)
+            
+            # 5. Ensemble Scoring
+            ensemble_result = EnsembleScorer.calculate_technical_score(predictions, network_data_raw, all_urls)
+            logger.info(f"Ensemble Technical Score: {ensemble_result['score']:.2f}")
+            
+            # 6. LLM Final Decision
+            # CRITICAL UPDATE: Pass both Raw HTML (for forensics) AND Extracted Text (for highlighting)
+            llm_result = await get_groq_decision(
+                ensemble_result, 
+                network_data_raw, 
+                landing_page_text, 
+                cleaned_text_for_models, 
+                input_data.text,   # Original Raw HTML (for forensic scan)
+                extracted_text,    # Readable Text (for LLM display output)
+                input_data.sender, 
+                input_data.subject
+            )
+            
+            final_dec = llm_result.get('final_decision', 'legitimate').lower()
+            if final_dec not in ['phishing', 'legitimate']: final_dec = 'legitimate'
+            
+            elapsed = time.time() - start_time
+            logger.info(f"✅ Processed in {elapsed:.2f}s | TechScore: {ensemble_result['score']:.0f} | Final: {final_dec.upper()}")
+            
+            return PredictionResponse(
+                confidence=float(llm_result.get('confidence', ensemble_result['score'])),
+                reasoning=llm_result.get('reasoning', ensemble_result['details']),
+                highlighted_text=llm_result.get('highlighted_text', extracted_text),
+                final_decision=final_dec,
+                suggestion=llm_result.get('suggestion', 'Check details carefully.')
+            )
+            
+        except Exception as e:
+            logger.error(f"Prediction Failed: {e}")
+            import traceback
+            traceback.print_exc()
+            raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    
     uvicorn.run(app, host="0.0.0.0", port=8000)
