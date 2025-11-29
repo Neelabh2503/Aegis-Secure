@@ -1,0 +1,40 @@
+appId: com.example.gmailclone
+---
+# - launchApp:
+ #   clearState: true
+- longPressOn:
+    point: 17%,94%
+
+# An example test message we need to scroll
+- scrollUntilVisible:
+    element:
+      text: |-
+        I
+        ISATHI-G
+        Want to check number of SIMs in your name? Download Sanchar Saathi to check: Android: https://play.google.com/store/apps/details?id=com.dot.app.sancharsaathiiOS: https://apps.apple.com/in/app/sanchar-saathi/id6739700695 Department of Telecom
+        5.00
+        Nov 24
+
+
+# A test case about searching a sms from the list of SMSes
+
+- tapOn: "Search Messages"
+- inputText: "Jio"
+# checking if scroll is possible in search option
+- scrollUntilVisible:
+    element:
+      text: |-
+        J
+        JG-JIOPAY-S
+        रिचार्ज प्लान 20-Nov-25 22:35 Hrs को समाप्त हो चूका है!
+        Jio नंबर: 7984719576
+        प्लान का नाम: Rs 349_28D_2GB/D
+        MyJio का उपयोग करके रिचार्ज करें और सभी रिचार्ज पर शून्य सुविधा शुल्क का आनंद लें।
+        रिचार्ज करने के लिए - https://www.jio.com/dl/recharge_web
+        10.00
+        Nov 20
+
+
+
+
+

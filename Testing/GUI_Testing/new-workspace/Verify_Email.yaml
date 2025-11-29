@@ -1,0 +1,26 @@
+appId: com.example.gmailclone
+---
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd:
+    timeout: 40000
+- tapOn: Verify your email
+- tapOn: "ex: user@aegissecure.com"
+- inputText: "tinycoder69@gmail.com"
+#option1 
+- tapOn: Send Code
+#option2
+#- tapOn: Cancel
+#Option 1
+- tapOn: Resend
+#Option 2
+
+#- waitForAnimationToEnd:
+ #   timeout: 20000
+#- tapOn: Confirm
+
+- tapOn:
+   point: 1%,6%
+
+
+
