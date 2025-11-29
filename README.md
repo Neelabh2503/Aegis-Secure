@@ -38,12 +38,17 @@ It automatically fetches SMS and Emails in real time, analyzes them using an adv
 
 ---
 
-![SignIn Page](Documents/PreviewImages/SignIn.jpeg)
-![Home Screen](Documents/PreviewImages/DashBoard.jpeg)
-![Gmail Inbox Page](Documents/PreviewImages/Inbox.jpeg)
-![Email Section](Documents/PreviewImages/email.jpeg)
+<div align="center">
+  <p float="left">
+    <img src="Documents/PreviewImages/SignIn.jpeg" width="220" />
+    <img src="Documents/PreviewImages/DashBoard.jpeg" width="220" />
+    <img src="Documents/PreviewImages/Inbox.jpeg" width="220" />
+    <img src="Documents/PreviewImages/email.jpeg" width="220" />
+  </p>
+</div>
 
 
 
-![Accuracy Comparision](Documents/PreviewImages/accuracy_comparision.png)
+
+![Accuracy Comparision](Documents/PreviewImages/accuracy_comparison.png)
 
