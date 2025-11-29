@@ -1,0 +1,24 @@
+appId: com.example.gmailclone
+---
+- tapOn: Already Have an Account?
+
+# If want to delete one of them 
+- longPressOn:
+    point: 71%,49%
+#Option1 
+- tapOn: |-
+    T
+    tinycoder69@gmail.com
+#Option 2
+- tapOn: |-
+    P
+    pvadsmiya@gmail.com
+# If want to delete one of them 
+- tapOn:
+    point: 71%,49%
+
+# Cross on the table 
+#- longPressOn:
+ #   point: 74%,33%
+
+

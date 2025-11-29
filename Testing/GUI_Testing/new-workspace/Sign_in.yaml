@@ -1,0 +1,14 @@
+appId: com.example.gmailclone
+---
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd:
+    timeout: 10000
+
+- tapOn: "Email"
+- inputText: "pvadsmiya@gmail.com"
+- tapOn: Password
+- inputText: "Vagabond@123"
+- tapOn: "SIGN IN"
+
+

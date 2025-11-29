@@ -1,0 +1,10 @@
+appId: com.example.gmailclone
+---
+- launchApp:
+    clearState: true
+- swipe:
+    direction: UP
+    duration: 700
+- swipe:
+    direction: DOWN
+    duration: 700
