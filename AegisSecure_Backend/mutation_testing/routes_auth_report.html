@@ -1,0 +1,1017 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /><link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" /><title>Cosmic Ray Report</title></head><body><div class="container"><h1><p class="text-dark">Cosmic Ray Report</p></h1></div><div class="container"><div class="mb-1" id="summary_info___accordion"><div class="card"><a data-toggle="collapse" data-target="#summary_info___collapse_1" aria-expanded="true" aria-controls="summary_info___collapse_1" href="#"><div class="card-header" id="summary_info___heading_1"><button class="btn btn-outline-dark"><h4 class="m-0">Summary info</h4></button></div></a><div aria-labelledby="summary_info___heading_1" data-parent="#summary_info___accordion" class="collapse show" id="summary_info___collapse_1"><div class="card-body"><p>Date time: 28/11/2025 23:46:37</p><p>Total jobs: 91</p><p>Complete: 91 (100.00%)</p><p>Surviving mutants: 0 (0.00%)</p></div></div></div></div><div class="mb-1" id="job_list___accordion"><div class="card"><a data-toggle="collapse" data-target="#job_list___collapse_1" aria-expanded="false" aria-controls="job_list___collapse_1" href="#"><div class="card-header" id="job_list___heading_1"><button class="btn btn-outline-dark"><h4 class="m-0">Job list</h4></button></div></a><div aria-labelledby="job_list___heading_1" data-parent="#job_list___accordion" class="collapse" id="job_list___collapse_1"><div class="card-body"><div class="text-right mb-1"><div class="mx-1" id="job_item_expand_all"><a href="#" onclick="$('div.job_list___sub_multi_collapse').collapse('show');"><button class="btn btn-outline-dark"><span>Expand All</span></button></a></div><div class="mx-1" id="job_item_collapse_all"><a href="#" onclick="$('div.job_list___sub_multi_collapse').collapse('hide');"><button class="btn btn-outline-dark"><span>Collapse All</span></button></a></div></div><div class="mb-1" id="job_list___sub_accordion_1"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_1_1" aria-expanded="false" aria-controls="job_list___sub_collapse_1_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_1_1"><button class="btn btn-outline-success"><span class="job_id">1 : Job ID 117fe948325442c8b5364b192c080a47</span></button></div></a><div aria-labelledby="job_list___sub_heading_1_1" data-parent="#job_list___sub_accordion_1" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_1_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=60" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (60, 42), end pos: (60, 43)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_Sub, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -57,7 +57,7 @@
+     payload = {
+         "email": user["email"],
+         "user_id": str(user["user_id"]),
+-        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30)
++        "exp": datetime.datetime.utcnow() - datetime.timedelta(days=30)
+     }
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_2"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_2_1" aria-expanded="false" aria-controls="job_list___sub_collapse_2_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_2_1"><button class="btn btn-outline-success"><span class="job_id">2 : Job ID 9baa82d5c6164d1c9e39e805f8b98b31</span></button></div></a><div aria-labelledby="job_list___sub_heading_2_1" data-parent="#job_list___sub_accordion_2" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_2_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=60" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (60, 42), end pos: (60, 43)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_Mul, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -57,7 +57,7 @@
+     payload = {
+         "email": user["email"],
+         "user_id": str(user["user_id"]),
+-        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30)
++        "exp": datetime.datetime.utcnow() * datetime.timedelta(days=30)
+     }
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_3"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_3_1" aria-expanded="false" aria-controls="job_list___sub_collapse_3_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_3_1"><button class="btn btn-outline-success"><span class="job_id">3 : Job ID c1e85784e95a4938a7f5c243a01a28f2</span></button></div></a><div aria-labelledby="job_list___sub_heading_3_1" data-parent="#job_list___sub_accordion_3" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_3_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=60" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (60, 42), end pos: (60, 43)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_Div, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -57,7 +57,7 @@
+     payload = {
+         "email": user["email"],
+         "user_id": str(user["user_id"]),
+-        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30)
++        "exp": datetime.datetime.utcnow() / datetime.timedelta(days=30)
+     }
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_4"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_4_1" aria-expanded="false" aria-controls="job_list___sub_collapse_4_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_4_1"><button class="btn btn-outline-success"><span class="job_id">4 : Job ID 94eeddc571f14e10b388cbab28c6414f</span></button></div></a><div aria-labelledby="job_list___sub_heading_4_1" data-parent="#job_list___sub_accordion_4" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_4_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=60" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (60, 42), end pos: (60, 43)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_FloorDiv, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -57,7 +57,7 @@
+     payload = {
+         "email": user["email"],
+         "user_id": str(user["user_id"]),
+-        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30)
++        "exp": datetime.datetime.utcnow() // datetime.timedelta(days=30)
+     }
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_5"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_5_1" aria-expanded="false" aria-controls="job_list___sub_collapse_5_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_5_1"><button class="btn btn-outline-success"><span class="job_id">5 : Job ID d05f6c88642642aeb529854d78a094dd</span></button></div></a><div aria-labelledby="job_list___sub_heading_5_1" data-parent="#job_list___sub_accordion_5" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_5_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=60" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (60, 42), end pos: (60, 43)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_Mod, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -57,7 +57,7 @@
+     payload = {
+         "email": user["email"],
+         "user_id": str(user["user_id"]),
+-        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30)
++        "exp": datetime.datetime.utcnow() % datetime.timedelta(days=30)
+     }
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_6"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_6_1" aria-expanded="false" aria-controls="job_list___sub_collapse_6_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_6_1"><button class="btn btn-outline-success"><span class="job_id">6 : Job ID 9f174927f0644a52ae504c8c36175745</span></button></div></a><div aria-labelledby="job_list___sub_heading_6_1" data-parent="#job_list___sub_accordion_6" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_6_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=60" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (60, 42), end pos: (60, 43)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_Pow, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -57,7 +57,7 @@
+     payload = {
+         "email": user["email"],
+         "user_id": str(user["user_id"]),
+-        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30)
++        "exp": datetime.datetime.utcnow() ** datetime.timedelta(days=30)
+     }
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_7"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_7_1" aria-expanded="false" aria-controls="job_list___sub_collapse_7_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_7_1"><button class="btn btn-outline-success"><span class="job_id">7 : Job ID fac577791d8a40609c123cae26d726d7</span></button></div></a><div aria-labelledby="job_list___sub_heading_7_1" data-parent="#job_list___sub_accordion_7" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_7_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=60" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (60, 42), end pos: (60, 43)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_RShift, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -57,7 +57,7 @@
+     payload = {
+         "email": user["email"],
+         "user_id": str(user["user_id"]),
+-        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30)
++        "exp": datetime.datetime.utcnow() &gt;&gt; datetime.timedelta(days=30)
+     }
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_8"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_8_1" aria-expanded="false" aria-controls="job_list___sub_collapse_8_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_8_1"><button class="btn btn-outline-success"><span class="job_id">8 : Job ID c14a45ae1d104885a6de257469213980</span></button></div></a><div aria-labelledby="job_list___sub_heading_8_1" data-parent="#job_list___sub_accordion_8" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_8_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=60" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (60, 42), end pos: (60, 43)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_LShift, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -57,7 +57,7 @@
+     payload = {
+         "email": user["email"],
+         "user_id": str(user["user_id"]),
+-        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30)
++        "exp": datetime.datetime.utcnow() &lt;&lt; datetime.timedelta(days=30)
+     }
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_9"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_9_1" aria-expanded="false" aria-controls="job_list___sub_collapse_9_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_9_1"><button class="btn btn-outline-success"><span class="job_id">9 : Job ID 8e7f37a936dd4b09bd7baeb8c35b568c</span></button></div></a><div aria-labelledby="job_list___sub_heading_9_1" data-parent="#job_list___sub_accordion_9" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_9_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=60" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (60, 42), end pos: (60, 43)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_BitOr, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -57,7 +57,7 @@
+     payload = {
+         "email": user["email"],
+         "user_id": str(user["user_id"]),
+-        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30)
++        "exp": datetime.datetime.utcnow() | datetime.timedelta(days=30)
+     }
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_10"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_10_1" aria-expanded="false" aria-controls="job_list___sub_collapse_10_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_10_1"><button class="btn btn-outline-success"><span class="job_id">10 : Job ID 70cb88953ad7458386813c054a805e20</span></button></div></a><div aria-labelledby="job_list___sub_heading_10_1" data-parent="#job_list___sub_accordion_10" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_10_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=60" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (60, 42), end pos: (60, 43)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_BitAnd, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -57,7 +57,7 @@
+     payload = {
+         "email": user["email"],
+         "user_id": str(user["user_id"]),
+-        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30)
++        "exp": datetime.datetime.utcnow() &amp; datetime.timedelta(days=30)
+     }
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_11"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_11_1" aria-expanded="false" aria-controls="job_list___sub_collapse_11_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_11_1"><button class="btn btn-outline-success"><span class="job_id">11 : Job ID 6f7582471a294ee3b1aa1cf6e4a627d1</span></button></div></a><div aria-labelledby="job_list___sub_heading_11_1" data-parent="#job_list___sub_accordion_11" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_11_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=60" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (60, 42), end pos: (60, 43)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_BitXor, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -57,7 +57,7 @@
+     payload = {
+         "email": user["email"],
+         "user_id": str(user["user_id"]),
+-        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30)
++        "exp": datetime.datetime.utcnow() ^ datetime.timedelta(days=30)
+     }
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_12"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_12_1" aria-expanded="false" aria-controls="job_list___sub_collapse_12_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_12_1"><button class="btn btn-outline-success"><span class="job_id">12 : Job ID 4ecacd622fbc41208a3740c1e875449c</span></button></div></a><div aria-labelledby="job_list___sub_heading_12_1" data-parent="#job_list___sub_accordion_12" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_12_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=194" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (194, 29), end pos: (194, 31)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_NotEq, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -191,7 +191,7 @@
+         {"$set": {"password": hashed_pw}}
+     )
+ 
+-    if result.modified_count == 0:
++    if result.modified_count != 0:
+         raise HTTPException(status_code=404, detail="User not found")
+ 
+     await otps_col.delete_many({"email": email})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_13"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_13_1" aria-expanded="false" aria-controls="job_list___sub_collapse_13_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_13_1"><button class="btn btn-outline-success"><span class="job_id">13 : Job ID d789d653a0ed481a95b54c58d004ed7c</span></button></div></a><div aria-labelledby="job_list___sub_heading_13_1" data-parent="#job_list___sub_accordion_13" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_13_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=194" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (194, 29), end pos: (194, 31)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_Lt, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -191,7 +191,7 @@
+         {"$set": {"password": hashed_pw}}
+     )
+ 
+-    if result.modified_count == 0:
++    if result.modified_count &lt; 0:
+         raise HTTPException(status_code=404, detail="User not found")
+ 
+     await otps_col.delete_many({"email": email})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_14"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_14_1" aria-expanded="false" aria-controls="job_list___sub_collapse_14_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_14_1"><button class="btn btn-outline-success"><span class="job_id">14 : Job ID ae483e90fa4b490da5ce7f41aaea8aa0</span></button></div></a><div aria-labelledby="job_list___sub_heading_14_1" data-parent="#job_list___sub_accordion_14" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_14_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=194" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (194, 29), end pos: (194, 31)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_LtE, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -191,7 +191,7 @@
+         {"$set": {"password": hashed_pw}}
+     )
+ 
+-    if result.modified_count == 0:
++    if result.modified_count &lt;= 0:
+         raise HTTPException(status_code=404, detail="User not found")
+ 
+     await otps_col.delete_many({"email": email})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_15"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_15_1" aria-expanded="false" aria-controls="job_list___sub_collapse_15_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_15_1"><button class="btn btn-outline-success"><span class="job_id">15 : Job ID 681166780dac4a77a6993382cf5b6799</span></button></div></a><div aria-labelledby="job_list___sub_heading_15_1" data-parent="#job_list___sub_accordion_15" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_15_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=194" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (194, 29), end pos: (194, 31)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_Gt, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -191,7 +191,7 @@
+         {"$set": {"password": hashed_pw}}
+     )
+ 
+-    if result.modified_count == 0:
++    if result.modified_count &gt; 0:
+         raise HTTPException(status_code=404, detail="User not found")
+ 
+     await otps_col.delete_many({"email": email})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_16"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_16_1" aria-expanded="false" aria-controls="job_list___sub_collapse_16_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_16_1"><button class="btn btn-outline-success"><span class="job_id">16 : Job ID 46117c7e92d34209a68487d73bc89b4d</span></button></div></a><div aria-labelledby="job_list___sub_heading_16_1" data-parent="#job_list___sub_accordion_16" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_16_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=194" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (194, 29), end pos: (194, 31)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_GtE, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -191,7 +191,7 @@
+         {"$set": {"password": hashed_pw}}
+     )
+ 
+-    if result.modified_count == 0:
++    if result.modified_count &gt;= 0:
+         raise HTTPException(status_code=404, detail="User not found")
+ 
+     await otps_col.delete_many({"email": email})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_17"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_17_1" aria-expanded="false" aria-controls="job_list___sub_collapse_17_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_17_1"><button class="btn btn-outline-success"><span class="job_id">17 : Job ID 2ee05282be914a7797cdd5062ef4f5d2</span></button></div></a><div aria-labelledby="job_list___sub_heading_17_1" data-parent="#job_list___sub_accordion_17" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_17_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=137" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (137, 17), end pos: (137, 19)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Is_IsNot, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -134,7 +134,7 @@
+     try:
+         payload = decode_jwt(token)
+         email: str = payload.get("email")
+-        if email is None:
++        if email is not None:
+             raise HTTPException(status_code=403, detail="Invalid token payload")
+ 
+         user = await users_col.find_one({"email": email})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_18"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_18_1" aria-expanded="false" aria-controls="job_list___sub_collapse_18_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_18_1"><button class="btn btn-outline-success"><span class="job_id">18 : Job ID 8b7c86061bb54a7abc68e01832926f77</span></button></div></a><div aria-labelledby="job_list___sub_heading_18_1" data-parent="#job_list___sub_accordion_18" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_18_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=141" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (141, 16), end pos: (141, 18)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Is_IsNot, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -138,7 +138,7 @@
+             raise HTTPException(status_code=403, detail="Invalid token payload")
+ 
+         user = await users_col.find_one({"email": email})
+-        if user is None:
++        if user is not None:
+             raise HTTPException(status_code=404, detail="User not found")
+         user["user_id"] = str(user["user_id"])
+         return user</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_19"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_19_1" aria-expanded="false" aria-controls="job_list___sub_collapse_19_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_19_1"><button class="btn btn-outline-success"><span class="job_id">19 : Job ID 7fb56b765c684624b4d8f3cb354db534</span></button></div></a><div aria-labelledby="job_list___sub_heading_19_1" data-parent="#job_list___sub_accordion_19" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_19_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=51" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (51, 7), end pos: (51, 10)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -48,7 +48,7 @@
+ @router.post("/login", response_model=models.LoginResponse)
+ async def login_user(req: models.LoginRequest):
+     user = await users_col.find_one({"email": req.email})
+-    if not user:
++    if  user:
+         raise HTTPException(status_code=400, detail="User not found")
+     
+     if not verify_password(req.password, user["password"]):</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_20"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_20_1" aria-expanded="false" aria-controls="job_list___sub_collapse_20_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_20_1"><button class="btn btn-outline-success"><span class="job_id">20 : Job ID f230008e90af4e0095b3ff1c57842504</span></button></div></a><div aria-labelledby="job_list___sub_heading_20_1" data-parent="#job_list___sub_accordion_20" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_20_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=54" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (54, 7), end pos: (54, 10)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -51,7 +51,7 @@
+     if not user:
+         raise HTTPException(status_code=400, detail="User not found")
+     
+-    if not verify_password(req.password, user["password"]):
++    if  verify_password(req.password, user["password"]):
+         raise HTTPException(status_code=400, detail="Incorrect password")
+     
+     payload = {</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_21"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_21_1" aria-expanded="false" aria-controls="job_list___sub_collapse_21_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_21_1"><button class="btn btn-outline-success"><span class="job_id">21 : Job ID e99b4848f1dc460bbd8252328eef39f5</span></button></div></a><div aria-labelledby="job_list___sub_heading_21_1" data-parent="#job_list___sub_accordion_21" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_21_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=72" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (72, 7), end pos: (72, 10)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -69,7 +69,7 @@
+ @router.post("/send-otp")
+ async def send_otp_router(req: models.SendOTPRequest):
+     user = await users_col.find_one({"email": req.email})
+-    if not user:
++    if  user:
+         raise HTTPException(status_code=400, detail="User not found")
+     
+     otp_code = generate_otp()</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_22"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_22_1" aria-expanded="false" aria-controls="job_list___sub_collapse_22_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_22_1"><button class="btn btn-outline-success"><span class="job_id">22 : Job ID c31c7f906c8e405392d0fe9a5d7a9dc3</span></button></div></a><div aria-labelledby="job_list___sub_heading_22_1" data-parent="#job_list___sub_accordion_22" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_22_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=84" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (84, 11), end pos: (84, 14)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -81,7 +81,7 @@
+ async def verify_otp(req: models.VerifyOTPRequest):
+     try:
+         is_valid = await verify_otp_in_db(req.email, req.otp)
+-        if not is_valid:
++        if  is_valid:
+             raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+ 
+         await users_col.update_one({"email": req.email}, {"$set": {"verified": True}})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_23"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_23_1" aria-expanded="false" aria-controls="job_list___sub_collapse_23_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_23_1"><button class="btn btn-outline-success"><span class="job_id">23 : Job ID ccddbdb29a8f4fe9b55e3bd5325b3257</span></button></div></a><div aria-labelledby="job_list___sub_heading_23_1" data-parent="#job_list___sub_accordion_23" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_23_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=102" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (102, 7), end pos: (102, 10)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 4</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -99,7 +99,7 @@
+     token = credentials.credentials
+     decoded = decode_jwt(token)
+     user = await users_col.find_one({"email": decoded["email"]})
+-    if not user:
++    if  user:
+         raise HTTPException(status_code=404, detail="User not found")
+ 
+     return {</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_24"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_24_1" aria-expanded="false" aria-controls="job_list___sub_collapse_24_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_24_1"><button class="btn btn-outline-success"><span class="job_id">24 : Job ID 3049c04f97454780bac356e6298488a3</span></button></div></a><div aria-labelledby="job_list___sub_heading_24_1" data-parent="#job_list___sub_accordion_24" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_24_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (117, 7), end pos: (117, 10)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 5</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -114,7 +114,7 @@
+     token = credentials.credentials
+     decoded = decode_jwt(token)
+     user = await users_col.find_one({"email": decoded["email"]})
+-    if not user:
++    if  user:
+         raise HTTPException(status_code=404, detail="User not found")
+ 
+     contents = await file.read()</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_25"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_25_1" aria-expanded="false" aria-controls="job_list___sub_collapse_25_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_25_1"><button class="btn btn-outline-success"><span class="job_id">25 : Job ID 468736fb48d04a93ad5595c6f91810b7</span></button></div></a><div aria-labelledby="job_list___sub_heading_25_1" data-parent="#job_list___sub_accordion_25" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_25_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=168" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (168, 7), end pos: (168, 10)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 6</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -165,7 +165,7 @@
+ async def verify_reset_otp(req: models.VerifyOTPRequest):
+     email = req.email.lower()
+     is_valid = await verify_otp_in_db(email, req.otp)
+-    if not is_valid:
++    if  is_valid:
+         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+ 
+     reset_token = create_reset_jwt(email)</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_26"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_26_1" aria-expanded="false" aria-controls="job_list___sub_collapse_26_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_26_1"><button class="btn btn-outline-success"><span class="job_id">26 : Job ID ee309bbd98cc4925ba62ce4d862c92fb</span></button></div></a><div aria-labelledby="job_list___sub_heading_26_1" data-parent="#job_list___sub_accordion_26" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_26_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=181" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (181, 7), end pos: (181, 10)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 7</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -178,7 +178,7 @@
+     otp = data.get("otp")
+     new_password = data.get("new_password")
+ 
+-    if not all([email, otp, new_password]):
++    if  all([email, otp, new_password]):
+         raise HTTPException(status_code=400, detail="Missing fields")
+ 
+     otp_doc = await otps_col.find_one({"email": email, "otp": otp})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_27"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_27_1" aria-expanded="false" aria-controls="job_list___sub_collapse_27_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_27_1"><button class="btn btn-outline-success"><span class="job_id">27 : Job ID 5c592311a0914a258fe45a5cb39e35b0</span></button></div></a><div aria-labelledby="job_list___sub_heading_27_1" data-parent="#job_list___sub_accordion_27" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_27_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=185" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (185, 7), end pos: (185, 10)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 8</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -182,7 +182,7 @@
+         raise HTTPException(status_code=400, detail="Missing fields")
+ 
+     otp_doc = await otps_col.find_one({"email": email, "otp": otp})
+-    if not otp_doc:
++    if  otp_doc:
+         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+ 
+     hashed_pw = hash_password(new_password)</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_28"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_28_1" aria-expanded="false" aria-controls="job_list___sub_collapse_28_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_28_1"><button class="btn btn-outline-success"><span class="job_id">28 : Job ID c909b8046af4494da59eef59745cd2aa</span></button></div></a><div aria-labelledby="job_list___sub_heading_28_1" data-parent="#job_list___sub_accordion_28" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_28_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=29" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (29, 7), end pos: (29, 15)</button></a></pre><pre>operator: core/AddNot, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -26,7 +26,7 @@
+ @router.post("/register")
+ async def register_user(req: models.RegisterRequest):
+     existing = await users_col.find_one({"email": req.email})
+-    if existing:
++    if not existing:
+         raise HTTPException(status_code=400, detail="Email already registered")
+     
+     hashed_password = hash_password(req.password)</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_29"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_29_1" aria-expanded="false" aria-controls="job_list___sub_collapse_29_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_29_1"><button class="btn btn-outline-success"><span class="job_id">29 : Job ID 6b48cc23cf2344638c395e7dbe2ace59</span></button></div></a><div aria-labelledby="job_list___sub_heading_29_1" data-parent="#job_list___sub_accordion_29" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_29_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=51" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (51, 7), end pos: (51, 15)</button></a></pre><pre>operator: core/AddNot, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -48,7 +48,7 @@
+ @router.post("/login", response_model=models.LoginResponse)
+ async def login_user(req: models.LoginRequest):
+     user = await users_col.find_one({"email": req.email})
+-    if not user:
++    if not not user:
+         raise HTTPException(status_code=400, detail="User not found")
+     
+     if not verify_password(req.password, user["password"]):</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_30"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_30_1" aria-expanded="false" aria-controls="job_list___sub_collapse_30_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_30_1"><button class="btn btn-outline-success"><span class="job_id">30 : Job ID 126f44494edf4d1c88a648baca2eec82</span></button></div></a><div aria-labelledby="job_list___sub_heading_30_1" data-parent="#job_list___sub_accordion_30" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_30_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=54" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (54, 7), end pos: (54, 58)</button></a></pre><pre>operator: core/AddNot, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -51,7 +51,7 @@
+     if not user:
+         raise HTTPException(status_code=400, detail="User not found")
+     
+-    if not verify_password(req.password, user["password"]):
++    if not not verify_password(req.password, user["password"]):
+         raise HTTPException(status_code=400, detail="Incorrect password")
+     
+     payload = {</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_31"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_31_1" aria-expanded="false" aria-controls="job_list___sub_collapse_31_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_31_1"><button class="btn btn-outline-success"><span class="job_id">31 : Job ID e05426f1996a480a863aef540b96cdd5</span></button></div></a><div aria-labelledby="job_list___sub_heading_31_1" data-parent="#job_list___sub_accordion_31" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_31_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=72" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (72, 7), end pos: (72, 15)</button></a></pre><pre>operator: core/AddNot, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -69,7 +69,7 @@
+ @router.post("/send-otp")
+ async def send_otp_router(req: models.SendOTPRequest):
+     user = await users_col.find_one({"email": req.email})
+-    if not user:
++    if not not user:
+         raise HTTPException(status_code=400, detail="User not found")
+     
+     otp_code = generate_otp()</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_32"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_32_1" aria-expanded="false" aria-controls="job_list___sub_collapse_32_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_32_1"><button class="btn btn-outline-success"><span class="job_id">32 : Job ID ecedb07550b744bca0fa681c84ed6472</span></button></div></a><div aria-labelledby="job_list___sub_heading_32_1" data-parent="#job_list___sub_accordion_32" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_32_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=84" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (84, 11), end pos: (84, 23)</button></a></pre><pre>operator: core/AddNot, occurrence: 4</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -81,7 +81,7 @@
+ async def verify_otp(req: models.VerifyOTPRequest):
+     try:
+         is_valid = await verify_otp_in_db(req.email, req.otp)
+-        if not is_valid:
++        if not not is_valid:
+             raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+ 
+         await users_col.update_one({"email": req.email}, {"$set": {"verified": True}})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_33"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_33_1" aria-expanded="false" aria-controls="job_list___sub_collapse_33_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_33_1"><button class="btn btn-outline-success"><span class="job_id">33 : Job ID 7ffb8a8ac4554144a10e39b0dd998993</span></button></div></a><div aria-labelledby="job_list___sub_heading_33_1" data-parent="#job_list___sub_accordion_33" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_33_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=102" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (102, 7), end pos: (102, 15)</button></a></pre><pre>operator: core/AddNot, occurrence: 5</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -99,7 +99,7 @@
+     token = credentials.credentials
+     decoded = decode_jwt(token)
+     user = await users_col.find_one({"email": decoded["email"]})
+-    if not user:
++    if not not user:
+         raise HTTPException(status_code=404, detail="User not found")
+ 
+     return {</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_34"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_34_1" aria-expanded="false" aria-controls="job_list___sub_collapse_34_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_34_1"><button class="btn btn-outline-success"><span class="job_id">34 : Job ID eb6df9febd8043588cc5a190ce33c77b</span></button></div></a><div aria-labelledby="job_list___sub_heading_34_1" data-parent="#job_list___sub_accordion_34" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_34_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=117" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (117, 7), end pos: (117, 15)</button></a></pre><pre>operator: core/AddNot, occurrence: 6</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -114,7 +114,7 @@
+     token = credentials.credentials
+     decoded = decode_jwt(token)
+     user = await users_col.find_one({"email": decoded["email"]})
+-    if not user:
++    if not not user:
+         raise HTTPException(status_code=404, detail="User not found")
+ 
+     contents = await file.read()</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_35"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_35_1" aria-expanded="false" aria-controls="job_list___sub_collapse_35_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_35_1"><button class="btn btn-outline-success"><span class="job_id">35 : Job ID f615ce1060f94f8fb9cc872845e10503</span></button></div></a><div aria-labelledby="job_list___sub_heading_35_1" data-parent="#job_list___sub_accordion_35" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_35_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=137" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (137, 11), end pos: (137, 24)</button></a></pre><pre>operator: core/AddNot, occurrence: 7</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -134,7 +134,7 @@
+     try:
+         payload = decode_jwt(token)
+         email: str = payload.get("email")
+-        if email is None:
++        if not email is None:
+             raise HTTPException(status_code=403, detail="Invalid token payload")
+ 
+         user = await users_col.find_one({"email": email})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_36"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_36_1" aria-expanded="false" aria-controls="job_list___sub_collapse_36_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_36_1"><button class="btn btn-outline-success"><span class="job_id">36 : Job ID 6032cd0ca4d74c00ac059a89c6d3a0f7</span></button></div></a><div aria-labelledby="job_list___sub_heading_36_1" data-parent="#job_list___sub_accordion_36" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_36_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=141" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (141, 11), end pos: (141, 23)</button></a></pre><pre>operator: core/AddNot, occurrence: 8</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -138,7 +138,7 @@
+             raise HTTPException(status_code=403, detail="Invalid token payload")
+ 
+         user = await users_col.find_one({"email": email})
+-        if user is None:
++        if not user is None:
+             raise HTTPException(status_code=404, detail="User not found")
+         user["user_id"] = str(user["user_id"])
+         return user</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_37"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_37_1" aria-expanded="false" aria-controls="job_list___sub_collapse_37_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_37_1"><button class="btn btn-outline-success"><span class="job_id">37 : Job ID 25e79fb5adc94e608e122f4ce9972b3f</span></button></div></a><div aria-labelledby="job_list___sub_heading_37_1" data-parent="#job_list___sub_accordion_37" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_37_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=159" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (159, 7), end pos: (159, 11)</button></a></pre><pre>operator: core/AddNot, occurrence: 9</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -156,7 +156,7 @@
+ async def forgot_password(req: models.SendOTPRequest):
+     email = req.email.lower()
+     user = await users_col.find_one({"email": email})
+-    if user:
++    if not user:
+         otp_code =generate_otp()
+         await store_otp(email, otp_code)
+         await send_otp(email, otp_code)</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_38"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_38_1" aria-expanded="false" aria-controls="job_list___sub_collapse_38_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_38_1"><button class="btn btn-outline-success"><span class="job_id">38 : Job ID 837f968308eb4d4c914a25e48bd72557</span></button></div></a><div aria-labelledby="job_list___sub_heading_38_1" data-parent="#job_list___sub_accordion_38" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_38_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=168" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (168, 7), end pos: (168, 19)</button></a></pre><pre>operator: core/AddNot, occurrence: 10</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -165,7 +165,7 @@
+ async def verify_reset_otp(req: models.VerifyOTPRequest):
+     email = req.email.lower()
+     is_valid = await verify_otp_in_db(email, req.otp)
+-    if not is_valid:
++    if not not is_valid:
+         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+ 
+     reset_token = create_reset_jwt(email)</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_39"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_39_1" aria-expanded="false" aria-controls="job_list___sub_collapse_39_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_39_1"><button class="btn btn-outline-success"><span class="job_id">39 : Job ID ff221495a61c45fb8750d35d5acdea7a</span></button></div></a><div aria-labelledby="job_list___sub_heading_39_1" data-parent="#job_list___sub_accordion_39" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_39_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=181" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (181, 7), end pos: (181, 42)</button></a></pre><pre>operator: core/AddNot, occurrence: 11</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -178,7 +178,7 @@
+     otp = data.get("otp")
+     new_password = data.get("new_password")
+ 
+-    if not all([email, otp, new_password]):
++    if not not all([email, otp, new_password]):
+         raise HTTPException(status_code=400, detail="Missing fields")
+ 
+     otp_doc = await otps_col.find_one({"email": email, "otp": otp})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_40"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_40_1" aria-expanded="false" aria-controls="job_list___sub_collapse_40_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_40_1"><button class="btn btn-outline-success"><span class="job_id">40 : Job ID 8aa97119951342b4bb07c84526bf1621</span></button></div></a><div aria-labelledby="job_list___sub_heading_40_1" data-parent="#job_list___sub_accordion_40" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_40_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=185" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (185, 7), end pos: (185, 18)</button></a></pre><pre>operator: core/AddNot, occurrence: 12</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -182,7 +182,7 @@
+         raise HTTPException(status_code=400, detail="Missing fields")
+ 
+     otp_doc = await otps_col.find_one({"email": email, "otp": otp})
+-    if not otp_doc:
++    if not not otp_doc:
+         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+ 
+     hashed_pw = hash_password(new_password)</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_41"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_41_1" aria-expanded="false" aria-controls="job_list___sub_collapse_41_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_41_1"><button class="btn btn-outline-success"><span class="job_id">41 : Job ID bf2e327947ea4b588a10f594459b49a2</span></button></div></a><div aria-labelledby="job_list___sub_heading_41_1" data-parent="#job_list___sub_accordion_41" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_41_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=194" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (194, 7), end pos: (194, 33)</button></a></pre><pre>operator: core/AddNot, occurrence: 13</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -191,7 +191,7 @@
+         {"$set": {"password": hashed_pw}}
+     )
+ 
+-    if result.modified_count == 0:
++    if not result.modified_count == 0:
+         raise HTTPException(status_code=404, detail="User not found")
+ 
+     await otps_col.delete_many({"email": email})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_42"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_42_1" aria-expanded="false" aria-controls="job_list___sub_collapse_42_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_42_1"><button class="btn btn-outline-success"><span class="job_id">42 : Job ID a5485abc13e54313b7f0d5c393f4023f</span></button></div></a><div aria-labelledby="job_list___sub_heading_42_1" data-parent="#job_list___sub_accordion_42" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_42_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=87" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (87, 79), end pos: (87, 83)</button></a></pre><pre>operator: core/ReplaceTrueWithFalse, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -84,7 +84,7 @@
+         if not is_valid:
+             raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+ 
+-        await users_col.update_one({"email": req.email}, {"$set": {"verified": True}})
++        await users_col.update_one({"email": req.email}, {"$set": {"verified": False}})
+         await otps_col.delete_many({"email": req.email})
+         return {"message": "OTP verified successfully, user is now verified."}
+ </pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_43"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_43_1" aria-expanded="false" aria-controls="job_list___sub_collapse_43_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_43_1"><button class="btn btn-outline-success"><span class="job_id">43 : Job ID 7d31677f66314784b140f33d295d7a03</span></button></div></a><div aria-labelledby="job_list___sub_heading_43_1" data-parent="#job_list___sub_accordion_43" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_43_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=37" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (37, 20), end pos: (37, 25)</button></a></pre><pre>operator: core/ReplaceFalseWithTrue, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -34,7 +34,7 @@
+         "name": req.name,
+         "email": req.email,
+         "password": hashed_password,
+-        "verified": False,
++        "verified": True,
+         "user_id" : str(uuid.uuid4()),
+         "avatar_base64": "",
+     }</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_44"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_44_1" aria-expanded="false" aria-controls="job_list___sub_collapse_44_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_44_1"><button class="btn btn-outline-success"><span class="job_id">44 : Job ID 23292a726842411891fca3e1f390c281</span></button></div></a><div aria-labelledby="job_list___sub_heading_44_1" data-parent="#job_list___sub_accordion_44" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_44_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=64" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (64, 60), end pos: (64, 65)</button></a></pre><pre>operator: core/ReplaceFalseWithTrue, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -61,7 +61,7 @@
+     }
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+-    return {"token": token,"verified": user.get("verified", False)}
++    return {"token": token,"verified": user.get("verified", True)}
+ 
+ 
+ #Routes for OTP send aaand verification during Registeration as well as password change</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_45"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_45_1" aria-expanded="false" aria-controls="job_list___sub_collapse_45_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_45_1"><button class="btn btn-outline-success"><span class="job_id">45 : Job ID e7ad2aafa00441f1a5fa7807d3662eb2</span></button></div></a><div aria-labelledby="job_list___sub_heading_45_1" data-parent="#job_list___sub_accordion_45" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_45_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=108" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (108, 41), end pos: (108, 46)</button></a></pre><pre>operator: core/ReplaceFalseWithTrue, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -105,7 +105,7 @@
+     return {
+         "name": user["name"],
+         "email": user["email"],
+-        "verified": user.get("verified", False),
++        "verified": user.get("verified", True),
+         "avatar_base64": user.get("avatar_base64", ""),
+     }
+ </pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_46"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_46_1" aria-expanded="false" aria-controls="job_list___sub_collapse_46_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_46_1"><button class="btn btn-outline-success"><span class="job_id">46 : Job ID c2ac42c981034567ab0db22cca0797d6</span></button></div></a><div aria-labelledby="job_list___sub_heading_46_1" data-parent="#job_list___sub_accordion_46" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_46_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=91" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (91, 11), end pos: (91, 20)</button></a></pre><pre>operator: core/ExceptionReplacer, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -88,7 +88,7 @@
+         await otps_col.delete_many({"email": req.email})
+         return {"message": "OTP verified successfully, user is now verified."}
+ 
+-    except Exception as e:
++    except CosmicRayTestingException as e:
+         print(f"Exception during OTP verify: {e}")
+         raise
+ </pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_47"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_47_1" aria-expanded="false" aria-controls="job_list___sub_collapse_47_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_47_1"><button class="btn btn-outline-success"><span class="job_id">47 : Job ID 23b07cf1a4614d4da195ff7b33d14971</span></button></div></a><div aria-labelledby="job_list___sub_heading_47_1" data-parent="#job_list___sub_accordion_47" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_47_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=146" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (146, 14), end pos: (146, 15)</button></a></pre><pre>operator: core/ExceptionReplacer, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -143,7 +143,7 @@
+         user["user_id"] = str(user["user_id"])
+         return user
+     
+-    except jwt.ExpiredSignatureError:
++    except jwtCosmicRayTestingExceptionExpiredSignatureError:
+         raise HTTPException(status_code=403, detail="JWT Token has expired")
+     except jwt.InvalidTokenError:
+         raise HTTPException(status_code=403, detail="Invalid JWT token")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_48"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_48_1" aria-expanded="false" aria-controls="job_list___sub_collapse_48_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_48_1"><button class="btn btn-outline-success"><span class="job_id">48 : Job ID ee39037ece384756a5e454d05f253960</span></button></div></a><div aria-labelledby="job_list___sub_heading_48_1" data-parent="#job_list___sub_accordion_48" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_48_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=148" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (148, 14), end pos: (148, 15)</button></a></pre><pre>operator: core/ExceptionReplacer, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -145,7 +145,7 @@
+     
+     except jwt.ExpiredSignatureError:
+         raise HTTPException(status_code=403, detail="JWT Token has expired")
+-    except jwt.InvalidTokenError:
++    except jwtCosmicRayTestingExceptionInvalidTokenError:
+         raise HTTPException(status_code=403, detail="Invalid JWT token")
+     
+ </pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_49"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_49_1" aria-expanded="false" aria-controls="job_list___sub_collapse_49_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_49_1"><button class="btn btn-outline-success"><span class="job_id">49 : Job ID bef43004a90f45a59c493604505b36db</span></button></div></a><div aria-labelledby="job_list___sub_heading_49_1" data-parent="#job_list___sub_accordion_49" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_49_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=30" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (30, 40), end pos: (30, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -27,7 +27,7 @@
+ async def register_user(req: models.RegisterRequest):
+     existing = await users_col.find_one({"email": req.email})
+     if existing:
+-        raise HTTPException(status_code=400, detail="Email already registered")
++        raise HTTPException(status_code= 401, detail="Email already registered")
+     
+     hashed_password = hash_password(req.password)
+     user_doc = {</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_50"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_50_1" aria-expanded="false" aria-controls="job_list___sub_collapse_50_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_50_1"><button class="btn btn-outline-success"><span class="job_id">50 : Job ID c87da1f70eb54e3ea3165f6f33e5c061</span></button></div></a><div aria-labelledby="job_list___sub_heading_50_1" data-parent="#job_list___sub_accordion_50" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_50_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=30" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (30, 40), end pos: (30, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -27,7 +27,7 @@
+ async def register_user(req: models.RegisterRequest):
+     existing = await users_col.find_one({"email": req.email})
+     if existing:
+-        raise HTTPException(status_code=400, detail="Email already registered")
++        raise HTTPException(status_code= 399, detail="Email already registered")
+     
+     hashed_password = hash_password(req.password)
+     user_doc = {</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_51"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_51_1" aria-expanded="false" aria-controls="job_list___sub_collapse_51_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_51_1"><button class="btn btn-outline-success"><span class="job_id">51 : Job ID 210c8fcf6f114b219e93bfa9b321fc75</span></button></div></a><div aria-labelledby="job_list___sub_heading_51_1" data-parent="#job_list___sub_accordion_51" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_51_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=52" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (52, 40), end pos: (52, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -49,7 +49,7 @@
+ async def login_user(req: models.LoginRequest):
+     user = await users_col.find_one({"email": req.email})
+     if not user:
+-        raise HTTPException(status_code=400, detail="User not found")
++        raise HTTPException(status_code= 401, detail="User not found")
+     
+     if not verify_password(req.password, user["password"]):
+         raise HTTPException(status_code=400, detail="Incorrect password")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_52"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_52_1" aria-expanded="false" aria-controls="job_list___sub_collapse_52_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_52_1"><button class="btn btn-outline-success"><span class="job_id">52 : Job ID e1f7d05084c641bc893ba3fe7a20cc32</span></button></div></a><div aria-labelledby="job_list___sub_heading_52_1" data-parent="#job_list___sub_accordion_52" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_52_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=52" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (52, 40), end pos: (52, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -49,7 +49,7 @@
+ async def login_user(req: models.LoginRequest):
+     user = await users_col.find_one({"email": req.email})
+     if not user:
+-        raise HTTPException(status_code=400, detail="User not found")
++        raise HTTPException(status_code= 399, detail="User not found")
+     
+     if not verify_password(req.password, user["password"]):
+         raise HTTPException(status_code=400, detail="Incorrect password")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_53"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_53_1" aria-expanded="false" aria-controls="job_list___sub_collapse_53_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_53_1"><button class="btn btn-outline-success"><span class="job_id">53 : Job ID 8dcc12f9b9ef4953bc46b23992e799e2</span></button></div></a><div aria-labelledby="job_list___sub_heading_53_1" data-parent="#job_list___sub_accordion_53" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_53_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=55" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (55, 40), end pos: (55, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 4</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -52,7 +52,7 @@
+         raise HTTPException(status_code=400, detail="User not found")
+     
+     if not verify_password(req.password, user["password"]):
+-        raise HTTPException(status_code=400, detail="Incorrect password")
++        raise HTTPException(status_code= 401, detail="Incorrect password")
+     
+     payload = {
+         "email": user["email"],</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_54"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_54_1" aria-expanded="false" aria-controls="job_list___sub_collapse_54_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_54_1"><button class="btn btn-outline-success"><span class="job_id">54 : Job ID bfa9b207f1ed4369aa0e71e9a7bd9aa9</span></button></div></a><div aria-labelledby="job_list___sub_heading_54_1" data-parent="#job_list___sub_accordion_54" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_54_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=55" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (55, 40), end pos: (55, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 5</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -52,7 +52,7 @@
+         raise HTTPException(status_code=400, detail="User not found")
+     
+     if not verify_password(req.password, user["password"]):
+-        raise HTTPException(status_code=400, detail="Incorrect password")
++        raise HTTPException(status_code= 399, detail="Incorrect password")
+     
+     payload = {
+         "email": user["email"],</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_55"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_55_1" aria-expanded="false" aria-controls="job_list___sub_collapse_55_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_55_1"><button class="btn btn-outline-success"><span class="job_id">55 : Job ID 57e5a2535daf4ff5a8335272218eb94f</span></button></div></a><div aria-labelledby="job_list___sub_heading_55_1" data-parent="#job_list___sub_accordion_55" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_55_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=60" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (60, 68), end pos: (60, 70)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 6</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -57,7 +57,7 @@
+     payload = {
+         "email": user["email"],
+         "user_id": str(user["user_id"]),
+-        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30)
++        "exp": datetime.datetime.utcnow() + datetime.timedelta(days= 31)
+     }
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_56"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_56_1" aria-expanded="false" aria-controls="job_list___sub_collapse_56_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_56_1"><button class="btn btn-outline-success"><span class="job_id">56 : Job ID f9562c3624ea494499af9e9d84a994e5</span></button></div></a><div aria-labelledby="job_list___sub_heading_56_1" data-parent="#job_list___sub_accordion_56" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_56_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=60" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (60, 68), end pos: (60, 70)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 7</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -57,7 +57,7 @@
+     payload = {
+         "email": user["email"],
+         "user_id": str(user["user_id"]),
+-        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30)
++        "exp": datetime.datetime.utcnow() + datetime.timedelta(days= 29)
+     }
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_57"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_57_1" aria-expanded="false" aria-controls="job_list___sub_collapse_57_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_57_1"><button class="btn btn-outline-success"><span class="job_id">57 : Job ID 7b5d3a4c03d1467fb92915f720005ba6</span></button></div></a><div aria-labelledby="job_list___sub_heading_57_1" data-parent="#job_list___sub_accordion_57" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_57_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=73" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (73, 40), end pos: (73, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 8</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -70,7 +70,7 @@
+ async def send_otp_router(req: models.SendOTPRequest):
+     user = await users_col.find_one({"email": req.email})
+     if not user:
+-        raise HTTPException(status_code=400, detail="User not found")
++        raise HTTPException(status_code= 401, detail="User not found")
+     
+     otp_code = generate_otp()
+     await store_otp(req.email, otp_code)</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_58"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_58_1" aria-expanded="false" aria-controls="job_list___sub_collapse_58_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_58_1"><button class="btn btn-outline-success"><span class="job_id">58 : Job ID 65aee8f602ed49ada084209059afcbbe</span></button></div></a><div aria-labelledby="job_list___sub_heading_58_1" data-parent="#job_list___sub_accordion_58" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_58_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=73" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (73, 40), end pos: (73, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 9</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -70,7 +70,7 @@
+ async def send_otp_router(req: models.SendOTPRequest):
+     user = await users_col.find_one({"email": req.email})
+     if not user:
+-        raise HTTPException(status_code=400, detail="User not found")
++        raise HTTPException(status_code= 399, detail="User not found")
+     
+     otp_code = generate_otp()
+     await store_otp(req.email, otp_code)</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_59"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_59_1" aria-expanded="false" aria-controls="job_list___sub_collapse_59_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_59_1"><button class="btn btn-outline-success"><span class="job_id">59 : Job ID 7d526236e41d4ed09f0734c6901945e7</span></button></div></a><div aria-labelledby="job_list___sub_heading_59_1" data-parent="#job_list___sub_accordion_59" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_59_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=85" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (85, 44), end pos: (85, 47)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 10</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -82,7 +82,7 @@
+     try:
+         is_valid = await verify_otp_in_db(req.email, req.otp)
+         if not is_valid:
+-            raise HTTPException(status_code=400, detail="Invalid or expired OTP")
++            raise HTTPException(status_code= 401, detail="Invalid or expired OTP")
+ 
+         await users_col.update_one({"email": req.email}, {"$set": {"verified": True}})
+         await otps_col.delete_many({"email": req.email})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_60"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_60_1" aria-expanded="false" aria-controls="job_list___sub_collapse_60_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_60_1"><button class="btn btn-outline-success"><span class="job_id">60 : Job ID 0d37458c35ff462db47dbd7f36899056</span></button></div></a><div aria-labelledby="job_list___sub_heading_60_1" data-parent="#job_list___sub_accordion_60" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_60_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=85" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (85, 44), end pos: (85, 47)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 11</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -82,7 +82,7 @@
+     try:
+         is_valid = await verify_otp_in_db(req.email, req.otp)
+         if not is_valid:
+-            raise HTTPException(status_code=400, detail="Invalid or expired OTP")
++            raise HTTPException(status_code= 399, detail="Invalid or expired OTP")
+ 
+         await users_col.update_one({"email": req.email}, {"$set": {"verified": True}})
+         await otps_col.delete_many({"email": req.email})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_61"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_61_1" aria-expanded="false" aria-controls="job_list___sub_collapse_61_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_61_1"><button class="btn btn-outline-success"><span class="job_id">61 : Job ID d55c060a586f4379befa8d6157b6b5a0</span></button></div></a><div aria-labelledby="job_list___sub_heading_61_1" data-parent="#job_list___sub_accordion_61" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_61_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=103" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (103, 40), end pos: (103, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 12</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -100,7 +100,7 @@
+     decoded = decode_jwt(token)
+     user = await users_col.find_one({"email": decoded["email"]})
+     if not user:
+-        raise HTTPException(status_code=404, detail="User not found")
++        raise HTTPException(status_code= 405, detail="User not found")
+ 
+     return {
+         "name": user["name"],</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_62"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_62_1" aria-expanded="false" aria-controls="job_list___sub_collapse_62_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_62_1"><button class="btn btn-outline-success"><span class="job_id">62 : Job ID 698dbb1b84f448c7a011b2e77795b29e</span></button></div></a><div aria-labelledby="job_list___sub_heading_62_1" data-parent="#job_list___sub_accordion_62" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_62_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=103" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (103, 40), end pos: (103, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 13</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -100,7 +100,7 @@
+     decoded = decode_jwt(token)
+     user = await users_col.find_one({"email": decoded["email"]})
+     if not user:
+-        raise HTTPException(status_code=404, detail="User not found")
++        raise HTTPException(status_code= 403, detail="User not found")
+ 
+     return {
+         "name": user["name"],</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_63"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_63_1" aria-expanded="false" aria-controls="job_list___sub_collapse_63_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_63_1"><button class="btn btn-outline-success"><span class="job_id">63 : Job ID a7b52680821d4f0a8c3ea5217001253f</span></button></div></a><div aria-labelledby="job_list___sub_heading_63_1" data-parent="#job_list___sub_accordion_63" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_63_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=118" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (118, 40), end pos: (118, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 14</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -115,7 +115,7 @@
+     decoded = decode_jwt(token)
+     user = await users_col.find_one({"email": decoded["email"]})
+     if not user:
+-        raise HTTPException(status_code=404, detail="User not found")
++        raise HTTPException(status_code= 405, detail="User not found")
+ 
+     contents = await file.read()
+     avatar_base64 = base64.b64encode(contents).decode('utf-8')</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_64"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_64_1" aria-expanded="false" aria-controls="job_list___sub_collapse_64_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_64_1"><button class="btn btn-outline-success"><span class="job_id">64 : Job ID 7917a8c469194e5389e60e8fb7b6dcf9</span></button></div></a><div aria-labelledby="job_list___sub_heading_64_1" data-parent="#job_list___sub_accordion_64" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_64_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=118" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (118, 40), end pos: (118, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 15</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -115,7 +115,7 @@
+     decoded = decode_jwt(token)
+     user = await users_col.find_one({"email": decoded["email"]})
+     if not user:
+-        raise HTTPException(status_code=404, detail="User not found")
++        raise HTTPException(status_code= 403, detail="User not found")
+ 
+     contents = await file.read()
+     avatar_base64 = base64.b64encode(contents).decode('utf-8')</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_65"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_65_1" aria-expanded="false" aria-controls="job_list___sub_collapse_65_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_65_1"><button class="btn btn-outline-success"><span class="job_id">65 : Job ID 5ccf075f53de4d79833045341873eb6b</span></button></div></a><div aria-labelledby="job_list___sub_heading_65_1" data-parent="#job_list___sub_accordion_65" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_65_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=138" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (138, 44), end pos: (138, 47)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 16</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -135,7 +135,7 @@
+         payload = decode_jwt(token)
+         email: str = payload.get("email")
+         if email is None:
+-            raise HTTPException(status_code=403, detail="Invalid token payload")
++            raise HTTPException(status_code= 404, detail="Invalid token payload")
+ 
+         user = await users_col.find_one({"email": email})
+         if user is None:</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_66"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_66_1" aria-expanded="false" aria-controls="job_list___sub_collapse_66_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_66_1"><button class="btn btn-outline-success"><span class="job_id">66 : Job ID 6fadcc39ddb7444080d0243e0a565fa7</span></button></div></a><div aria-labelledby="job_list___sub_heading_66_1" data-parent="#job_list___sub_accordion_66" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_66_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=138" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (138, 44), end pos: (138, 47)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 17</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -135,7 +135,7 @@
+         payload = decode_jwt(token)
+         email: str = payload.get("email")
+         if email is None:
+-            raise HTTPException(status_code=403, detail="Invalid token payload")
++            raise HTTPException(status_code= 402, detail="Invalid token payload")
+ 
+         user = await users_col.find_one({"email": email})
+         if user is None:</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_67"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_67_1" aria-expanded="false" aria-controls="job_list___sub_collapse_67_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_67_1"><button class="btn btn-outline-success"><span class="job_id">67 : Job ID 6c4fa3d5194f4302b5abf281a0e4a8a1</span></button></div></a><div aria-labelledby="job_list___sub_heading_67_1" data-parent="#job_list___sub_accordion_67" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_67_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=142" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (142, 44), end pos: (142, 47)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 18</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -139,7 +139,7 @@
+ 
+         user = await users_col.find_one({"email": email})
+         if user is None:
+-            raise HTTPException(status_code=404, detail="User not found")
++            raise HTTPException(status_code= 405, detail="User not found")
+         user["user_id"] = str(user["user_id"])
+         return user
+     </pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_68"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_68_1" aria-expanded="false" aria-controls="job_list___sub_collapse_68_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_68_1"><button class="btn btn-outline-success"><span class="job_id">68 : Job ID 30277e14db594295bb9abfe14cf3a471</span></button></div></a><div aria-labelledby="job_list___sub_heading_68_1" data-parent="#job_list___sub_accordion_68" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_68_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=142" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (142, 44), end pos: (142, 47)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 19</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -139,7 +139,7 @@
+ 
+         user = await users_col.find_one({"email": email})
+         if user is None:
+-            raise HTTPException(status_code=404, detail="User not found")
++            raise HTTPException(status_code= 403, detail="User not found")
+         user["user_id"] = str(user["user_id"])
+         return user
+     </pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_69"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_69_1" aria-expanded="false" aria-controls="job_list___sub_collapse_69_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_69_1"><button class="btn btn-outline-success"><span class="job_id">69 : Job ID 26d00cbdc8a54837b21d84f6f9210e8d</span></button></div></a><div aria-labelledby="job_list___sub_heading_69_1" data-parent="#job_list___sub_accordion_69" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_69_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=147" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (147, 40), end pos: (147, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 20</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -144,7 +144,7 @@
+         return user
+     
+     except jwt.ExpiredSignatureError:
+-        raise HTTPException(status_code=403, detail="JWT Token has expired")
++        raise HTTPException(status_code= 404, detail="JWT Token has expired")
+     except jwt.InvalidTokenError:
+         raise HTTPException(status_code=403, detail="Invalid JWT token")
+     </pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_70"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_70_1" aria-expanded="false" aria-controls="job_list___sub_collapse_70_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_70_1"><button class="btn btn-outline-success"><span class="job_id">70 : Job ID 7c0caace1ee249bfa1a5a21c57aa97be</span></button></div></a><div aria-labelledby="job_list___sub_heading_70_1" data-parent="#job_list___sub_accordion_70" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_70_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=147" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (147, 40), end pos: (147, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 21</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -144,7 +144,7 @@
+         return user
+     
+     except jwt.ExpiredSignatureError:
+-        raise HTTPException(status_code=403, detail="JWT Token has expired")
++        raise HTTPException(status_code= 402, detail="JWT Token has expired")
+     except jwt.InvalidTokenError:
+         raise HTTPException(status_code=403, detail="Invalid JWT token")
+     </pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_71"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_71_1" aria-expanded="false" aria-controls="job_list___sub_collapse_71_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_71_1"><button class="btn btn-outline-success"><span class="job_id">71 : Job ID e47b7eb864c34a56908fa3dabb6ee12e</span></button></div></a><div aria-labelledby="job_list___sub_heading_71_1" data-parent="#job_list___sub_accordion_71" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_71_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=149" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (149, 40), end pos: (149, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 22</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -146,7 +146,7 @@
+     except jwt.ExpiredSignatureError:
+         raise HTTPException(status_code=403, detail="JWT Token has expired")
+     except jwt.InvalidTokenError:
+-        raise HTTPException(status_code=403, detail="Invalid JWT token")
++        raise HTTPException(status_code= 404, detail="Invalid JWT token")
+     
+ 
+ </pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_72"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_72_1" aria-expanded="false" aria-controls="job_list___sub_collapse_72_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_72_1"><button class="btn btn-outline-success"><span class="job_id">72 : Job ID 85828be0ff7e4a8ea7f1a3e1fa66f644</span></button></div></a><div aria-labelledby="job_list___sub_heading_72_1" data-parent="#job_list___sub_accordion_72" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_72_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=149" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (149, 40), end pos: (149, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 23</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -146,7 +146,7 @@
+     except jwt.ExpiredSignatureError:
+         raise HTTPException(status_code=403, detail="JWT Token has expired")
+     except jwt.InvalidTokenError:
+-        raise HTTPException(status_code=403, detail="Invalid JWT token")
++        raise HTTPException(status_code= 402, detail="Invalid JWT token")
+     
+ 
+ </pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_73"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_73_1" aria-expanded="false" aria-controls="job_list___sub_collapse_73_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_73_1"><button class="btn btn-outline-success"><span class="job_id">73 : Job ID ae6a7881fc13488ca5bad0903991fb59</span></button></div></a><div aria-labelledby="job_list___sub_heading_73_1" data-parent="#job_list___sub_accordion_73" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_73_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=169" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (169, 40), end pos: (169, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 24</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -166,7 +166,7 @@
+     email = req.email.lower()
+     is_valid = await verify_otp_in_db(email, req.otp)
+     if not is_valid:
+-        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
++        raise HTTPException(status_code= 401, detail="Invalid or expired OTP")
+ 
+     reset_token = create_reset_jwt(email)
+     return {"reset_token": reset_token, "expires_in_minutes": RESET_JWT_TTL_MINUTES}</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_74"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_74_1" aria-expanded="false" aria-controls="job_list___sub_collapse_74_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_74_1"><button class="btn btn-outline-success"><span class="job_id">74 : Job ID 158937c59ecf4c609d21dae84f536390</span></button></div></a><div aria-labelledby="job_list___sub_heading_74_1" data-parent="#job_list___sub_accordion_74" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_74_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=169" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (169, 40), end pos: (169, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 25</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -166,7 +166,7 @@
+     email = req.email.lower()
+     is_valid = await verify_otp_in_db(email, req.otp)
+     if not is_valid:
+-        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
++        raise HTTPException(status_code= 399, detail="Invalid or expired OTP")
+ 
+     reset_token = create_reset_jwt(email)
+     return {"reset_token": reset_token, "expires_in_minutes": RESET_JWT_TTL_MINUTES}</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_75"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_75_1" aria-expanded="false" aria-controls="job_list___sub_collapse_75_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_75_1"><button class="btn btn-outline-success"><span class="job_id">75 : Job ID 1b23137e4f4e403798acbd5f66ab0b54</span></button></div></a><div aria-labelledby="job_list___sub_heading_75_1" data-parent="#job_list___sub_accordion_75" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_75_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=182" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (182, 40), end pos: (182, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 26</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -179,7 +179,7 @@
+     new_password = data.get("new_password")
+ 
+     if not all([email, otp, new_password]):
+-        raise HTTPException(status_code=400, detail="Missing fields")
++        raise HTTPException(status_code= 401, detail="Missing fields")
+ 
+     otp_doc = await otps_col.find_one({"email": email, "otp": otp})
+     if not otp_doc:</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_76"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_76_1" aria-expanded="false" aria-controls="job_list___sub_collapse_76_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_76_1"><button class="btn btn-outline-success"><span class="job_id">76 : Job ID 29d0bd96590045ad9394b21ade178a4d</span></button></div></a><div aria-labelledby="job_list___sub_heading_76_1" data-parent="#job_list___sub_accordion_76" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_76_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=182" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (182, 40), end pos: (182, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 27</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -179,7 +179,7 @@
+     new_password = data.get("new_password")
+ 
+     if not all([email, otp, new_password]):
+-        raise HTTPException(status_code=400, detail="Missing fields")
++        raise HTTPException(status_code= 399, detail="Missing fields")
+ 
+     otp_doc = await otps_col.find_one({"email": email, "otp": otp})
+     if not otp_doc:</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_77"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_77_1" aria-expanded="false" aria-controls="job_list___sub_collapse_77_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_77_1"><button class="btn btn-outline-success"><span class="job_id">77 : Job ID 5b9f591f6bc540a19d35b5f2398702f2</span></button></div></a><div aria-labelledby="job_list___sub_heading_77_1" data-parent="#job_list___sub_accordion_77" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_77_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=186" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (186, 40), end pos: (186, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 28</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -183,7 +183,7 @@
+ 
+     otp_doc = await otps_col.find_one({"email": email, "otp": otp})
+     if not otp_doc:
+-        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
++        raise HTTPException(status_code= 401, detail="Invalid or expired OTP")
+ 
+     hashed_pw = hash_password(new_password)
+     result = await users_col.update_one(</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_78"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_78_1" aria-expanded="false" aria-controls="job_list___sub_collapse_78_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_78_1"><button class="btn btn-outline-success"><span class="job_id">78 : Job ID 1611697f934a4dc5a1c0b95cbeef0c7f</span></button></div></a><div aria-labelledby="job_list___sub_heading_78_1" data-parent="#job_list___sub_accordion_78" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_78_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=186" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (186, 40), end pos: (186, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 29</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -183,7 +183,7 @@
+ 
+     otp_doc = await otps_col.find_one({"email": email, "otp": otp})
+     if not otp_doc:
+-        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
++        raise HTTPException(status_code= 399, detail="Invalid or expired OTP")
+ 
+     hashed_pw = hash_password(new_password)
+     result = await users_col.update_one(</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_79"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_79_1" aria-expanded="false" aria-controls="job_list___sub_collapse_79_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_79_1"><button class="btn btn-outline-success"><span class="job_id">79 : Job ID a29467f814ed455ca59e4d118c8f6bd9</span></button></div></a><div aria-labelledby="job_list___sub_heading_79_1" data-parent="#job_list___sub_accordion_79" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_79_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=194" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (194, 32), end pos: (194, 33)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 30</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -191,7 +191,7 @@
+         {"$set": {"password": hashed_pw}}
+     )
+ 
+-    if result.modified_count == 0:
++    if result.modified_count == 1:
+         raise HTTPException(status_code=404, detail="User not found")
+ 
+     await otps_col.delete_many({"email": email})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_80"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_80_1" aria-expanded="false" aria-controls="job_list___sub_collapse_80_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_80_1"><button class="btn btn-outline-success"><span class="job_id">80 : Job ID 809c23dc91c94ab8a71fac9e0805557f</span></button></div></a><div aria-labelledby="job_list___sub_heading_80_1" data-parent="#job_list___sub_accordion_80" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_80_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=194" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (194, 32), end pos: (194, 33)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 31</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -191,7 +191,7 @@
+         {"$set": {"password": hashed_pw}}
+     )
+ 
+-    if result.modified_count == 0:
++    if result.modified_count == -1:
+         raise HTTPException(status_code=404, detail="User not found")
+ 
+     await otps_col.delete_many({"email": email})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_81"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_81_1" aria-expanded="false" aria-controls="job_list___sub_collapse_81_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_81_1"><button class="btn btn-outline-success"><span class="job_id">81 : Job ID b96d6b13aed5402e8713d52d38ee3603</span></button></div></a><div aria-labelledby="job_list___sub_heading_81_1" data-parent="#job_list___sub_accordion_81" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_81_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=195" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (195, 40), end pos: (195, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 32</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -192,7 +192,7 @@
+     )
+ 
+     if result.modified_count == 0:
+-        raise HTTPException(status_code=404, detail="User not found")
++        raise HTTPException(status_code= 405, detail="User not found")
+ 
+     await otps_col.delete_many({"email": email})
+     return {"message": "Password updated successfully"}</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_82"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_82_1" aria-expanded="false" aria-controls="job_list___sub_collapse_82_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_82_1"><button class="btn btn-outline-success"><span class="job_id">82 : Job ID 68ba0b9aaf6044d79defc249eaa2f070</span></button></div></a><div aria-labelledby="job_list___sub_heading_82_1" data-parent="#job_list___sub_accordion_82" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_82_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=195" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (195, 40), end pos: (195, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 33</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -192,7 +192,7 @@
+     )
+ 
+     if result.modified_count == 0:
+-        raise HTTPException(status_code=404, detail="User not found")
++        raise HTTPException(status_code= 403, detail="User not found")
+ 
+     await otps_col.delete_many({"email": email})
+     return {"message": "Password updated successfully"}</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_83"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_83_1" aria-expanded="false" aria-controls="job_list___sub_collapse_83_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_83_1"><button class="btn btn-outline-success"><span class="job_id">83 : Job ID 50ea57e110e540bf9d6fa8d347ba3017</span></button></div></a><div aria-labelledby="job_list___sub_heading_83_1" data-parent="#job_list___sub_accordion_83" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_83_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=26" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (26, 0), end pos: (27, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -20,10 +20,6 @@
+ RESET_JWT_TTL_MINUTES = int(os.getenv("RESET_JWT_TTL_MINUTES", "15"))
+ JWT_SECRET = os.getenv("JWT_SECRET", "supersecret")  
+ JWT_ALGORITHM="HS256"
+-
+-
+-#Routes with prefix auth
+-@router.post("/register")
+ async def register_user(req: models.RegisterRequest):
+     existing = await users_col.find_one({"email": req.email})
+     if existing:</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_84"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_84_1" aria-expanded="false" aria-controls="job_list___sub_collapse_84_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_84_1"><button class="btn btn-outline-success"><span class="job_id">84 : Job ID 7f14f0092657455c883c1dd93f78176d</span></button></div></a><div aria-labelledby="job_list___sub_heading_84_1" data-parent="#job_list___sub_accordion_84" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_84_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=48" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (48, 0), end pos: (49, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -42,10 +42,6 @@
+     otp_code =generate_otp()
+     await store_otp(req.email, otp_code)
+     await send_otp(req.email, otp_code)
+-
+-
+-
+-@router.post("/login", response_model=models.LoginResponse)
+ async def login_user(req: models.LoginRequest):
+     user = await users_col.find_one({"email": req.email})
+     if not user:</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_85"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_85_1" aria-expanded="false" aria-controls="job_list___sub_collapse_85_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_85_1"><button class="btn btn-outline-success"><span class="job_id">85 : Job ID f33bcf9fee1f4780801800117af8ae02</span></button></div></a><div aria-labelledby="job_list___sub_heading_85_1" data-parent="#job_list___sub_accordion_85" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_85_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=69" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (69, 0), end pos: (70, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -62,11 +62,6 @@
+     
+     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+     return {"token": token,"verified": user.get("verified", False)}
+-
+-
+-#Routes for OTP send aaand verification during Registeration as well as password change
+-#Prefix is auth
+-@router.post("/send-otp")
+ async def send_otp_router(req: models.SendOTPRequest):
+     user = await users_col.find_one({"email": req.email})
+     if not user:</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_86"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_86_1" aria-expanded="false" aria-controls="job_list___sub_collapse_86_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_86_1"><button class="btn btn-outline-success"><span class="job_id">86 : Job ID d0177d4a562c45519af6d61f964727b4</span></button></div></a><div aria-labelledby="job_list___sub_heading_86_1" data-parent="#job_list___sub_accordion_86" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_86_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=80" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (80, 0), end pos: (81, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -75,9 +75,6 @@
+     otp_code = generate_otp()
+     await store_otp(req.email, otp_code)
+     await send_otp(req.email, otp_code)
+-
+-
+-@router.post("/verify-otp")
+ async def verify_otp(req: models.VerifyOTPRequest):
+     try:
+         is_valid = await verify_otp_in_db(req.email, req.otp)</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_87"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_87_1" aria-expanded="false" aria-controls="job_list___sub_collapse_87_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_87_1"><button class="btn btn-outline-success"><span class="job_id">87 : Job ID 6e54ff862d5b4405a8ec06b0d3ccbe00</span></button></div></a><div aria-labelledby="job_list___sub_heading_87_1" data-parent="#job_list___sub_accordion_87" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_87_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=97" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (97, 0), end pos: (98, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 4</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -91,10 +91,6 @@
+     except Exception as e:
+         print(f"Exception during OTP verify: {e}")
+         raise
+-
+-
+-#Routes with prefix auth and these routes are for fetching user Information
+-@router.get("/me")
+ async def get_user_info(credentials: HTTPAuthorizationCredentials = Depends(security)):
+     token = credentials.credentials
+     decoded = decode_jwt(token)</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_88"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_88_1" aria-expanded="false" aria-controls="job_list___sub_collapse_88_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_88_1"><button class="btn btn-outline-success"><span class="job_id">88 : Job ID cf134f2b579a4482a99d3d0da0a833f3</span></button></div></a><div aria-labelledby="job_list___sub_heading_88_1" data-parent="#job_list___sub_accordion_88" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_88_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=112" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (112, 0), end pos: (113, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 5</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -108,8 +108,6 @@
+         "verified": user.get("verified", False),
+         "avatar_base64": user.get("avatar_base64", ""),
+     }
+-
+-@router.post("/me/avatar")
+ async def upload_avatar(credentials: HTTPAuthorizationCredentials = Depends(security), file: UploadFile = File(...)):
+     token = credentials.credentials
+     decoded = decode_jwt(token)</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_89"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_89_1" aria-expanded="false" aria-controls="job_list___sub_collapse_89_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_89_1"><button class="btn btn-outline-success"><span class="job_id">89 : Job ID c6ffcdff94df4e398394d56d5031b4e7</span></button></div></a><div aria-labelledby="job_list___sub_heading_89_1" data-parent="#job_list___sub_accordion_89" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_89_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=155" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (155, 0), end pos: (156, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 6</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -147,12 +147,6 @@
+         raise HTTPException(status_code=403, detail="JWT Token has expired")
+     except jwt.InvalidTokenError:
+         raise HTTPException(status_code=403, detail="Invalid JWT token")
+-    
+-
+-
+-
+-#Routes with auth prefix 
+-@router.post("/forgot-password")
+ async def forgot_password(req: models.SendOTPRequest):
+     email = req.email.lower()
+     user = await users_col.find_one({"email": email})</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_90"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_90_1" aria-expanded="false" aria-controls="job_list___sub_collapse_90_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_90_1"><button class="btn btn-outline-success"><span class="job_id">90 : Job ID a758625427654eed821f21ffdd30b243</span></button></div></a><div aria-labelledby="job_list___sub_heading_90_1" data-parent="#job_list___sub_accordion_90" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_90_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=164" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (164, 0), end pos: (165, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 7</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -160,8 +160,6 @@
+         otp_code =generate_otp()
+         await store_otp(email, otp_code)
+         await send_otp(email, otp_code)
+-
+-@router.post("/verify-reset-otp")
+ async def verify_reset_otp(req: models.VerifyOTPRequest):
+     email = req.email.lower()
+     is_valid = await verify_otp_in_db(email, req.otp)</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_91"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_91_1" aria-expanded="false" aria-controls="job_list___sub_collapse_91_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_91_1"><button class="btn btn-outline-success"><span class="job_id">91 : Job ID b78705b4482a4a6b80549a374625d699</span></button></div></a><div aria-labelledby="job_list___sub_heading_91_1" data-parent="#job_list___sub_accordion_91" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_91_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/auth.py&amp;line=175" class="text-secondary"><button class="btn btn-outline-dark">routes/auth.py, start pos: (175, 0), end pos: (176, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 8</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/auth.py
++++ broutes/auth.py
+@@ -170,9 +170,6 @@
+ 
+     reset_token = create_reset_jwt(email)
+     return {"reset_token": reset_token, "expires_in_minutes": RESET_JWT_TTL_MINUTES}
+-
+-
+-@router.post("/reset-password")
+ async def reset_password(data: dict):
+     email = data.get("email")
+     otp = data.get("otp")</pre></div></div></div></div></div></div></div></div></div></div><script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script><script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script><script type="text/javascript">$('div.job_list___sub_multi_collapse').on('shown.bs.collapse',  function () {    correct_behavior_functional_buttons();  });$('div.job_list___sub_multi_collapse').on('hidden.bs.collapse',  function () {    correct_behavior_functional_buttons();  });function correct_behavior_functional_buttons() {    var expand = false;    var collapse = false;    $('a.job_list___sub_multi_heading').each(function(index) {      if ($(this).attr('aria-expanded') == 'false') {        expand = true;        return false;      };    });    $('a.job_list___sub_multi_heading').each(function(index) {      if ($(this).attr('aria-expanded') == 'true') {        collapse = true;        return false;      };    });    if (expand) {      $('div#job_item_expand_all').css('display', 'inline-block');    } else {      $('div#job_item_expand_all').css('display', 'none');    };    if (collapse) {      $('div#job_item_collapse_all').css('display', 'inline-block');    } else {      $('div#job_item_collapse_all').css('display', 'none');    };  };correct_behavior_functional_buttons();</script></body></html>

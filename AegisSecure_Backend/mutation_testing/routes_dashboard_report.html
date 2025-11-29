@@ -1,0 +1,551 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /><link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" /><title>Cosmic Ray Report</title></head><body><div class="container"><h1><p class="text-dark">Cosmic Ray Report</p></h1></div><div class="container"><div class="mb-1" id="summary_info___accordion"><div class="card"><a data-toggle="collapse" data-target="#summary_info___collapse_1" aria-expanded="true" aria-controls="summary_info___collapse_1" href="#"><div class="card-header" id="summary_info___heading_1"><button class="btn btn-outline-dark"><h4 class="m-0">Summary info</h4></button></div></a><div aria-labelledby="summary_info___heading_1" data-parent="#summary_info___accordion" class="collapse show" id="summary_info___collapse_1"><div class="card-body"><p>Date time: 29/11/2025 00:07:02</p><p>Total jobs: 50</p><p>Complete: 50 (100.00%)</p><p>Surviving mutants: 0 (0.00%)</p></div></div></div></div><div class="mb-1" id="job_list___accordion"><div class="card"><a data-toggle="collapse" data-target="#job_list___collapse_1" aria-expanded="false" aria-controls="job_list___collapse_1" href="#"><div class="card-header" id="job_list___heading_1"><button class="btn btn-outline-dark"><h4 class="m-0">Job list</h4></button></div></a><div aria-labelledby="job_list___heading_1" data-parent="#job_list___accordion" class="collapse" id="job_list___collapse_1"><div class="card-body"><div class="text-right mb-1"><div class="mx-1" id="job_item_expand_all"><a href="#" onclick="$('div.job_list___sub_multi_collapse').collapse('show');"><button class="btn btn-outline-dark"><span>Expand All</span></button></a></div><div class="mx-1" id="job_item_collapse_all"><a href="#" onclick="$('div.job_list___sub_multi_collapse').collapse('hide');"><button class="btn btn-outline-dark"><span>Collapse All</span></button></a></div></div><div class="mb-1" id="job_list___sub_accordion_1"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_1_1" aria-expanded="false" aria-controls="job_list___sub_collapse_1_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_1_1"><button class="btn btn-outline-success"><span class="job_id">1 : Job ID 4737c76973e64a49bd70b6285ea17226</span></button></div></a><div aria-labelledby="job_list___sub_heading_1_1" data-parent="#job_list___sub_accordion_1" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_1_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 51), end pos: (40, 52)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_Sub, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, 0) - mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_2"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_2_1" aria-expanded="false" aria-controls="job_list___sub_collapse_2_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_2_1"><button class="btn btn-outline-success"><span class="job_id">2 : Job ID 1a94c765fd0e4e86a32d0a2226bc8b8e</span></button></div></a><div aria-labelledby="job_list___sub_heading_2_1" data-parent="#job_list___sub_accordion_2" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_2_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 51), end pos: (40, 52)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_Mul, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, 0) * mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_3"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_3_1" aria-expanded="false" aria-controls="job_list___sub_collapse_3_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_3_1"><button class="btn btn-outline-success"><span class="job_id">3 : Job ID 3efac537e93e46c0a876eb2d8528a786</span></button></div></a><div aria-labelledby="job_list___sub_heading_3_1" data-parent="#job_list___sub_accordion_3" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_3_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 51), end pos: (40, 52)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_Div, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, 0) / mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_4"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_4_1" aria-expanded="false" aria-controls="job_list___sub_collapse_4_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_4_1"><button class="btn btn-outline-success"><span class="job_id">4 : Job ID e4e4f348894b48958d6d0e378e358564</span></button></div></a><div aria-labelledby="job_list___sub_heading_4_1" data-parent="#job_list___sub_accordion_4" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_4_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 51), end pos: (40, 52)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_FloorDiv, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, 0) // mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_5"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_5_1" aria-expanded="false" aria-controls="job_list___sub_collapse_5_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_5_1"><button class="btn btn-outline-success"><span class="job_id">5 : Job ID 1dc7ecd7cd0544bd8a7a969cdbe95238</span></button></div></a><div aria-labelledby="job_list___sub_heading_5_1" data-parent="#job_list___sub_accordion_5" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_5_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 51), end pos: (40, 52)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_Mod, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, 0) % mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_6"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_6_1" aria-expanded="false" aria-controls="job_list___sub_collapse_6_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_6_1"><button class="btn btn-outline-success"><span class="job_id">6 : Job ID 0bac11fc7ca24ec48335662aec314a84</span></button></div></a><div aria-labelledby="job_list___sub_heading_6_1" data-parent="#job_list___sub_accordion_6" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_6_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 51), end pos: (40, 52)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_Pow, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, 0) ** mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_7"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_7_1" aria-expanded="false" aria-controls="job_list___sub_collapse_7_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_7_1"><button class="btn btn-outline-success"><span class="job_id">7 : Job ID 908ce1bf96eb41d5bea98aac3222ad70</span></button></div></a><div aria-labelledby="job_list___sub_heading_7_1" data-parent="#job_list___sub_accordion_7" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_7_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 51), end pos: (40, 52)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_RShift, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, 0) &gt;&gt; mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_8"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_8_1" aria-expanded="false" aria-controls="job_list___sub_collapse_8_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_8_1"><button class="btn btn-outline-success"><span class="job_id">8 : Job ID 5d8d37c1a76b426eb00912d60876f673</span></button></div></a><div aria-labelledby="job_list___sub_heading_8_1" data-parent="#job_list___sub_accordion_8" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_8_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 51), end pos: (40, 52)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_LShift, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, 0) &lt;&lt; mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_9"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_9_1" aria-expanded="false" aria-controls="job_list___sub_collapse_9_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_9_1"><button class="btn btn-outline-success"><span class="job_id">9 : Job ID cc17305516ad4c8881832a8e17a6dcdd</span></button></div></a><div aria-labelledby="job_list___sub_heading_9_1" data-parent="#job_list___sub_accordion_9" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_9_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 51), end pos: (40, 52)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_BitOr, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, 0) | mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_10"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_10_1" aria-expanded="false" aria-controls="job_list___sub_collapse_10_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_10_1"><button class="btn btn-outline-success"><span class="job_id">10 : Job ID ab431b6b45d24fc89b9c4e95c9077bd3</span></button></div></a><div aria-labelledby="job_list___sub_heading_10_1" data-parent="#job_list___sub_accordion_10" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_10_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 51), end pos: (40, 52)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_BitAnd, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, 0) &amp; mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_11"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_11_1" aria-expanded="false" aria-controls="job_list___sub_collapse_11_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_11_1"><button class="btn btn-outline-success"><span class="job_id">11 : Job ID 9859d95956684542866b63d34d3fc9cb</span></button></div></a><div aria-labelledby="job_list___sub_heading_11_1" data-parent="#job_list___sub_accordion_11" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_11_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 51), end pos: (40, 52)</button></a></pre><pre>operator: core/ReplaceBinaryOperator_Add_BitXor, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, 0) ^ mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_12"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_12_1" aria-expanded="false" aria-controls="job_list___sub_collapse_12_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_12_1"><button class="btn btn-outline-success"><span class="job_id">12 : Job ID eb3e9d696287426186254b21d52b7192</span></button></div></a><div aria-labelledby="job_list___sub_heading_12_1" data-parent="#job_list___sub_accordion_12" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_12_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=39" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (39, 12), end pos: (39, 14)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_NotEq, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -36,7 +36,7 @@
+             messages_col, "user_id", "spam_prediction", user_id, days
+         )
+ 
+-    if mode == "both":
++    if mode != "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_13"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_13_1" aria-expanded="false" aria-controls="job_list___sub_collapse_13_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_13_1"><button class="btn btn-outline-success"><span class="job_id">13 : Job ID f258ed2b9e35412daca358bd2ca7a4de</span></button></div></a><div aria-labelledby="job_list___sub_heading_13_1" data-parent="#job_list___sub_accordion_13" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_13_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=42" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (42, 14), end pos: (42, 16)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_NotEq, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -39,7 +39,7 @@
+     if mode == "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+-    elif mode == "sms":
++    elif mode != "sms":
+         counts_to_send = sms_counts
+     elif mode == "mail":
+         counts_to_send = mail_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_14"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_14_1" aria-expanded="false" aria-controls="job_list___sub_collapse_14_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_14_1"><button class="btn btn-outline-success"><span class="job_id">14 : Job ID 21b25147d4e7434b9b15c656fe496179</span></button></div></a><div aria-labelledby="job_list___sub_heading_14_1" data-parent="#job_list___sub_accordion_14" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_14_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=44" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (44, 14), end pos: (44, 16)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_NotEq, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -41,7 +41,7 @@
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts
+-    elif mode == "mail":
++    elif mode != "mail":
+         counts_to_send = mail_counts
+ 
+     for i in range(len(LABELS)):</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_15"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_15_1" aria-expanded="false" aria-controls="job_list___sub_collapse_15_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_15_1"><button class="btn btn-outline-success"><span class="job_id">15 : Job ID c55eb882c23446048ddef2a31a03151b</span></button></div></a><div aria-labelledby="job_list___sub_heading_15_1" data-parent="#job_list___sub_accordion_15" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_15_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=39" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (39, 12), end pos: (39, 14)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_Lt, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -36,7 +36,7 @@
+             messages_col, "user_id", "spam_prediction", user_id, days
+         )
+ 
+-    if mode == "both":
++    if mode &lt; "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_16"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_16_1" aria-expanded="false" aria-controls="job_list___sub_collapse_16_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_16_1"><button class="btn btn-outline-success"><span class="job_id">16 : Job ID e7cfed903ee44823909e7059c3a345b1</span></button></div></a><div aria-labelledby="job_list___sub_heading_16_1" data-parent="#job_list___sub_accordion_16" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_16_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=42" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (42, 14), end pos: (42, 16)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_Lt, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -39,7 +39,7 @@
+     if mode == "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+-    elif mode == "sms":
++    elif mode &lt; "sms":
+         counts_to_send = sms_counts
+     elif mode == "mail":
+         counts_to_send = mail_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_17"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_17_1" aria-expanded="false" aria-controls="job_list___sub_collapse_17_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_17_1"><button class="btn btn-outline-success"><span class="job_id">17 : Job ID 75ac5b6ee6a24553b4b19087e1b2ea64</span></button></div></a><div aria-labelledby="job_list___sub_heading_17_1" data-parent="#job_list___sub_accordion_17" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_17_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=44" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (44, 14), end pos: (44, 16)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_Lt, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -41,7 +41,7 @@
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts
+-    elif mode == "mail":
++    elif mode &lt; "mail":
+         counts_to_send = mail_counts
+ 
+     for i in range(len(LABELS)):</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_18"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_18_1" aria-expanded="false" aria-controls="job_list___sub_collapse_18_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_18_1"><button class="btn btn-outline-success"><span class="job_id">18 : Job ID 8db6c66e8b8e422aa442712a658c8bf4</span></button></div></a><div aria-labelledby="job_list___sub_heading_18_1" data-parent="#job_list___sub_accordion_18" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_18_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=39" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (39, 12), end pos: (39, 14)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_LtE, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -36,7 +36,7 @@
+             messages_col, "user_id", "spam_prediction", user_id, days
+         )
+ 
+-    if mode == "both":
++    if mode &lt;= "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_19"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_19_1" aria-expanded="false" aria-controls="job_list___sub_collapse_19_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_19_1"><button class="btn btn-outline-success"><span class="job_id">19 : Job ID 1a135920f54642ddae09e6bcc153c73a</span></button></div></a><div aria-labelledby="job_list___sub_heading_19_1" data-parent="#job_list___sub_accordion_19" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_19_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=42" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (42, 14), end pos: (42, 16)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_LtE, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -39,7 +39,7 @@
+     if mode == "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+-    elif mode == "sms":
++    elif mode &lt;= "sms":
+         counts_to_send = sms_counts
+     elif mode == "mail":
+         counts_to_send = mail_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_20"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_20_1" aria-expanded="false" aria-controls="job_list___sub_collapse_20_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_20_1"><button class="btn btn-outline-success"><span class="job_id">20 : Job ID 7c069afeab5d430b801a5f39ae8a1dbb</span></button></div></a><div aria-labelledby="job_list___sub_heading_20_1" data-parent="#job_list___sub_accordion_20" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_20_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=44" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (44, 14), end pos: (44, 16)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_LtE, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -41,7 +41,7 @@
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts
+-    elif mode == "mail":
++    elif mode &lt;= "mail":
+         counts_to_send = mail_counts
+ 
+     for i in range(len(LABELS)):</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_21"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_21_1" aria-expanded="false" aria-controls="job_list___sub_collapse_21_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_21_1"><button class="btn btn-outline-success"><span class="job_id">21 : Job ID b19006900daf46199d63d6ce43d3aaee</span></button></div></a><div aria-labelledby="job_list___sub_heading_21_1" data-parent="#job_list___sub_accordion_21" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_21_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=39" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (39, 12), end pos: (39, 14)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_Gt, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -36,7 +36,7 @@
+             messages_col, "user_id", "spam_prediction", user_id, days
+         )
+ 
+-    if mode == "both":
++    if mode &gt; "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_22"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_22_1" aria-expanded="false" aria-controls="job_list___sub_collapse_22_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_22_1"><button class="btn btn-outline-success"><span class="job_id">22 : Job ID 5e178a3c65934c93b9490d285a02af85</span></button></div></a><div aria-labelledby="job_list___sub_heading_22_1" data-parent="#job_list___sub_accordion_22" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_22_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=42" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (42, 14), end pos: (42, 16)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_Gt, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -39,7 +39,7 @@
+     if mode == "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+-    elif mode == "sms":
++    elif mode &gt; "sms":
+         counts_to_send = sms_counts
+     elif mode == "mail":
+         counts_to_send = mail_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_23"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_23_1" aria-expanded="false" aria-controls="job_list___sub_collapse_23_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_23_1"><button class="btn btn-outline-success"><span class="job_id">23 : Job ID dc3527b2a9df4517aae1034a8fddbb82</span></button></div></a><div aria-labelledby="job_list___sub_heading_23_1" data-parent="#job_list___sub_accordion_23" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_23_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=44" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (44, 14), end pos: (44, 16)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_Gt, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -41,7 +41,7 @@
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts
+-    elif mode == "mail":
++    elif mode &gt; "mail":
+         counts_to_send = mail_counts
+ 
+     for i in range(len(LABELS)):</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_24"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_24_1" aria-expanded="false" aria-controls="job_list___sub_collapse_24_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_24_1"><button class="btn btn-outline-success"><span class="job_id">24 : Job ID 367cc756b39c484ea8fb1c00b47501a9</span></button></div></a><div aria-labelledby="job_list___sub_heading_24_1" data-parent="#job_list___sub_accordion_24" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_24_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=39" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (39, 12), end pos: (39, 14)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_GtE, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -36,7 +36,7 @@
+             messages_col, "user_id", "spam_prediction", user_id, days
+         )
+ 
+-    if mode == "both":
++    if mode &gt;= "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_25"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_25_1" aria-expanded="false" aria-controls="job_list___sub_collapse_25_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_25_1"><button class="btn btn-outline-success"><span class="job_id">25 : Job ID 200de3822fa64168b5521cc416a4f069</span></button></div></a><div aria-labelledby="job_list___sub_heading_25_1" data-parent="#job_list___sub_accordion_25" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_25_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=42" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (42, 14), end pos: (42, 16)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_GtE, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -39,7 +39,7 @@
+     if mode == "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+-    elif mode == "sms":
++    elif mode &gt;= "sms":
+         counts_to_send = sms_counts
+     elif mode == "mail":
+         counts_to_send = mail_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_26"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_26_1" aria-expanded="false" aria-controls="job_list___sub_collapse_26_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_26_1"><button class="btn btn-outline-success"><span class="job_id">26 : Job ID cdf9d87fbf164d97ae122d0e8a38994c</span></button></div></a><div aria-labelledby="job_list___sub_heading_26_1" data-parent="#job_list___sub_accordion_26" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_26_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=44" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (44, 14), end pos: (44, 16)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_GtE, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -41,7 +41,7 @@
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts
+-    elif mode == "mail":
++    elif mode &gt;= "mail":
+         counts_to_send = mail_counts
+ 
+     for i in range(len(LABELS)):</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_27"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_27_1" aria-expanded="false" aria-controls="job_list___sub_collapse_27_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_27_1"><button class="btn btn-outline-success"><span class="job_id">27 : Job ID 58c939477c774e8f87ed0845a7f3395a</span></button></div></a><div aria-labelledby="job_list___sub_heading_27_1" data-parent="#job_list___sub_accordion_27" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_27_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=39" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (39, 12), end pos: (39, 14)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_Is, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -36,7 +36,7 @@
+             messages_col, "user_id", "spam_prediction", user_id, days
+         )
+ 
+-    if mode == "both":
++    if mode is "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_28"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_28_1" aria-expanded="false" aria-controls="job_list___sub_collapse_28_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_28_1"><button class="btn btn-outline-success"><span class="job_id">28 : Job ID d473a27edd404becbade31207c19bdd5</span></button></div></a><div aria-labelledby="job_list___sub_heading_28_1" data-parent="#job_list___sub_accordion_28" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_28_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=42" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (42, 14), end pos: (42, 16)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_Is, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -39,7 +39,7 @@
+     if mode == "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+-    elif mode == "sms":
++    elif mode is "sms":
+         counts_to_send = sms_counts
+     elif mode == "mail":
+         counts_to_send = mail_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_29"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_29_1" aria-expanded="false" aria-controls="job_list___sub_collapse_29_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_29_1"><button class="btn btn-outline-success"><span class="job_id">29 : Job ID b96a84f49a574f10965f9ad3894ea55c</span></button></div></a><div aria-labelledby="job_list___sub_heading_29_1" data-parent="#job_list___sub_accordion_29" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_29_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=44" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (44, 14), end pos: (44, 16)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_Is, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -41,7 +41,7 @@
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts
+-    elif mode == "mail":
++    elif mode is "mail":
+         counts_to_send = mail_counts
+ 
+     for i in range(len(LABELS)):</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_30"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_30_1" aria-expanded="false" aria-controls="job_list___sub_collapse_30_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_30_1"><button class="btn btn-outline-success"><span class="job_id">30 : Job ID 2cb5c04163dc4133b829624133d6743b</span></button></div></a><div aria-labelledby="job_list___sub_heading_30_1" data-parent="#job_list___sub_accordion_30" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_30_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=39" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (39, 12), end pos: (39, 14)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_IsNot, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -36,7 +36,7 @@
+             messages_col, "user_id", "spam_prediction", user_id, days
+         )
+ 
+-    if mode == "both":
++    if mode is not "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_31"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_31_1" aria-expanded="false" aria-controls="job_list___sub_collapse_31_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_31_1"><button class="btn btn-outline-success"><span class="job_id">31 : Job ID bf85f59b307a4caea82acfa47313c301</span></button></div></a><div aria-labelledby="job_list___sub_heading_31_1" data-parent="#job_list___sub_accordion_31" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_31_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=42" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (42, 14), end pos: (42, 16)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_IsNot, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -39,7 +39,7 @@
+     if mode == "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+-    elif mode == "sms":
++    elif mode is not "sms":
+         counts_to_send = sms_counts
+     elif mode == "mail":
+         counts_to_send = mail_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_32"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_32_1" aria-expanded="false" aria-controls="job_list___sub_collapse_32_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_32_1"><button class="btn btn-outline-success"><span class="job_id">32 : Job ID bb5c4e9285924f7194ef3b24c1239c4d</span></button></div></a><div aria-labelledby="job_list___sub_heading_32_1" data-parent="#job_list___sub_accordion_32" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_32_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=44" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (44, 14), end pos: (44, 16)</button></a></pre><pre>operator: core/ReplaceComparisonOperator_Eq_IsNot, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -41,7 +41,7 @@
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts
+-    elif mode == "mail":
++    elif mode is not "mail":
+         counts_to_send = mail_counts
+ 
+     for i in range(len(LABELS)):</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_33"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_33_1" aria-expanded="false" aria-controls="job_list___sub_collapse_33_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_33_1"><button class="btn btn-outline-success"><span class="job_id">33 : Job ID c990d042e2a144e3b3b04f183af7bcb9</span></button></div></a><div aria-labelledby="job_list___sub_heading_33_1" data-parent="#job_list___sub_accordion_33" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_33_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=26" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (26, 7), end pos: (26, 10)</button></a></pre><pre>operator: core/ReplaceUnaryOperator_Delete_Not, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -23,7 +23,7 @@
+     current_user: dict = Depends(get_current_user),
+ ):
+     user_id = current_user.get("user_id")
+-    if not user_id:
++    if  user_id:
+         raise HTTPException(status_code=401, detail="Unauthorized")
+ 
+     sms_counts, mail_counts = {}, {}</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_34"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_34_1" aria-expanded="false" aria-controls="job_list___sub_collapse_34_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_34_1"><button class="btn btn-outline-success"><span class="job_id">34 : Job ID 96b1cac3c32e4f5e99d92057a9dcacdf</span></button></div></a><div aria-labelledby="job_list___sub_heading_34_1" data-parent="#job_list___sub_accordion_34" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_34_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=26" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (26, 7), end pos: (26, 18)</button></a></pre><pre>operator: core/AddNot, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -23,7 +23,7 @@
+     current_user: dict = Depends(get_current_user),
+ ):
+     user_id = current_user.get("user_id")
+-    if not user_id:
++    if not not user_id:
+         raise HTTPException(status_code=401, detail="Unauthorized")
+ 
+     sms_counts, mail_counts = {}, {}</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_35"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_35_1" aria-expanded="false" aria-controls="job_list___sub_collapse_35_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_35_1"><button class="btn btn-outline-success"><span class="job_id">35 : Job ID c6f9b871547c4e28ba519dea23775d2f</span></button></div></a><div aria-labelledby="job_list___sub_heading_35_1" data-parent="#job_list___sub_accordion_35" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_35_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=30" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (30, 7), end pos: (30, 30)</button></a></pre><pre>operator: core/AddNot, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -27,7 +27,7 @@
+         raise HTTPException(status_code=401, detail="Unauthorized")
+ 
+     sms_counts, mail_counts = {}, {}
+-    if mode in ("sms", "both"):
++    if not mode in ("sms", "both"):
+         sms_counts = await grouped_data_fromDB(
+             sms_messages_col, "user_id", "spam_score", user_id, days
+         )</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_36"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_36_1" aria-expanded="false" aria-controls="job_list___sub_collapse_36_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_36_1"><button class="btn btn-outline-success"><span class="job_id">36 : Job ID f9fe8269d8be456bb7cd2ba826e0c462</span></button></div></a><div aria-labelledby="job_list___sub_heading_36_1" data-parent="#job_list___sub_accordion_36" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_36_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=34" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (34, 7), end pos: (34, 31)</button></a></pre><pre>operator: core/AddNot, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -31,7 +31,7 @@
+         sms_counts = await grouped_data_fromDB(
+             sms_messages_col, "user_id", "spam_score", user_id, days
+         )
+-    if mode in ("mail", "both"):
++    if not mode in ("mail", "both"):
+         mail_counts = await grouped_data_fromDB(
+             messages_col, "user_id", "spam_prediction", user_id, days
+         )</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_37"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_37_1" aria-expanded="false" aria-controls="job_list___sub_collapse_37_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_37_1"><button class="btn btn-outline-success"><span class="job_id">37 : Job ID 40dd631e5b314c71aa7eabf5630c5648</span></button></div></a><div aria-labelledby="job_list___sub_heading_37_1" data-parent="#job_list___sub_accordion_37" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_37_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=39" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (39, 7), end pos: (39, 21)</button></a></pre><pre>operator: core/AddNot, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -36,7 +36,7 @@
+             messages_col, "user_id", "spam_prediction", user_id, days
+         )
+ 
+-    if mode == "both":
++    if not mode == "both":
+         combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_38"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_38_1" aria-expanded="false" aria-controls="job_list___sub_collapse_38_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_38_1"><button class="btn btn-outline-success"><span class="job_id">38 : Job ID 5f4529e1455648948c6079e327c7b52f</span></button></div></a><div aria-labelledby="job_list___sub_heading_38_1" data-parent="#job_list___sub_accordion_38" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_38_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=22" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (22, 31), end pos: (22, 32)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -19,7 +19,7 @@
+ @router.get("/")
+ async def get_dashboard(
+     mode: str = Query("both", regex="^(sms|mail|both)$"),
+-    days: int = Query(None, ge=1),
++    days: int = Query(None, ge= 2),
+     current_user: dict = Depends(get_current_user),
+ ):
+     user_id = current_user.get("user_id")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_39"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_39_1" aria-expanded="false" aria-controls="job_list___sub_collapse_39_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_39_1"><button class="btn btn-outline-success"><span class="job_id">39 : Job ID 74c07b309836471a942c0260fe69de79</span></button></div></a><div aria-labelledby="job_list___sub_heading_39_1" data-parent="#job_list___sub_accordion_39" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_39_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=22" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (22, 31), end pos: (22, 32)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -19,7 +19,7 @@
+ @router.get("/")
+ async def get_dashboard(
+     mode: str = Query("both", regex="^(sms|mail|both)$"),
+-    days: int = Query(None, ge=1),
++    days: int = Query(None, ge= 0),
+     current_user: dict = Depends(get_current_user),
+ ):
+     user_id = current_user.get("user_id")</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_40"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_40_1" aria-expanded="false" aria-controls="job_list___sub_collapse_40_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_40_1"><button class="btn btn-outline-success"><span class="job_id">40 : Job ID 2c2516c247d9472ba019e556202b5e77</span></button></div></a><div aria-labelledby="job_list___sub_heading_40_1" data-parent="#job_list___sub_accordion_40" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_40_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=27" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (27, 40), end pos: (27, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 2</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -24,7 +24,7 @@
+ ):
+     user_id = current_user.get("user_id")
+     if not user_id:
+-        raise HTTPException(status_code=401, detail="Unauthorized")
++        raise HTTPException(status_code= 402, detail="Unauthorized")
+ 
+     sms_counts, mail_counts = {}, {}
+     if mode in ("sms", "both"):</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_41"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_41_1" aria-expanded="false" aria-controls="job_list___sub_collapse_41_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_41_1"><button class="btn btn-outline-success"><span class="job_id">41 : Job ID 6c4b69f8b9e9401095a710b548f16b8a</span></button></div></a><div aria-labelledby="job_list___sub_heading_41_1" data-parent="#job_list___sub_accordion_41" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_41_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=27" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (27, 40), end pos: (27, 43)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 3</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -24,7 +24,7 @@
+ ):
+     user_id = current_user.get("user_id")
+     if not user_id:
+-        raise HTTPException(status_code=401, detail="Unauthorized")
++        raise HTTPException(status_code= 400, detail="Unauthorized")
+ 
+     sms_counts, mail_counts = {}, {}
+     if mode in ("sms", "both"):</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_42"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_42_1" aria-expanded="false" aria-controls="job_list___sub_collapse_42_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_42_1"><button class="btn btn-outline-success"><span class="job_id">42 : Job ID 70d58c8e1b7c4b7abfa6b3966d35051e</span></button></div></a><div aria-labelledby="job_list___sub_heading_42_1" data-parent="#job_list___sub_accordion_42" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_42_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 48), end pos: (40, 49)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 4</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, 1) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_43"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_43_1" aria-expanded="false" aria-controls="job_list___sub_collapse_43_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_43_1"><button class="btn btn-outline-success"><span class="job_id">43 : Job ID 755a52e507614f8e8bad5336f082e96e</span></button></div></a><div aria-labelledby="job_list___sub_heading_43_1" data-parent="#job_list___sub_accordion_43" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_43_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 48), end pos: (40, 49)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 5</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, -1) + mail_counts.get(i, 0) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_44"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_44_1" aria-expanded="false" aria-controls="job_list___sub_collapse_44_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_44_1"><button class="btn btn-outline-success"><span class="job_id">44 : Job ID 0d8303e3b5814d158d4e8209fa741a56</span></button></div></a><div aria-labelledby="job_list___sub_heading_44_1" data-parent="#job_list___sub_accordion_44" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_44_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 72), end pos: (40, 73)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 6</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 1) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_45"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_45_1" aria-expanded="false" aria-controls="job_list___sub_collapse_45_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_45_1"><button class="btn btn-outline-success"><span class="job_id">45 : Job ID 53daa66f498043868cd9296b50e72229</span></button></div></a><div aria-labelledby="job_list___sub_heading_45_1" data-parent="#job_list___sub_accordion_45" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_45_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=40" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (40, 72), end pos: (40, 73)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 7</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -37,7 +37,7 @@
+         )
+ 
+     if mode == "both":
+-        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, 0) for i in range(len(LABELS))}
++        combined_counts = {i: sms_counts.get(i, 0) + mail_counts.get(i, -1) for i in range(len(LABELS))}
+         counts_to_send = combined_counts
+     elif mode == "sms":
+         counts_to_send = sms_counts</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_46"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_46_1" aria-expanded="false" aria-controls="job_list___sub_collapse_46_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_46_1"><button class="btn btn-outline-success"><span class="job_id">46 : Job ID fc0c8fbb48e64187b29cca7e3c8ad7dc</span></button></div></a><div aria-labelledby="job_list___sub_heading_46_1" data-parent="#job_list___sub_accordion_46" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_46_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=48" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (48, 37), end pos: (48, 38)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 8</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -45,7 +45,7 @@
+         counts_to_send = mail_counts
+ 
+     for i in range(len(LABELS)):
+-        counts_to_send.setdefault(i, 0)
++        counts_to_send.setdefault(i, 1)
+ 
+     insights = await generate_Cyber_insights()
+     return {</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_47"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_47_1" aria-expanded="false" aria-controls="job_list___sub_collapse_47_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_47_1"><button class="btn btn-outline-success"><span class="job_id">47 : Job ID cab27db676404af88d5f2df0e37cd9c2</span></button></div></a><div aria-labelledby="job_list___sub_heading_47_1" data-parent="#job_list___sub_accordion_47" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_47_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=48" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (48, 37), end pos: (48, 38)</button></a></pre><pre>operator: core/NumberReplacer, occurrence: 9</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -45,7 +45,7 @@
+         counts_to_send = mail_counts
+ 
+     for i in range(len(LABELS)):
+-        counts_to_send.setdefault(i, 0)
++        counts_to_send.setdefault(i, -1)
+ 
+     insights = await generate_Cyber_insights()
+     return {</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_48"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_48_1" aria-expanded="false" aria-controls="job_list___sub_collapse_48_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_48_1"><button class="btn btn-outline-success"><span class="job_id">48 : Job ID 68f8ee24724143b79fda0ea00993c7f9</span></button></div></a><div aria-labelledby="job_list___sub_heading_48_1" data-parent="#job_list___sub_accordion_48" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_48_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=18" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (18, 0), end pos: (19, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -13,9 +13,6 @@
+ router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
+ 
+ LABELS = ["Secure", "Suspicious", "Threat", "Critical"]
+-
+-
+-@router.get("")
+ @router.get("/")
+ async def get_dashboard(
+     mode: str = Query("both", regex="^(sms|mail|both)$"),</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_49"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_49_1" aria-expanded="false" aria-controls="job_list___sub_collapse_49_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_49_1"><button class="btn btn-outline-success"><span class="job_id">49 : Job ID 239913ad003744209f266a0a71a6c97f</span></button></div></a><div aria-labelledby="job_list___sub_heading_49_1" data-parent="#job_list___sub_accordion_49" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_49_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=19" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (19, 0), end pos: (20, 0)</button></a></pre><pre>operator: core/RemoveDecorator, occurrence: 1</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -16,7 +16,6 @@
+ 
+ 
+ @router.get("")
+-@router.get("/")
+ async def get_dashboard(
+     mode: str = Query("both", regex="^(sms|mail|both)$"),
+     days: int = Query(None, ge=1),</pre></div></div></div></div></div><div class="mb-1" id="job_list___sub_accordion_50"><div class="card"><a data-toggle="collapse" data-target="#job_list___sub_collapse_50_1" aria-expanded="false" aria-controls="job_list___sub_collapse_50_1" href="#" class="job_list___sub_multi_heading"><div role="alert" class="card-header alert-success" id="job_list___sub_heading_50_1"><button class="btn btn-outline-success"><span class="job_id">50 : Job ID 71e3844998014018b6becea1d7568915</span></button></div></a><div aria-labelledby="job_list___sub_heading_50_1" data-parent="#job_list___sub_accordion_50" class="collapse job_list___sub_multi_collapse" id="job_list___sub_collapse_50_1"><div class="card-body"><div class="work-item"><div class="alert alert-success test-outcome" role="alert"><p>worker outcome: WorkerOutcome.NORMAL</p><p>test outcome: TestOutcome.KILLED</p></div></div><pre class="location"><a href="pycharm://open?file=routes/dashboard.py&amp;line=47" class="text-secondary"><button class="btn btn-outline-dark">routes/dashboard.py, start pos: (47, 13), end pos: (47, 31)</button></a></pre><pre>operator: core/ZeroIterationForLoop, occurrence: 0</pre><div class="alert alert-secondary"><pre class="diff">--- mutation diff ---
+--- aroutes/dashboard.py
++++ broutes/dashboard.py
+@@ -44,7 +44,7 @@
+     elif mode == "mail":
+         counts_to_send = mail_counts
+ 
+-    for i in range(len(LABELS)):
++    for i in []:
+         counts_to_send.setdefault(i, 0)
+ 
+     insights = await generate_Cyber_insights()</pre></div></div></div></div></div></div></div></div></div></div><script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script><script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script><script type="text/javascript">$('div.job_list___sub_multi_collapse').on('shown.bs.collapse',  function () {    correct_behavior_functional_buttons();  });$('div.job_list___sub_multi_collapse').on('hidden.bs.collapse',  function () {    correct_behavior_functional_buttons();  });function correct_behavior_functional_buttons() {    var expand = false;    var collapse = false;    $('a.job_list___sub_multi_heading').each(function(index) {      if ($(this).attr('aria-expanded') == 'false') {        expand = true;        return false;      };    });    $('a.job_list___sub_multi_heading').each(function(index) {      if ($(this).attr('aria-expanded') == 'true') {        collapse = true;        return false;      };    });    if (expand) {      $('div#job_item_expand_all').css('display', 'inline-block');    } else {      $('div#job_item_expand_all').css('display', 'none');    };    if (collapse) {      $('div#job_item_collapse_all').css('display', 'inline-block');    } else {      $('div#job_item_collapse_all').css('display', 'none');    };  };correct_behavior_functional_buttons();</script></body></html>

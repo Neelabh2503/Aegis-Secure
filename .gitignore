@@ -71,3 +71,4 @@ logs/
 BACKEND_CHANGES.md
 SETUP_AND_GIT.md
 
+.venv

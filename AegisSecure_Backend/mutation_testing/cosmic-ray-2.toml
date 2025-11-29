@@ -1,0 +1,8 @@
+[cosmic-ray]
+module-path = "middleware.py"
+timeout = 50.0
+test-command = "env PYTHONPATH=/mnt/c/Users/dhruv/VSCodeProjects/Aegis-Secure/AegisSecure_Backend python -m pytest tests/tests_middleware.py"
+
+[cosmic-ray.distributor]
+name = "local"
+
