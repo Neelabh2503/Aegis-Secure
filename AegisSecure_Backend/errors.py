@@ -5,7 +5,6 @@ from typing import Optional, Dict, Any
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 
-
 class AegisException(Exception):
     """Base exception class for AegisSecure application."""
     
@@ -20,7 +19,6 @@ class AegisException(Exception):
         self.details = details or {}
         super().__init__(self.message)
 
-
 class AuthenticationError(AegisException):
     """Raised when authentication fails."""
     
@@ -30,7 +28,6 @@ class AuthenticationError(AegisException):
             status_code=status.HTTP_401_UNAUTHORIZED,
             details=details
         )
-
 
 class AuthorizationError(AegisException):
     """Raised when user lacks permission."""
@@ -42,7 +39,6 @@ class AuthorizationError(AegisException):
             details=details
         )
 
-
 class ValidationError(AegisException):
     """Raised when input validation fails."""
     
@@ -52,7 +48,6 @@ class ValidationError(AegisException):
             status_code=status.HTTP_400_BAD_REQUEST,
             details=details
         )
-
 
 class ResourceNotFoundError(AegisException):
     """Raised when a requested resource is not found."""
@@ -64,7 +59,6 @@ class ResourceNotFoundError(AegisException):
             details=details
         )
 
-
 class DuplicateResourceError(AegisException):
     """Raised when attempting to create a duplicate resource."""
     
@@ -75,7 +69,6 @@ class DuplicateResourceError(AegisException):
             details=details
         )
 
-
 class DatabaseError(AegisException):
     """Raised when database operations fail."""
     
@@ -85,7 +78,6 @@ class DatabaseError(AegisException):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             details=details
         )
-
 
 class ExternalAPIError(AegisException):
     """Raised when external API calls fail."""
@@ -104,7 +96,6 @@ class ExternalAPIError(AegisException):
             details=details
         )
 
-
 class RateLimitError(AegisException):
     """Raised when rate limit is exceeded."""
     
@@ -122,7 +113,6 @@ class RateLimitError(AegisException):
             details=details
         )
 
-
 class OTPError(AegisException):
     """Raised when OTP operations fail."""
     
@@ -133,7 +123,6 @@ class OTPError(AegisException):
             details=details
         )
 
-
 class TokenError(AegisException):
     """Raised when token operations fail."""
     
@@ -143,7 +132,6 @@ class TokenError(AegisException):
             status_code=status.HTTP_401_UNAUTHORIZED,
             details=details
         )
-
 
 def create_error_response(
     message: str,
@@ -172,7 +160,6 @@ def create_error_response(
     
     return JSONResponse(status_code=status_code, content=content)
 
-
 def handle_exception(exc: Exception) -> JSONResponse:
     """
     Convert exceptions to standardized JSON responses.
@@ -197,15 +184,13 @@ def handle_exception(exc: Exception) -> JSONResponse:
         )
     
     else:
-        # Generic error for unexpected exceptions
+
         return create_error_response(
             message="An unexpected error occurred",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             details={"error_type": type(exc).__name__}
         )
 
-
-# Error response templates
 class ErrorResponses:
     """Predefined error response templates."""
     

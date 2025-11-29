@@ -13,7 +13,12 @@ Examples:
 """
 import subprocess
 import sys
+import os
 import argparse
+
+# Add refactored backend to path
+backend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'AegisSecureRefactored', 'Backend'))
+sys.path.insert(0, backend_path)
 
 
 MODULES = {
@@ -45,13 +50,6 @@ MODULES = {
         "test_file": "tests/test_routes_auth.py",
         "source": "routes/auth.py",
         "description": "Authentication Routes",
-        "priority": "HIGH",
-        "type": "unit"
-    },
-    "routes_otp": {
-        "test_file": "tests/test_routes_otp.py",
-        "source": "routes/otp.py",
-        "description": "OTP Management",
         "priority": "HIGH",
         "type": "unit"
     },
@@ -121,6 +119,87 @@ MODULES = {
         "description": "Application Entry Point",
         "priority": "MEDIUM",
         "type": "integration"
+    },
+    
+    # Models (Unit Tests - Priority HIGH)
+    "models": {
+        "test_file": "tests/test_models.py",
+        "source": "models.py",
+        "description": "Pydantic Models",
+        "priority": "HIGH",
+        "type": "unit"
+    },
+    
+    # Utility Tests (Unit Tests - Priority MEDIUM)
+    "utils_password": {
+        "test_file": "tests/test_utils_password.py",
+        "source": "utils/password_utils.py",
+        "description": "Password Utilities",
+        "priority": "MEDIUM",
+        "type": "unit"
+    },
+    "utils_format": {
+        "test_file": "tests/test_utils_format.py",
+        "source": "utils/format_utils.py",
+        "description": "Format Utilities",
+        "priority": "MEDIUM",
+        "type": "unit"
+    },
+    "utils_color": {
+        "test_file": "tests/test_utils_color.py",
+        "source": "utils/Color_decoration_utils.py",
+        "description": "Color Decoration Utilities",
+        "priority": "MEDIUM",
+        "type": "unit"
+    },
+    "utils_jwt": {
+        "test_file": "tests/test_utils_jwt.py",
+        "source": "utils/jwt_utils.py",
+        "description": "JWT Utilities",
+        "priority": "HIGH",
+        "type": "unit"
+    },
+    "utils_access_token": {
+        "test_file": "tests/test_utils_access_token.py",
+        "source": "utils/access_token_util.py",
+        "description": "Access Token Utilities",
+        "priority": "MEDIUM",
+        "type": "unit"
+    },
+    "utils_otp": {
+        "test_file": "tests/test_utils_otp.py",
+        "source": "utils/otp_utils.py",
+        "description": "OTP Utilities",
+        "priority": "HIGH",
+        "type": "unit"
+    },
+    "utils_user_info": {
+        "test_file": "tests/test_utils_user_info.py",
+        "source": "utils/user_info_utils.py",
+        "description": "User Info Utilities",
+        "priority": "MEDIUM",
+        "type": "unit"
+    },
+    "utils_spam_prediction": {
+        "test_file": "tests/test_utils_spam_prediction.py",
+        "source": "utils/SpamPrediction_utils.py",
+        "description": "Spam Prediction Utilities",
+        "priority": "LOW",
+        "type": "unit"
+    },
+    "utils_dashboard": {
+        "test_file": "tests/test_utils_dashboard.py",
+        "source": "utils/dashboard_utils.py",
+        "description": "Dashboard Utilities",
+        "priority": "LOW",
+        "type": "unit"
+    },
+    "utils_get_email": {
+        "test_file": "tests/test_utils_get_email.py",
+        "source": "utils/get_email_utils.py",
+        "description": "Get Email Utilities",
+        "priority": "LOW",
+        "type": "unit"
     }
 }
 

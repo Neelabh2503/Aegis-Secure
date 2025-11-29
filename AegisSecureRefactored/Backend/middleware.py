@@ -13,7 +13,6 @@ from starlette.middleware.cors import CORSMiddleware
 
 from config import settings, SecurityHeaders
 
-
 class RateLimiter:
     """
     Simple in-memory rate limiter.
@@ -54,8 +53,7 @@ class RateLimiter:
         
         current_time = time.time()
         cutoff_time = current_time - window_seconds
-        
-        # Filter out old requests
+
         self.requests[identifier] = [
             req_time for req_time in self.requests[identifier]
             if req_time > cutoff_time
@@ -67,10 +65,7 @@ class RateLimiter:
         self.requests[identifier].append(current_time)
         return False
 
-
-# Global rate limiter instance
 rate_limiter = RateLimiter()
-
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """Middleware to enforce rate limiting on API endpoints."""
@@ -78,14 +73,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable):
         if not settings.RATE_LIMIT_ENABLED:
             return await call_next(request)
-        
-        # Get client identifier (IP address)
+
         client_ip = request.client.host if request.client else "unknown"
-        
-        # Different rate limits for different endpoint types
+
         path = request.url.path
-        
-        # Strict rate limit for authentication endpoints
+
         if path.startswith("/auth/login") or path.startswith("/auth/register"):
             if rate_limiter.is_rate_limited(
                 f"auth:{client_ip}",
@@ -99,8 +91,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                         "retry_after": 3600
                     }
                 )
-        
-        # General rate limit for all other endpoints
+
         elif rate_limiter.is_rate_limited(
             f"general:{client_ip}",
             max_requests=settings.RATE_LIMIT_PER_MINUTE,
@@ -117,19 +108,16 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         return response
 
-
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Middleware to add security headers to all responses."""
     
     async def dispatch(self, request: Request, call_next: Callable):
         response = await call_next(request)
-        
-        # Add security headers
+
         for header, value in SecurityHeaders.HEADERS.items():
             response.headers[header] = value
         
         return response
-
 
 class RequestValidationMiddleware(BaseHTTPMiddleware):
     """Middleware to validate and sanitize requests."""
@@ -146,15 +134,14 @@ class RequestValidationMiddleware(BaseHTTPMiddleware):
     ]
     
     async def dispatch(self, request: Request, call_next: Callable):
-        # Check content length to prevent large payload attacks
+
         content_length = request.headers.get("content-length")
         if content_length and int(content_length) > 10 * 1024 * 1024:  # 10MB limit
             return JSONResponse(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                 content={"detail": "Request payload too large"}
             )
-        
-        # Validate query parameters for suspicious patterns
+
         for key, value in request.query_params.items():
             if self._contains_suspicious_pattern(value):
                 return JSONResponse(
@@ -172,24 +159,20 @@ class RequestValidationMiddleware(BaseHTTPMiddleware):
                 return True
         return False
 
-
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """Middleware to log all incoming requests and responses."""
     
     async def dispatch(self, request: Request, call_next: Callable):
         start_time = time.time()
-        
-        # Log request
+
         client_ip = request.client.host if request.client else "unknown"
         print(f"🔵 {request.method} {request.url.path} - Client: {client_ip}")
         
         try:
             response = await call_next(request)
-            
-            # Calculate request duration
+
             duration = time.time() - start_time
-            
-            # Log response
+
             status_emoji = "✅" if response.status_code < 400 else "❌"
             print(
                 f"{status_emoji} {request.method} {request.url.path} - "
@@ -206,7 +189,6 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             )
             raise
 
-
 class ErrorHandlerMiddleware(BaseHTTPMiddleware):
     """Middleware to catch and format unhandled errors."""
     
@@ -214,13 +196,12 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
         try:
             return await call_next(request)
         except HTTPException:
-            # Let FastAPI handle HTTPExceptions
+
             raise
         except Exception as e:
-            # Log the error
+
             print(f"❌ Unhandled error in {request.url.path}: {str(e)}")
-            
-            # Return generic error response (don't expose internal details)
+
             if settings.DEBUG:
                 detail = str(e)
             else:
@@ -235,21 +216,19 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
                 }
             )
 
-
 def get_client_ip(request: Request) -> str:
     """
     Extract client IP address from request.
     Handles proxy headers like X-Forwarded-For.
     """
-    # Check for proxy headers first
+
     forwarded_for = request.headers.get("X-Forwarded-For")
     if forwarded_for:
-        # X-Forwarded-For can contain multiple IPs, take the first one
+
         return forwarded_for.split(",")[0].strip()
     
     real_ip = request.headers.get("X-Real-IP")
     if real_ip:
         return real_ip
-    
-    # Fallback to direct client IP
+
     return request.client.host if request.client else "unknown"

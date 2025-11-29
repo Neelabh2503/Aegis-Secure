@@ -13,28 +13,9 @@ def html_to_text(html_content):
 
     return text.strip()
 
-
-# def shorten_urls(text, max_length=100):
-#     def _shorten(match):
-#         url = match.group(0)
-#         if len(url) <= max_length:
-#             return url
-#         return url[:max_length] + "..."
-    
-#     url_regex = r"(https?://[^\s]+)"
-#     return re.sub(url_regex, _shorten, text)
-
-
-# def format_links(text):
-#     if not text:
-#         return text
-#     text = shorten_urls(text)
-#     return text
-
-
 def extract_body(payload):
     if not payload:
-        return None
+        return ""
 
     mime_type = payload.get("mimeType", "")
     body_data = payload.get("body", {}).get("data")
@@ -50,10 +31,10 @@ def extract_body(payload):
                 text = html_to_text(decoded)
 
             else:
-                text = None
+                text = ""
 
-            # if text:
-            #     return format_links(text)
+            if text:
+                return text
 
         except Exception:
             pass
@@ -63,4 +44,4 @@ def extract_body(payload):
         if text:
             return text
 
-    return None
+    return ""

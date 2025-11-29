@@ -59,7 +59,6 @@ async def grouped_data_fromDB(col, user_id_field, score_field, user_id, days: in
 
     return counts
 
-
 async def generate_Cyber_insights() -> dict:
     try:
         prompt = """

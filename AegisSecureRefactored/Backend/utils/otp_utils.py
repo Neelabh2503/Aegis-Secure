@@ -10,7 +10,6 @@ from utils.access_token_util import get_access_token
 from dotenv import load_dotenv
 load_dotenv()
 
-
 OTP_EXPIRE_MINUTES = int(os.getenv("OTP_EXPIRE_MINUTES", "10"))
 otp_col = auth_db.otps
 
@@ -18,8 +17,6 @@ REFRESH_TOKEN = os.getenv("REFRESH_TOKEN")
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 AEGISEMAIL=os.getenv("AEGISEMAIL")
-
-
 
 def generate_otp() -> str:
     return str(random.randint(100000, 999999)).zfill(6)
@@ -49,9 +46,6 @@ async def verify_otp_in_db(email: str, otp: str) -> bool:
         return True
     return False
 
-
-
-
 async def send_gmail_email(access_token: str, to_email: str, subject: str, body: str):
     message = MIMEText(body, "html")
     message["to"] = to_email
@@ -70,8 +64,6 @@ async def send_gmail_email(access_token: str, to_email: str, subject: str, body:
         if resp.status_code != 200:
             raise Exception(f"Failed to send email: {resp.text}")
         return resp.json()
-    
-
 
 async def send_otp(to_email: str, otp: str) -> bool:
     html_body = f"""

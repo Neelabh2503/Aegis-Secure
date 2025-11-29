@@ -10,7 +10,7 @@ from contextlib import asynccontextmanager
 load_dotenv()
 
 from config import settings
-from routes import auth, gmail, Oauth, notifications, otp, sms, dashboard
+
 from middleware import (
     RateLimitMiddleware,
     SecurityHeadersMiddleware,
@@ -21,7 +21,6 @@ from middleware import (
 from errors import AegisException, handle_exception
 from logger import logger, log_startup_message, log_shutdown_message
 from db_utils import db_manager
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -39,15 +38,13 @@ async def lifespan(app: FastAPI):
         logger.info("✅ Database connection established")
     except Exception as e:
         logger.error(f"❌ Failed to connect to database: {str(e)}")
-    
-    # Create database indexes
+
     try:
         await avatars_col.create_index("email", unique=True)
         logger.info("✅ Database indexes created")
     except Exception as e:
         logger.warning(f"⚠️ Index creation warning: {str(e)}")
-    
-    # Start background cleanup task
+
     from routes.notifications import clean_invalid_messages
     cleanup_task = asyncio.create_task(clean_invalid_messages())
     logger.info("✅ Background cleanup task started")
@@ -55,12 +52,10 @@ async def lifespan(app: FastAPI):
     settings.print_config_summary()
     
     yield  # Application runs here
-    
-    # Shutdown
+
     log_shutdown_message()
     cleanup_task.cancel()
     await db_manager.disconnect()
-
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -84,12 +79,10 @@ app.add_middleware(
     expose_headers=["*"]
 )
 
-# Exception handlers
 @app.exception_handler(AegisException)
 async def aegis_exception_handler(request: Request, exc: AegisException):
     """Handle custom AegisException errors."""
     return handle_exception(exc)
-
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -104,18 +97,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         }
     )
 
-
-# Include routers
-app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
-app.include_router(gmail.router, prefix="/gmail", tags=["Gmail"])
-app.include_router(Oauth.router, prefix="/oauth", tags=["OAuth"])
-app.include_router(Oauth.router, prefix="/auth", tags=["OAuth"])
-app.include_router(notifications.router, prefix="/notifications", tags=["Notifications"])
-app.include_router(sms.router, prefix="/sms", tags=["SMS"])
-app.include_router(dashboard.router)
-
-
-# Health check endpoints
 @app.get("/", tags=["Health"])
 async def root():
     """Root endpoint - API status."""
@@ -125,7 +106,6 @@ async def root():
         "version": settings.APP_VERSION,
         "message": "AegisSecure Backend is running"
     }
-
 
 @app.get("/health", tags=["Health"])
 async def health_check():
@@ -138,12 +118,10 @@ async def health_check():
         "database": "connected" if db_healthy else "disconnected"
     }
 
-
 @app.get("/ping", tags=["Health"])
 async def ping():
     """Simple ping endpoint for monitoring."""
     return {"ping": "pong"}
-
 
 app = FastAPI(title="Aegis Backend")
 
@@ -153,14 +131,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-app.include_router(auth.router, prefix="/auth")
-app.include_router(gmail.router)
-app.include_router(Oauth.router)
-app.include_router(Oauth.router, prefix="/auth")
-app.include_router(notifications.router)
-app.include_router(sms.router, prefix="/sms", tags=["SMS"])
-app.include_router(dashboard.router)
 
 ws_router = APIRouter()
 

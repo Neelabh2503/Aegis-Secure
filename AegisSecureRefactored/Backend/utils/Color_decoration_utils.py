@@ -3,7 +3,9 @@ from dotenv import load_dotenv
 from database import avatars_col
 load_dotenv()
 
-COLOR_PALETTE = os.getenv("COLOR_PALETTE", "").split(",")
+DEFAULT_COLORS = "#F44336,#E91E63,#9C27B0,#673AB7,#3F51B5,#2196F3,#00BCD4,#009688,#4CAF50,#FF9800"
+color_env = os.getenv("COLOR_PALETTE", DEFAULT_COLORS)
+COLOR_PALETTE = [c.strip() for c in color_env.split(",") if c.strip()]
 
 async def get_sender_avatar_color(sender: str):
     existing = await avatars_col.find_one({"email": sender})

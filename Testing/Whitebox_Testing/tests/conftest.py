@@ -10,8 +10,9 @@ import os
 import sys
 from unittest.mock import AsyncMock, MagicMock
 
-# Add parent directory to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Add refactored backend to path (3 directories up to project root, then into AegisSecureRefactored/Backend)
+backend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AegisSecureRefactored', 'Backend'))
+sys.path.insert(0, backend_path)
 
 # Import config first (doesn't need firebase)
 from config import settings

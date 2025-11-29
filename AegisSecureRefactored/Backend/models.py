@@ -14,10 +14,8 @@ class LoginResponse(BaseModel):
     token: str
     verified: bool
 
-
 class SendOTPRequest(BaseModel):
     email: EmailStr
-
 
 class UserResponse(BaseModel):
     name: str
@@ -38,19 +36,16 @@ class Spam_request(BaseModel):
     subject: str
     text: str
 
-
 class SpamRequest(BaseModel):
     sender: str
     subject: str
     text: str
-
 
 class SmsMessage(BaseModel):
     address: str
     body: str
     date_ms: int
     type: str
-
 
 class SmsSyncRequest(BaseModel):
     messages: List[SmsMessage]

@@ -1,22 +1,17 @@
 import os,time,re
 from jose import jwt
 
-
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
-
 from database import messages_col, accounts_col,avatars_col
 from utils.user_info_utils import get_current_user_id
-
 
 router = APIRouter()
 JWT_SECRET = os.getenv("JWT_SECRET", "your_secret_key")
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-
-#route to fetch the state-token
 @router.get("/gmail/state-token")
 def get_state_token(user_id: str):
     payload = {
@@ -27,8 +22,6 @@ def get_state_token(user_id: str):
     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
     return {"state": token}
 
-
-#This route fetches all the emails of the current user form the DB
 @router.get("/emails")
 async def get_emails(
     user_id: str = Depends(get_current_user_id),
@@ -62,8 +55,6 @@ async def get_emails(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-#To get the name,gmail_email of the current user
 @router.get("/user/me")
 async def get_current_user(user_id: str):
     user = await accounts_col.find_one({"user_id": user_id})
@@ -71,8 +62,6 @@ async def get_current_user(user_id: str):
         raise HTTPException(status_code=404, detail="User not found")
     return {"name": user.get("name", "User"), "gmail_email": user.get("gmail_email")}
 
-
-#to get the connected/linked accounts of the current user
 @router.get("/gmail/accounts")
 async def get_connected_accounts(user_id: str = Depends(get_current_user_id)):
     try:
@@ -84,9 +73,7 @@ async def get_connected_accounts(user_id: str = Depends(get_current_user_id)):
         return {"accounts": accounts}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
 
-#to delete a particular account of the current user
 @router.post("/accounts/delete")
 async def delete_connected_account(
     payload: dict,
@@ -107,3 +94,25 @@ async def delete_connected_account(
         raise HTTPException(status_code=404, detail="Account not found")
 
     return {"message": "Account deleted successfully"}
+
+async def search_emails(q: str, user_id: str):
+    """Search emails by query string."""
+    if not q:
+        return []
+    
+    try:
+        query = {"user_id": user_id}
+        emails_cursor = messages_col.find(query, {"_id": 0})
+        emails = await emails_cursor.to_list(length=None)
+
+        q_lower = q.lower()
+        filtered = [
+            e for e in emails
+            if q_lower in e.get("subject", "").lower() 
+            or q_lower in e.get("from", "").lower()
+            or q_lower in e.get("body", "").lower()
+        ]
+        
+        return filtered
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

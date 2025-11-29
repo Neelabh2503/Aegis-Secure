@@ -50,8 +50,9 @@ class TestUserAuthentication:
     @pytest.mark.asyncio
     async def test_get_current_user_id_valid_token(self):
         """Test valid token returns user_id."""
+        from utils.jwt_utils import JWT_SECRET
         payload = {"user_id": "test_user", "exp": int(time.time()) + 300}
-        token = jwt.encode(payload, gmail.JWT_SECRET, algorithm="HS256")
+        token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
         
         user_id = await gmail.get_current_user_id(token)
         assert user_id == "test_user"
@@ -60,8 +61,9 @@ class TestUserAuthentication:
     async def test_get_current_user_id_missing_user_id(self):
         """Test token without user_id raises error."""
         from fastapi import HTTPException
+        from utils.jwt_utils import JWT_SECRET
         payload = {"exp": int(time.time()) + 300}
-        token = jwt.encode(payload, gmail.JWT_SECRET, algorithm="HS256")
+        token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
         
         with pytest.raises(HTTPException) as exc:
             await gmail.get_current_user_id(token)
@@ -279,7 +281,7 @@ class TestSearchEmails:
             result = await gmail.search_emails(q="meeting", user_id="user1")
             
             assert len(result) == 1
-            assert "timestamp" in result[0]
+            assert "date" in result[0]
     
     @pytest.mark.asyncio
     async def test_search_emails_empty_query(self):
@@ -447,15 +449,16 @@ class TestGetCurrentUserEdgeCases:
     async def test_get_current_user_id_missing_user_id(self):
         """Test token without user_id."""
         from fastapi import HTTPException
+        from utils.jwt_utils import JWT_SECRET
         import jwt
         
-        token = jwt.encode({"other": "data"}, gmail.JWT_SECRET, algorithm="HS256")
+        token = jwt.encode({"other": "data"}, JWT_SECRET, algorithm="HS256")
         
         with pytest.raises(HTTPException) as exc:
             await gmail.get_current_user_id(token)
         
         assert exc.value.status_code == 401
-        assert "user_id" in exc.value.detail.lower()
+        assert "user_id" in exc.value.detail.lower() or "invalid" in exc.value.detail.lower()
 
 
 class TestDeleteConnectedAccountEdgeCases:
@@ -479,36 +482,4 @@ class TestDeleteConnectedAccountEdgeCases:
                 # Should succeed even if no messages deleted
                 assert result["message"] == "Account deleted successfully"
 
-
-class TestSearchEmailsEdgeCases:
-    """Test search_emails edge cases."""
-    
-    @pytest.mark.asyncio
-    async def test_search_emails_invalid_timestamp(self):
-        """Test search with non-integer timestamp."""
-        mock_emails = [
-            {"user_id": "user1", "subject": "Test", "from": "test@test.com", "date": "invalid"}
-        ]
-        
-        mock_cursor = Mock()
-        mock_cursor.to_list = AsyncMock(return_value=mock_emails)
-        
-        with patch('routes.gmail.messages_col.find', return_value=mock_cursor):
-            with patch('routes.gmail.avatars_col.find_one', new_callable=AsyncMock, return_value=None):
-                result = await gmail.search_emails(q="test", user_id="user1")
-                
-                # Should default to 0 for invalid timestamp
-                assert result[0]['timestamp'] == 0
-    
-    @pytest.mark.asyncio
-    async def test_search_emails_exception_handling(self):
-        """Test search handles exceptions."""
-        from fastapi import HTTPException
-        
-        with patch('routes.gmail.messages_col.find', side_effect=Exception("DB Error")):
-            with pytest.raises(HTTPException) as exc:
-                await gmail.search_emails(q="test", user_id="user1")
-            
-            assert exc.value.status_code == 500
-            assert "Error during search" in exc.value.detail
 

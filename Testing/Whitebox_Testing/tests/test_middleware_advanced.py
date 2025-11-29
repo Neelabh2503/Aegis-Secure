@@ -4,8 +4,7 @@ Tests edge cases, cleanup logic, and advanced scenarios.
 """
 import pytest
 import time
-from unittest.mock import Mock, patch
-from tests.test_helpers import AsyncMock
+from unittest.mock import Mock, patch, AsyncMock
 from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
 from starlette.datastructures import Headers
