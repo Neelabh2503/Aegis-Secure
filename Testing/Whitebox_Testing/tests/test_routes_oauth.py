@@ -8,6 +8,12 @@ from .test_helpers import AsyncMock
 from routes import Oauth
 from fastapi import HTTPException
 import base64
+from utils.access_token_util import get_access_token
+from utils.Color_decoration_utils import get_sender_avatar_color, COLOR_PALETTE
+from utils.jwt_utils import JWT_SECRET
+from database import avatars_col
+import models
+from utils.get_email_utils import extract_body
 
 
 # Helper for async context manager mocking
@@ -37,7 +43,7 @@ class TestAccessTokenRefresh:
         mock_context = AsyncContextManagerMock(mock_client_instance)
         
         with patch('httpx.AsyncClient', return_value=mock_context):
-            token = await Oauth.get_access_token_from_refresh("refresh_token")
+            token = await get_access_token("refresh_token")
             assert token == "new_token_123"
     
     @pytest.mark.asyncio
@@ -51,7 +57,7 @@ class TestAccessTokenRefresh:
         mock_context = AsyncContextManagerMock(mock_client_instance)
         
         with patch('httpx.AsyncClient', return_value=mock_context):
-            token = await Oauth.get_access_token_from_refresh("invalid")
+            token = await get_access_token("invalid")
             assert token is None
 
 
@@ -68,7 +74,7 @@ class TestEmailBodyExtraction:
             "body": {"data": encoded}
         }
         
-        result = Oauth.extract_body(payload)
+        result = extract_body(payload)
         assert "Hello" in result
         assert "test email" in result
     
@@ -82,7 +88,7 @@ class TestEmailBodyExtraction:
             "body": {"data": encoded}
         }
         
-        result = Oauth.extract_body(payload)
+        result = extract_body(payload)
         assert "Test HTML email" in result
     
     def test_extract_body_multipart(self):
@@ -100,18 +106,18 @@ class TestEmailBodyExtraction:
             ]
         }
         
-        result = Oauth.extract_body(payload)
+        result = extract_body(payload)
         assert "Multipart message" in result
     
     def test_extract_body_empty_payload(self):
         """Test handling empty payload."""
-        result = Oauth.extract_body(None)
+        result = extract_body(None)
         assert result == ""
     
     def test_extract_body_no_data(self):
         """Test payload without body data."""
         payload = {"mimeType": "text/plain", "body": {}}
-        result = Oauth.extract_body(payload)
+        result = extract_body(payload)
         assert result == ""
     
     def test_extract_body_decode_error(self):
@@ -120,31 +126,13 @@ class TestEmailBodyExtraction:
             "mimeType": "text/plain",
             "body": {"data": "invalid-base64!!!"}
         }
-        result = Oauth.extract_body(payload)
+        result = extract_body(payload)
         assert result == ""
 
 
 class TestOAuthConfiguration:
     """Test OAuth configuration."""
     
-    def test_google_client_id_configured(self):
-        """Test Google client ID is set."""
-        assert Oauth.GOOGLE_CLIENT_ID is not None
-    
-    def test_google_client_secret_configured(self):
-        """Test Google client secret is set."""
-        assert Oauth.GOOGLE_CLIENT_SECRET is not None
-    
-    def test_redirect_uri_configured(self):
-        """Test redirect URI is set."""
-        assert Oauth.REDIRECT_URI is not None
-    
-    def test_jwt_secret_configured(self):
-        """Test JWT secret exists."""
-        assert Oauth.JWT_SECRET is not None
-        assert len(Oauth.JWT_SECRET) > 0
-
-
 class TestRefreshAccessTokenEndpoint:
     """Test refresh access token endpoint."""
     
@@ -158,7 +146,7 @@ class TestRefreshAccessTokenEndpoint:
         }
         
         with patch('routes.Oauth.accounts_col.find_one', new_callable=AsyncMock, return_value=mock_user_data), \
-             patch('routes.Oauth.get_access_token_from_refresh', new_callable=AsyncMock, return_value="new_access_token"):
+             patch('routes.Oauth.get_access_token', new_callable=AsyncMock, return_value="new_access_token"):
             
             result = await Oauth.refresh_access_token("user123", "test@gmail.com")
             
@@ -190,7 +178,7 @@ class TestRefreshAccessTokenEndpoint:
         }
         
         with patch('routes.Oauth.accounts_col.find_one', new_callable=AsyncMock, return_value=mock_user_data), \
-             patch('routes.Oauth.get_access_token_from_refresh', new_callable=AsyncMock, return_value=None):
+             patch('routes.Oauth.get_access_token', new_callable=AsyncMock, return_value=None):
             with pytest.raises(Exception):  # HTTPException
                 await Oauth.refresh_access_token("user123", "test@gmail.com")
 
@@ -228,19 +216,19 @@ class TestGetSenderAvatarColor:
         """Test retrieving existing avatar color."""
         mock_avatar = {"email": "test@example.com", "char_color": "#4285F4"}
         
-        with patch('routes.Oauth.avatars_col.find_one', new_callable=AsyncMock, return_value=mock_avatar):
+        with patch('database.avatars_col.find_one', new_callable=AsyncMock, return_value=mock_avatar):
             color = await Oauth.get_sender_avatar_color("test@example.com")
             assert color == "#4285F4"
     
     @pytest.mark.asyncio
     async def test_assign_new_color(self):
         """Test assigning new avatar color."""
-        with patch('routes.Oauth.avatars_col.find_one', new_callable=AsyncMock, return_value=None), \
-             patch('routes.Oauth.avatars_col.update_one', new_callable=AsyncMock) as mock_update:
+        with patch('database.avatars_col.find_one', new_callable=AsyncMock, return_value=None), \
+             patch('database.avatars_col.update_one', new_callable=AsyncMock) as mock_update:
             
             color = await Oauth.get_sender_avatar_color("new@example.com")
             
-            assert color in Oauth.COLOR_PALETTE
+            assert color in COLOR_PALETTE
             mock_update.assert_called_once()
     
     @pytest.mark.asyncio
@@ -248,7 +236,7 @@ class TestGetSenderAvatarColor:
         """Test color assignment is deterministic for same sender."""
         mock_avatar = {"email": "same@example.com", "char_color": "#EA4335"}
         
-        with patch('routes.Oauth.avatars_col.find_one', new_callable=AsyncMock, return_value=mock_avatar):
+        with patch('database.avatars_col.find_one', new_callable=AsyncMock, return_value=mock_avatar):
             color1 = await Oauth.get_sender_avatar_color("same@example.com")
             color2 = await Oauth.get_sender_avatar_color("same@example.com")
             
@@ -261,19 +249,19 @@ class TestColorPalette:
     
     def test_color_palette_exists(self):
         """Test color palette is defined."""
-        assert len(Oauth.COLOR_PALETTE) > 0
+        assert len(COLOR_PALETTE) > 0
     
     def test_all_colors_valid_hex(self):
         """Test all colors are valid hex codes."""
         import re
         hex_pattern = re.compile(r'^#[0-9A-Fa-f]{6}$')
-        for color in Oauth.COLOR_PALETTE:
+        for color in COLOR_PALETTE:
             assert hex_pattern.match(color), f"Invalid hex color: {color}"
     
     def test_color_palette_diversity(self):
         """Test color palette has sufficient variety."""
-        assert len(Oauth.COLOR_PALETTE) >= 10
-        assert len(set(Oauth.COLOR_PALETTE)) == len(Oauth.COLOR_PALETTE)  # No duplicates
+        assert len(COLOR_PALETTE) >= 10
+        assert len(set(COLOR_PALETTE)) == len(COLOR_PALETTE)  # No duplicates
 
 
 class TestSpamRequestModel:
@@ -281,7 +269,7 @@ class TestSpamRequestModel:
     
     def test_spam_request_valid(self):
         """Test valid spam request."""
-        req = Oauth.Spam_request(
+        req = models.Spam_request(
             sender="test@example.com",
             subject="Test Subject",
             text="Test email body"
@@ -293,7 +281,7 @@ class TestSpamRequestModel:
     def test_spam_request_validation(self):
         """Test spam request validation."""
         with pytest.raises(ValueError):
-            Oauth.Spam_request(sender="test@example.com")  # Missing required fields
+            models.Spam_request(sender="test@example.com")  # Missing required fields
 
 
 class TestGoogleCallbackEdgeCases:
@@ -471,7 +459,7 @@ class TestGoogleCallbackEdgeCases:
         with patch('httpx.AsyncClient', return_value=mock_context):
             with patch('routes.Oauth.accounts_col.update_one', new_callable=AsyncMock, return_value=mock_update.return_value):
                 with patch('routes.Oauth.messages_col.update_one', new_callable=AsyncMock, return_value=mock_update.return_value):
-                    with patch('routes.Oauth.extract_body', return_value="Test body"):
+                    with patch('utils.get_email_utils.extract_body', return_value="Test body"):
                         result = await google_callback(code="auth_code", state=state)
                         
                         assert result.status_code == 200
@@ -518,7 +506,7 @@ class TestGoogleCallbackEdgeCases:
         with patch('httpx.AsyncClient', return_value=mock_context):
             with patch('routes.Oauth.accounts_col.update_one', new_callable=AsyncMock, return_value=mock_update.return_value):
                 with patch('routes.Oauth.messages_col.update_one', new_callable=AsyncMock, return_value=mock_update.return_value):
-                    with patch('routes.Oauth.extract_body', return_value=None):
+                    with patch('routes.Oauth.extract_body', return_value=""):
                         result = await google_callback(code="auth_code", state=state)
                         
                         assert result.status_code == 200

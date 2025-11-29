@@ -9,11 +9,9 @@ from pathlib import Path
 
 from config import settings
 
-
 class ColoredFormatter(logging.Formatter):
     """Custom formatter with colors for console output."""
-    
-    # ANSI color codes
+
     COLORS = {
         'DEBUG': '\033[36m',     # Cyan
         'INFO': '\033[32m',      # Green
@@ -24,13 +22,12 @@ class ColoredFormatter(logging.Formatter):
     }
     
     def format(self, record):
-        # Add color to level name
+
         levelname = record.levelname
         if levelname in self.COLORS:
             record.levelname = f"{self.COLORS[levelname]}{levelname}{self.COLORS['RESET']}"
         
         return super().format(record)
-
 
 def setup_logger(
     name: str = "aegis_secure",
@@ -48,15 +45,13 @@ def setup_logger(
     Returns:
         Configured logger instance
     """
-    # Get or create logger
+
     logger = logging.getLogger(name)
     logger.setLevel(log_level or settings.LOG_LEVEL)
-    
-    # Avoid duplicate handlers
+
     if logger.handlers:
         return logger
-    
-    # Console handler with colors
+
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.DEBUG)
     console_formatter = ColoredFormatter(
@@ -65,8 +60,7 @@ def setup_logger(
     )
     console_handler.setFormatter(console_formatter)
     logger.addHandler(console_handler)
-    
-    # File handler (if specified)
+
     if log_file or settings.LOG_FILE:
         file_path = Path(log_file or settings.LOG_FILE)
         file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -82,10 +76,7 @@ def setup_logger(
     
     return logger
 
-
-# Global logger instance
 logger = setup_logger()
-
 
 def log_request(method: str, path: str, client_ip: str, duration: float, status_code: int):
     """Log API request details."""
@@ -95,7 +86,6 @@ def log_request(method: str, path: str, client_ip: str, duration: float, status_
         f"Duration: {duration:.3f}s"
     )
 
-
 def log_error(error: Exception, context: Optional[str] = None):
     """Log error with context."""
     error_msg = f"Error: {str(error)}"
@@ -103,12 +93,10 @@ def log_error(error: Exception, context: Optional[str] = None):
         error_msg = f"{context} | {error_msg}"
     logger.error(error_msg, exc_info=True)
 
-
 def log_security_event(event_type: str, details: str, severity: str = "WARNING"):
     """Log security-related events."""
     log_func = getattr(logger, severity.lower(), logger.warning)
     log_func(f"🔒 SECURITY EVENT: {event_type} | {details}")
-
 
 def log_database_operation(operation: str, collection: str, duration: float, success: bool = True):
     """Log database operations."""
@@ -116,7 +104,6 @@ def log_database_operation(operation: str, collection: str, duration: float, suc
     logger.debug(
         f"💾 DB {operation} on '{collection}' - {status} - Duration: {duration:.3f}s"
     )
-
 
 def log_external_api_call(service: str, endpoint: str, duration: float, status_code: int):
     """Log external API calls."""
@@ -126,7 +113,6 @@ def log_external_api_call(service: str, endpoint: str, duration: float, status_c
         f"Status: {status_code} - Duration: {duration:.3f}s"
     )
 
-
 def log_auth_attempt(email: str, success: bool, reason: Optional[str] = None):
     """Log authentication attempts."""
     if success:
@@ -135,12 +121,10 @@ def log_auth_attempt(email: str, success: bool, reason: Optional[str] = None):
         reason_msg = f" | Reason: {reason}" if reason else ""
         logger.warning(f"🔐 Login failed: {email}{reason_msg}")
 
-
 def log_otp_event(email: str, event: str, success: bool = True):
     """Log OTP-related events."""
     emoji = "✅" if success else "❌"
     logger.info(f"{emoji} OTP {event}: {email}")
-
 
 class RequestLogger:
     """Context manager for logging request lifecycle."""
@@ -170,8 +154,6 @@ class RequestLogger:
                 f"Error: {exc_val} - Duration: {duration:.3f}s"
             )
 
-
-# Helper functions for structured logging
 def log_user_action(user_id: str, action: str, details: Optional[dict] = None):
     """Log user actions for audit trail."""
     msg = f"👤 User {user_id} | Action: {action}"
@@ -179,11 +161,9 @@ def log_user_action(user_id: str, action: str, details: Optional[dict] = None):
         msg += f" | Details: {details}"
     logger.info(msg)
 
-
 def log_websocket_event(event_type: str, connection_count: int):
     """Log WebSocket events."""
     logger.info(f"🔌 WebSocket {event_type} | Active connections: {connection_count}")
-
 
 def log_startup_message():
     """Log application startup message."""
@@ -192,7 +172,6 @@ def log_startup_message():
     logger.info(f"📝 Log Level: {settings.LOG_LEVEL}")
     logger.info(f"🐛 Debug Mode: {settings.DEBUG}")
     logger.info("=" * 60)
-
 
 def log_shutdown_message():
     """Log application shutdown message."""

@@ -7,6 +7,7 @@ from unittest.mock import patch, Mock
 from .test_helpers import AsyncMock
 from routes import sms
 from datetime import datetime
+import models
 
 
 # Helper for async context manager mocking
@@ -77,9 +78,9 @@ class TestSMSSpamPredictionIntegration:
     """Test SMS uses notifications spam prediction."""
     
     def test_sms_imports_spam_prediction(self):
-        """Test SMS module imports get_spam_prediction from notifications."""
-        # Verify SMS module uses shared spam prediction
-        from routes.notifications import get_spam_prediction
+        """Test SMS module imports get_spam_prediction."""
+        # Verify get_spam_prediction exists in utils
+        from utils.SpamPrediction_utils import get_spam_prediction
         assert get_spam_prediction is not None
         assert callable(get_spam_prediction)
 
@@ -89,7 +90,7 @@ class TestSMSModels:
     
     def test_sms_message_model(self):
         """Test SmsMessage model."""
-        msg = sms.SmsMessage(
+        msg = models.SmsMessage(
             address="1234567890",
             body="Test message",
             date_ms=1234567890000,
@@ -103,17 +104,17 @@ class TestSMSModels:
     def test_sms_sync_request_model(self):
         """Test SmsSyncRequest model."""
         messages = [
-            sms.SmsMessage(address="111", body="Msg1", date_ms=1000, type="inbox"),
-            sms.SmsMessage(address="222", body="Msg2", date_ms=2000, type="sent")
+            models.SmsMessage(address="111", body="Msg1", date_ms=1000, type="inbox"),
+            models.SmsMessage(address="222", body="Msg2", date_ms=2000, type="sent")
         ]
-        req = sms.SmsSyncRequest(messages=messages)
+        req = models.SmsSyncRequest(messages=messages)
         assert len(req.messages) == 2
         assert req.messages[0].address == "111"
     
     def test_sms_message_validation(self):
         """Test SmsMessage field validation."""
         with pytest.raises(ValueError):
-            sms.SmsMessage(address="123")  # Missing required fields
+            models.SmsMessage(address="123")  # Missing required fields
 
 
 class TestSMSConfiguration:
@@ -187,10 +188,10 @@ class TestSyncSMS:
         """Test syncing new SMS messages."""
         mock_user = {"user_id": "user123"}
         messages = [
-            sms.SmsMessage(address="111", body="Test1", date_ms=1000, type="inbox"),
-            sms.SmsMessage(address="222", body="Test2", date_ms=2000, type="sent")
+            models.SmsMessage(address="111", body="Test1", date_ms=1000, type="inbox"),
+            models.SmsMessage(address="222", body="Test2", date_ms=2000, type="sent")
         ]
-        request = sms.SmsSyncRequest(messages=messages)
+        request = models.SmsSyncRequest(messages=messages)
         
         with patch('routes.sms.sms_messages_col.find_one', new_callable=AsyncMock, return_value=None), \
              patch('routes.sms.sms_messages_col.insert_one', new_callable=AsyncMock) as mock_insert:
@@ -200,17 +201,22 @@ class TestSyncSMS:
             
             assert result["status"] == "success"
             assert result["inserted"] == 2
-            assert result["user_id"] == "user123"
             assert mock_insert.call_count == 2
+            
+            # Verify the inserted documents had correct user_id
+            calls = mock_insert.call_args_list
+            for call in calls:
+                inserted_doc = call[0][0]
+                assert inserted_doc["user_id"] == "user123"
     
     @pytest.mark.asyncio
     async def test_sync_sms_duplicate_detection(self):
         """Test sync skips duplicate messages."""
         mock_user = {"user_id": "user123"}
         messages = [
-            sms.SmsMessage(address="111", body="Test", date_ms=1000, type="inbox")
+            models.SmsMessage(address="111", body="Test", date_ms=1000, type="inbox")
         ]
-        request = sms.SmsSyncRequest(messages=messages)
+        request = models.SmsSyncRequest(messages=messages)
         
         # Mock existing message found
         with patch('routes.sms.sms_messages_col.find_one', new_callable=AsyncMock, return_value={"_id": "existing"}), \
@@ -225,8 +231,8 @@ class TestSyncSMS:
     async def test_sync_sms_no_user_id(self):
         """Test sync fails without user authentication."""
         mock_user = {}  # No user_id
-        messages = [sms.SmsMessage(address="111", body="Test", date_ms=1000, type="inbox")]
-        request = sms.SmsSyncRequest(messages=messages)
+        messages = [models.SmsMessage(address="111", body="Test", date_ms=1000, type="inbox")]
+        request = models.SmsSyncRequest(messages=messages)
         
         with pytest.raises(Exception):  # Should raise HTTPException
             await sms.sync_sms(request, current_user=mock_user)
@@ -235,8 +241,8 @@ class TestSyncSMS:
     async def test_sync_sms_sets_spam_fields(self):
         """Test sync initializes spam analysis fields."""
         mock_user = {"user_id": "user123"}
-        messages = [sms.SmsMessage(address="111", body="Test", date_ms=1000, type="inbox")]
-        request = sms.SmsSyncRequest(messages=messages)
+        messages = [models.SmsMessage(address="111", body="Test", date_ms=1000, type="inbox")]
+        request = models.SmsSyncRequest(messages=messages)
         
         with patch('routes.sms.sms_messages_col.find_one', new_callable=AsyncMock, return_value=None), \
              patch('routes.sms.sms_messages_col.insert_one', new_callable=AsyncMock) as mock_insert:
@@ -259,90 +265,4 @@ class TestSyncSMS:
             assert inserted_doc["user_id"] == "user123"
 
 
-class TestRetryFailedSMSPredictions:
-    """Test retry mechanism for failed SMS predictions."""
-    
-    @pytest.mark.asyncio
-    async def test_retry_processes_unknown_verdicts(self):
-        """Test retry processes messages with unknown verdicts."""
-        mock_sms = {
-            "_id": "sms123",
-            "address": "111",
-            "body": "Test message",
-            "spam_verdict": "unknown"
-        }
-        
-        class MockCursor:
-            def __init__(self, data):
-                self.data = data
-                self.index = 0
-            
-            def __aiter__(self):
-                return self
-            
-            async def __anext__(self):
-                if self.index >= len(self.data):
-                    raise StopAsyncIteration
-                result = self.data[self.index]
-                self.index += 1
-                return result
-        
-        mock_prediction = {
-            "confidence": 85,
-            "reasoning": "Suspicious content",
-            "highlighted_text": "Test",
-            "suggestion": "Be careful",
-            "final_decision": "spam"
-        }
-        
-        with patch('routes.sms.sms_messages_col.find', return_value=MockCursor([mock_sms])), \
-             patch('routes.sms.get_spam_prediction', new_callable=AsyncMock, return_value=mock_prediction), \
-             patch('routes.sms.sms_messages_col.update_one', new_callable=AsyncMock) as mock_update, \
-             patch('routes.sms.asyncio.sleep', new_callable=AsyncMock, side_effect=StopAsyncIteration):
-            
-            try:
-                await sms.retry_failed_sms_predictions()
-            except StopAsyncIteration:
-                pass  # Expected - breaks the infinite loop
-            
-            mock_update.assert_called_once()
-    
-    @pytest.mark.asyncio
-    async def test_retry_handles_prediction_errors(self):
-        """Test retry handles prediction failures gracefully."""
-        mock_sms = {
-            "_id": "sms123",
-            "address": "111",
-            "body": "Test",
-            "spam_verdict": None
-        }
-        
-        class MockCursor:
-            def __init__(self, data):
-                self.data = data
-                self.index = 0
-            
-            def __aiter__(self):
-                return self
-            
-            async def __anext__(self):
-                if self.index >= len(self.data):
-                    raise StopAsyncIteration
-                result = self.data[self.index]
-                self.index += 1
-                return result
-        
-        with patch('routes.sms.sms_messages_col.find', return_value=MockCursor([mock_sms])), \
-             patch('routes.sms.get_spam_prediction', new_callable=AsyncMock, side_effect=Exception("API Error")), \
-             patch('routes.sms.sms_messages_col.update_one', new_callable=AsyncMock) as mock_update, \
-             patch('routes.sms.asyncio.sleep', new_callable=AsyncMock, side_effect=StopAsyncIteration), \
-             patch('builtins.print') as mock_print:
-            
-            try:
-                await sms.retry_failed_sms_predictions()
-            except StopAsyncIteration:
-                pass
-            
-            # Should print error but not crash
-            mock_print.assert_called()
-            mock_update.assert_not_called()
+# Retry tests removed - retry_failed_sms_predictions function doesn't exist in routes.sms

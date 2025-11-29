@@ -3,17 +3,14 @@ from typing import Dict, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-
 from datetime import datetime, timedelta
 from routes.auth import get_current_user
 from database import messages_col, sms_messages_col
 from utils.dashboard_utils import grouped_data_fromDB,generate_Cyber_insights
 
-
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
 LABELS = ["Secure", "Suspicious", "Threat", "Critical"]
-
 
 @router.get("")
 @router.get("/")

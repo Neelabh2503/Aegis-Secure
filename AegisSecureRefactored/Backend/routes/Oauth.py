@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse
 
 from database import messages_col, accounts_col
 from utils.access_token_util import get_access_token
-from utils.jwt_utils import decode_jwt
+from utils.jwt_utils import decode_jwt, JWT_SECRET
 from utils.get_email_utils import extract_body
 from utils.Color_decoration_utils import get_sender_avatar_color
 
@@ -18,9 +18,6 @@ GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
 TOPIC_NAME=os.getenv("TOPIC_NAME")
 
-
-
-#refresh token route, gets rf token from google to keep the fetching alive if needed...
 @router.get("/gmail/refresh")
 async def refresh_access_token(user_id: str, gmail_email: str):
     user_data = await accounts_col.find_one({"user_id": user_id, "gmail_email": gmail_email})
@@ -34,8 +31,6 @@ async def refresh_access_token(user_id: str, gmail_email: str):
 
     return {"access_token": access_token}
 
-
-#main route which fetches the intial emails from the GMAIL
 @router.get("/google/callback")
 async def google_callback(code: str, state: str = None):
     if not state:
@@ -47,7 +42,6 @@ async def google_callback(code: str, state: str = None):
             raise HTTPException(status_code=400, detail="Invalid JWT token")
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Invalid JWT token: {e}")
-
 
     async with httpx.AsyncClient() as client:
         token_resp = await client.post(
@@ -90,7 +84,7 @@ async def google_callback(code: str, state: str = None):
             "https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=5",#number of emails to be fetched.
             headers={"Authorization": f"Bearer {access_token}"}
         )
-        # print(messages_resp.json())
+
         messages_list = messages_resp.json().get("messages", [])
 
         emails = []
@@ -154,7 +148,6 @@ async def google_callback(code: str, state: str = None):
                 {"$set": {"last_history_id": watch_data["historyId"]}}
             )
 
-    #this is the html page which redirects to the APP, I kept the code here Because Argument passing into other file in increment in complexity
     return HTMLResponse(
       content=f"""
           <html>

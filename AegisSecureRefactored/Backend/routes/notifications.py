@@ -2,15 +2,13 @@ import os, json, base64,httpx
 import asyncio,traceback
 from datetime import datetime, timezone
 
-
-
 from database import messages_col, accounts_col
 from fastapi import APIRouter, Request
 from dotenv import load_dotenv
 
 from utils.access_token_util import get_access_token
+from utils.access_token_util import get_access_token as get_access_token_from_refresh
 from utils.get_email_utils import extract_body
-
 
 load_dotenv()
 router = APIRouter()
@@ -22,9 +20,6 @@ GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
 CYBER_SECURE_URI=os.getenv("CYBER_SECURE_API_URI")
 
-
-
-#To fetch the incoming new messages from GMAIL...
 @router.post("/gmail/notifications")
 async def gmail_notifications(request: Request):
     try:
@@ -77,7 +72,6 @@ async def gmail_notifications(request: Request):
                     })
                     if exists:
                         continue
-
 
                     msg_resp = await client.get(
                         f"https://gmail.googleapis.com/gmail/v1/users/me/messages/{msg_id}?format=full",

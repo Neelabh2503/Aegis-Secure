@@ -65,7 +65,6 @@ async def lifespan(app: FastAPI):
 
     print("Shutting down Aegis Backend...")
 
-
 app = FastAPI(
     title=getattr(settings, "APP_NAME", "Aegis Backend"),
     version=getattr(settings, "APP_VERSION", "1.0.0"),

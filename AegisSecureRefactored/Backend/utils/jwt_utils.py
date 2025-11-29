@@ -1,24 +1,20 @@
 import os,jwt
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from fastapi import HTTPException
 
 load_dotenv()
 
-
 JWT_SECRET = os.getenv("JWT_SECRET", "supersecret")  
 JWT_ALGORITHM="HS256"
 RESET_JWT_TTL_MINUTES = int(os.getenv("RESET_JWT_TTL_MINUTES", "15"))
 
-
-
 def create_reset_jwt(email: str) -> str:
-    exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=RESET_JWT_TTL_MINUTES)
+    exp = datetime.utcnow() + timedelta(minutes=RESET_JWT_TTL_MINUTES)
     payload = {"sub": email, "purpose": "password_reset", "exp": exp}
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token
-
 
 def decode_reset_jwt(token: str) -> dict:
     try:
@@ -30,7 +26,6 @@ def decode_reset_jwt(token: str) -> dict:
         raise HTTPException(status_code=401, detail="Reset token expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid reset token")
-    
 
 def decode_jwt(token: str):
     try:

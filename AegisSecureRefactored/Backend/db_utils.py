@@ -12,7 +12,6 @@ from config import settings
 from errors import DatabaseError
 from logger import logger, log_database_operation
 
-
 class DatabaseManager:
     """Manages database connections and operations."""
     
@@ -32,8 +31,7 @@ class DatabaseManager:
                 connectTimeoutMS=5000,
                 socketTimeoutMS=5000
             )
-            
-            # Test connection
+
             await self.client.admin.command('ping')
             self.connected = True
             logger.info("✅ Database connected successfully")
@@ -59,10 +57,7 @@ class DatabaseManager:
         except Exception:
             return False
 
-
-# Global database manager instance
 db_manager = DatabaseManager()
-
 
 def with_retry(max_retries: int = 3, delay: float = 1.0):
     """
@@ -93,14 +88,13 @@ def with_retry(max_retries: int = 3, delay: float = 1.0):
                         logger.error(f"Database operation failed after {max_retries} attempts")
                 
                 except Exception as e:
-                    # Don't retry on non-connection errors
+
                     raise
             
             raise DatabaseError(f"Operation failed after {max_retries} retries: {last_exception}")
         
         return wrapper
     return decorator
-
 
 def log_operation(operation_type: str):
     """
@@ -130,7 +124,6 @@ def log_operation(operation_type: str):
         
         return wrapper
     return decorator
-
 
 class DatabaseHelper:
     """Helper methods for common database operations."""
@@ -340,6 +333,4 @@ class DatabaseHelper:
             logger.error(f"Database count_documents error: {str(e)}")
             raise DatabaseError(f"Failed to count documents: {str(e)}")
 
-
-# Export helper instance
 db_helper = DatabaseHelper()

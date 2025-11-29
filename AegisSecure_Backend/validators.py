@@ -10,7 +10,6 @@ from pydantic import BaseModel, EmailStr, validator, Field
 from config import settings, ValidationPatterns
 from errors import ValidationError
 
-
 class PasswordValidator:
     """Validator for password strength."""
     
@@ -39,8 +38,7 @@ class PasswordValidator:
         
         if settings.PASSWORD_REQUIRE_SPECIAL and not re.search(r'[@$!%*?&#^()_+=\-\[\]{}|\\:;"\'<>,.\/]', password):
             return False, "Password must contain at least one special character"
-        
-        # Check for common weak passwords
+
         weak_passwords = ['password', '12345678', 'qwerty', 'admin', 'letmein']
         if password.lower() in weak_passwords:
             return False, "Password is too common. Please choose a stronger password"
@@ -53,7 +51,6 @@ class PasswordValidator:
         is_valid, error_message = PasswordValidator.validate(password)
         if not is_valid:
             raise ValidationError(error_message)
-
 
 class EmailValidator:
     """Validator for email addresses."""
@@ -69,15 +66,13 @@ class EmailValidator:
         """Validate email or raise ValidationError."""
         if not EmailValidator.validate(email):
             raise ValidationError("Invalid email format")
-        
-        # Additional checks
+
         if len(email) > 254:
             raise ValidationError("Email address is too long")
         
         local, domain = email.rsplit('@', 1)
         if len(local) > 64:
             raise ValidationError("Email local part is too long")
-
 
 class TextSanitizer:
     """Sanitizer for text input to prevent XSS and injection attacks."""
@@ -96,18 +91,14 @@ class TextSanitizer:
         """
         if not text:
             return ""
-        
-        # Trim whitespace
+
         text = text.strip()
-        
-        # Enforce max length
+
         if max_length and len(text) > max_length:
             text = text[:max_length]
-        
-        # HTML escape to prevent XSS
+
         text = html.escape(text)
-        
-        # Remove control characters except newlines and tabs
+
         text = ''.join(
             char for char in text
             if unicodedata.category(char)[0] != 'C' or char in '\n\t'
@@ -118,18 +109,18 @@ class TextSanitizer:
     @staticmethod
     def sanitize_html(text: str) -> str:
         """Remove all HTML tags from text."""
-        # Remove HTML tags
+
         clean = re.sub(r'<[^>]*>', '', text)
-        # Remove JavaScript
+
         clean = re.sub(r'javascript:', '', clean, flags=re.IGNORECASE)
-        # Remove event handlers
+
         clean = re.sub(r'on\w+\s*=', '', clean, flags=re.IGNORECASE)
         return clean
     
     @staticmethod
     def sanitize_sql(text: str) -> str:
         """Remove SQL injection patterns."""
-        # Remove SQL keywords
+
         dangerous_patterns = [
             r'\bSELECT\b', r'\bDROP\b', r'\bDELETE\b',
             r'\bINSERT\b', r'\bUPDATE\b', r'\bUNION\b',
@@ -141,7 +132,6 @@ class TextSanitizer:
             clean = re.sub(pattern, '', clean, flags=re.IGNORECASE)
         
         return clean
-
 
 class URLValidator:
     """Validator for URLs."""
@@ -157,11 +147,9 @@ class URLValidator:
         """Validate URL or raise ValidationError."""
         if not URLValidator.validate(url):
             raise ValidationError("Invalid URL format")
-        
-        # Check for dangerous protocols
+
         if url.lower().startswith(('javascript:', 'data:', 'file:')):
             raise ValidationError("Unsafe URL protocol")
-
 
 class OTPValidator:
     """Validator for OTP codes."""
@@ -171,12 +159,10 @@ class OTPValidator:
         """Check if OTP format is valid."""
         if not otp:
             return False
-        
-        # Must be digits only
+
         if not otp.isdigit():
             return False
-        
-        # Must match configured length
+
         if len(otp) != settings.OTP_LENGTH:
             return False
         
@@ -189,7 +175,6 @@ class OTPValidator:
             raise ValidationError(
                 f"Invalid OTP format. Must be {settings.OTP_LENGTH} digits"
             )
-
 
 class PhoneValidator:
     """Validator for phone numbers."""
@@ -204,9 +189,6 @@ class PhoneValidator:
     def sanitize(phone: str) -> str:
         """Remove non-digit characters from phone number."""
         return re.sub(r'\D', '', phone)
-
-
-# Pydantic models with built-in validation
 
 class RegisterRequestValidator(BaseModel):
     """Validated model for user registration."""
@@ -230,12 +212,10 @@ class RegisterRequestValidator(BaseModel):
             raise ValueError(error_message)
         return v
 
-
 class LoginRequestValidator(BaseModel):
     """Validated model for user login."""
     email: EmailStr
     password: str = Field(..., min_length=1)
-
 
 class OTPRequestValidator(BaseModel):
     """Validated model for OTP operations."""
@@ -248,7 +228,6 @@ class OTPRequestValidator(BaseModel):
         if not v.isdigit():
             raise ValueError("OTP must contain only digits")
         return v
-
 
 class PasswordResetValidator(BaseModel):
     """Validated model for password reset."""
@@ -271,7 +250,6 @@ class PasswordResetValidator(BaseModel):
             raise ValueError("Passwords do not match")
         return v
 
-
 class MessageTextValidator(BaseModel):
     """Validated model for message text analysis."""
     text: str = Field(..., min_length=1, max_length=10000)
@@ -280,7 +258,6 @@ class MessageTextValidator(BaseModel):
     def validate_text(cls, v):
         """Sanitize text input."""
         return TextSanitizer.sanitize(v, max_length=10000)
-
 
 def validate_pagination_params(page: int = 1, page_size: int = 50) -> Tuple[int, int]:
     """
@@ -293,12 +270,11 @@ def validate_pagination_params(page: int = 1, page_size: int = 50) -> Tuple[int,
     Returns:
         Tuple of (validated_page, validated_page_size)
     """
-    # Ensure positive values
+
     page = max(1, page)
     page_size = max(1, min(page_size, settings.MAX_PAGE_SIZE))
     
     return page, page_size
-
 
 def calculate_skip(page: int, page_size: int) -> int:
     """

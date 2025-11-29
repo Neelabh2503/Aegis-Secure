@@ -13,7 +13,6 @@ from utils.password_utils import hash_password,verify_password
 from utils.otp_utils import generate_otp,store_otp,send_otp,verify_otp_in_db
 from utils.jwt_utils import decode_jwt,create_reset_jwt
 
-#Load The env variables and defien router
 load_dotenv()
 router = APIRouter()
 security = HTTPBearer()
@@ -21,8 +20,6 @@ RESET_JWT_TTL_MINUTES = int(os.getenv("RESET_JWT_TTL_MINUTES", "15"))
 JWT_SECRET = os.getenv("JWT_SECRET", "supersecret")  
 JWT_ALGORITHM="HS256"
 
-
-#Routes with prefix auth
 @router.post("/register")
 async def register_user(req: models.RegisterRequest):
     existing = await users_col.find_one({"email": req.email})
@@ -41,9 +38,12 @@ async def register_user(req: models.RegisterRequest):
     await users_col.insert_one(user_doc)
     otp_code =generate_otp()
     await store_otp(req.email, otp_code)
-    await send_otp(req.email, otp_code)
-
-
+    email_sent = await send_otp(req.email, otp_code)
+    
+    if email_sent:
+        return {"message": "OTP sent to email"}
+    else:
+        return {"message": f"Dev mode: Your OTP is {otp_code}"}
 
 @router.post("/login", response_model=models.LoginResponse)
 async def login_user(req: models.LoginRequest):
@@ -63,9 +63,6 @@ async def login_user(req: models.LoginRequest):
     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
     return {"token": token,"verified": user.get("verified", False)}
 
-
-#Routes for OTP send aaand verification during Registeration as well as password change
-#Prefix is auth
 @router.post("/send-otp")
 async def send_otp_router(req: models.SendOTPRequest):
     user = await users_col.find_one({"email": req.email})
@@ -74,8 +71,12 @@ async def send_otp_router(req: models.SendOTPRequest):
     
     otp_code = generate_otp()
     await store_otp(req.email, otp_code)
-    await send_otp(req.email, otp_code)
-
+    email_sent = await send_otp(req.email, otp_code)
+    
+    if email_sent:
+        return {"message": "OTP sent to your email"}
+    else:
+        return {"message": f"Dev mode: Your OTP is {otp_code}"}
 
 @router.post("/verify-otp")
 async def verify_otp(req: models.VerifyOTPRequest):
@@ -92,8 +93,6 @@ async def verify_otp(req: models.VerifyOTPRequest):
         print(f"Exception during OTP verify: {e}")
         raise
 
-
-#Routes with prefix auth and these routes are for fetching user Information
 @router.get("/me")
 async def get_user_info(credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = credentials.credentials
@@ -126,9 +125,6 @@ async def upload_avatar(credentials: HTTPAuthorizationCredentials = Depends(secu
     )
     return JSONResponse({"avatar_base64": avatar_base64})
 
-
-
-
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = credentials.credentials
     try:
@@ -147,11 +143,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=403, detail="JWT Token has expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=403, detail="Invalid JWT token")
-    
 
-
-
-#Routes with auth prefix 
 @router.post("/forgot-password")
 async def forgot_password(req: models.SendOTPRequest):
     email = req.email.lower()
@@ -160,6 +152,8 @@ async def forgot_password(req: models.SendOTPRequest):
         otp_code =generate_otp()
         await store_otp(email, otp_code)
         await send_otp(email, otp_code)
+
+    return {"message": "If email is registered, you will receive an OTP"}
 
 @router.post("/verify-reset-otp")
 async def verify_reset_otp(req: models.VerifyOTPRequest):
@@ -170,7 +164,6 @@ async def verify_reset_otp(req: models.VerifyOTPRequest):
 
     reset_token = create_reset_jwt(email)
     return {"reset_token": reset_token, "expires_in_minutes": RESET_JWT_TTL_MINUTES}
-
 
 @router.post("/reset-password")
 async def reset_password(data: dict):

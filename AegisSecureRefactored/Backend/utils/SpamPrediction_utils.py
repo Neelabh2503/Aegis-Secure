@@ -10,8 +10,6 @@ load_dotenv()
 
 CYBER_SECURE_URI=os.getenv("CYBER_SECURE_API_URI")
 
-
-
 def format_score(value):
     try:
         num = float(value)
@@ -54,7 +52,6 @@ async def get_spam_prediction(req:models.Spam_request):
             "final_decision": "unknown"
         }
 
-
 async def retry_email_SpamPrediction():
     while True:
 
@@ -84,10 +81,9 @@ async def retry_email_SpamPrediction():
                 subject=msg["subject"],
                 text=msg["body"]
             )
-            # print("Predicting")
+
             prediction = await get_spam_prediction(req)
-            # print("got")
-            # print(prediction)
+
             await messages_col.update_one(
                 {"_id": msg["_id"]},
                 {
@@ -107,7 +103,6 @@ async def retry_email_SpamPrediction():
                 {"_id": msg["_id"]},
                 {"$set": {"processing": False}}  
             )
-
 
 async def retry_sms_SpamPrediction():
     while True:
@@ -136,9 +131,6 @@ async def retry_sms_SpamPrediction():
             except Exception as e:
                 print(f"Failed retry for SMS {sms.get('_id')}: {e}")
 
-
-
-#this function is to remove invalid messages which are presen in the DB.
 async def clean_invalid_messages():
     while True:
         try:
@@ -152,4 +144,4 @@ async def clean_invalid_messages():
             })
         except Exception as e:
             print("Error in clean_invalid_messages:", e)
-        await asyncio.sleep(15) 
+        await asyncio.sleep(15)
