@@ -1,0 +1,9 @@
+appId: com.example.gmailclone
+---
+#- launchApp:
+ #   clearState: true
+#After logging in 
+
+- tapOn: P
+- tapOn: Sign Out
+

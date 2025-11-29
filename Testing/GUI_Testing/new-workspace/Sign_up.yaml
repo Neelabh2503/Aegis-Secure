@@ -1,0 +1,44 @@
+appId: com.example.gmailclone
+
+---
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd:
+    timeout: 20000
+
+- scroll
+
+- tapOn: "Don’t have an account? SIGN UP"
+
+- tapOn: "Full Name"
+
+- inputText: "Pransu Vadsmiya"
+
+- tapOn: "Email"
+- inputRandomEmail
+
+- tapOn: "Password"
+- inputText: "Vagabond123#"
+
+- tapOn: "Confirm Password"
+- inputText: "Vagabond123#"
+#- hideKeyboard
+- doubleTapOn:
+    point: 7%,15%
+    
+
+
+- tapOn: "SIGN UP"
+
+
+- assertVisible: "Verification code"
+
+#i-button
+- tapOn:
+    point: 70%,52%
+
+- waitForAnimationToEnd:
+    timeout: 20000
+    
+- tapOn: Already have an account? SIGN IN
+

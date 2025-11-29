@@ -1,0 +1,40 @@
+appId: com.example.gmailclone
+---
+
+#-  launchApp:
+ #   clearState: true
+- tapOn: "Manual text input"
+
+# Wait for input field to appear
+- tapOn: "Enter text to analyze..."
+- waitForAnimationToEnd
+
+- tapOn: "Enter text to analyze..."
+
+# Type random text (25 characters)
+- inputRandomText:
+    length: 25
+
+- tapOn: "Analyze"
+# Small wait so UI can update
+- waitForAnimationToEnd:
+    timeout: 10000
+
+
+# Clear the text field for next test
+- eraseText
+
+
+- inputText: "Hi, would you like to get 10000 dollars for free?"
+
+# Click Analyze
+- tapOn: "Analyze"
+
+# Wait for analysis screen/dialog
+- waitForAnimationToEnd:
+    timeout: 60000
+
+
+
+# Verify Cancel button works
+- tapOn: "Cancel"
