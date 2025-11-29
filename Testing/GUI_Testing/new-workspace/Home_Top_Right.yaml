@@ -1,0 +1,45 @@
+appId: com.example.gmailclone
+---
+#- launchApp:
+ #   clearState: true
+# Testing the P logo on the top-right corner
+- tapOn: P
+- tapOn: Back
+- tapOn: P
+# For the settings logo which comes after clicking P 
+- tapOn:
+    point: 88%,6%
+- tapOn: Automatically fetch SMS messages
+- waitForAnimationToEnd:
+    timeout: 20000
+- tapOn: Back
+
+#Change_Password
+
+- tapOn: Change Password
+- tapOn: Email
+- inputText : "pvadsmiya@gmail.com"
+- tapOn: Send OTP
+- waitForAnimationToEnd:
+    timeout: 20000
+- tapOn: Verify OTP
+
+
+
+# For the photo upload option(small icon)
+- tapOn:
+    point: 56%,25%
+
+#Take photo option -- button
+- tapOn: Take Photo
+
+# Buttons to select whether to upload or not
+- tapOn: Cancel
+- tapOn: Upload
+#Selection the photo from gallery button
+- tapOn:
+    point: 56%,25%
+- tapOn: Choose from Gallery
+
+
+

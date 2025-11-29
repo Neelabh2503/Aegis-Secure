@@ -1,0 +1,35 @@
+appId: com.example.gmailclone
+---
+#- launchApp:
+ #   clearState: true
+- scrollUntilVisible:
+    element:
+      text: |-
+        C
+        Codeforces@codeforces.com
+        Codeforces Round 1067 (Div. 2)
+        Hello, Pransu2005. Welcome to the regular Codeforces round. I&#39;m glad to invite you to take part in Codeforces Round 1067 (Div. 2). It starts on Saturday, November, 29, 2025 14:35 (UTC). The contest
+        5.00
+        Nov 29
+# Back button when we open a mail 
+- tapOn : Back
+
+- waitForAnimationToEnd:
+    timeout: 10000
+    
+# Search button of email screen 
+- tapOn:
+    point: 76%,6%
+
+
+#input text for searching
+- inputText : "r"
+# Back button after searching for a mail
+- tapOn:
+    point: 1%,6%
+
+
+
+
+
+

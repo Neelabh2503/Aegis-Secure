@@ -1,0 +1,27 @@
+appId: com.example.gmailclone
+---
+
+# - launchApp:
+#    clearState: true
+
+#Tripple bar button
+- tapOn:
+    point: 1%,6%
+
+- tapOn: Home
+- tapOn:
+    point: 1%,6%
+
+- tapOn: Account
+- tapOn: Back
+- tapOn:
+    point: 61%,8%
+
+- tapOn: Settings
+
+- tapOn: Automatically fetch SMS messages
+- tapOn: Back
+
+# To close the sidebar
+- tapOn:
+    point: 61%,8%

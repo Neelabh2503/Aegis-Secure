@@ -1,0 +1,33 @@
+appId: com.example.gmailclone
+---
+#- launchApp:
+ #   clearState: true
+- doubleTapOn:
+    point: 76%,94%
+ # Top-right-corner account button
+- tapOn: P
+- tapOn: Back
+- tapOn: P
+# A redundant cross button
+
+- tapOn: Add another account
+
+# Managing accounts widget
+- tapOn: Manage your Accounts
+
+# Selecting a particular account
+- tapOn: |-
+    P
+    pvadsmiya@gmail.com
+    pvadsmiya@gmail.com
+
+# Deleting an account (Bin widget)
+- doubleTapOn:
+    point: 76%,45%
+
+
+
+
+
+
+

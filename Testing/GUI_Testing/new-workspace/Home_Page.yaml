@@ -1,0 +1,18 @@
+appId: com.example.gmailclone
+---
+#- launchApp:
+ #   clearState: true
+
+- longPressOn:
+    point: 47%,94%
+
+- tapOn: Mail
+- waitForAnimationToEnd:
+    timeout: 5000
+- tapOn: SMS
+- waitForAnimationToEnd:
+    timeout: 5000
+- doubleTapOn: Both
+#- tapOn: Both- 
+
+
